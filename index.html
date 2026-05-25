@@ -8,8 +8,7 @@
 
 <meta
 name="description"
-content="東京・神奈川のピックルボール施設をまとめています。予約ページへすぐアクセスできます。
-Find pickleball courts in Tokyo and Kanagawa. Compare indoor and outdoor courts, see availability, and book directly."
+content="東京・神奈川のピックルボール施設まとめ"
 />
 
 <script async
@@ -17,146 +16,172 @@ src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pu
 crossorigin="anonymous"></script>
 
 <style>
-*{box-sizing:border-box;}
+*{box-sizing:border-box}
 
 body{
 margin:0;
 font-family:Arial,sans-serif;
-background:
-linear-gradient(180deg,#e6fbff 0%,#ffffff 45%,#fffdf7 100%);
+background:linear-gradient(180deg,#f0fcff 0%,#ffffff 100%);
 color:#12343b;
 }
 
 .container{
 max-width:1180px;
 margin:auto;
-padding:24px;
+padding:20px;
 }
+
+/* HERO */
 
 .hero{
+position:relative;
+height:72vh;
+min-height:520px;
+display:flex;
+align-items:center;
+justify-content:center;
 text-align:center;
-padding:54px 20px 36px;
-}
-
-.hero h1{
-margin:0;
-font-size:2.4rem;
-line-height:1.3;
-color:#0f766e;
-}
-
-.hero p{
-margin-top:16px;
-color:#4b6b72;
-line-height:1.8;
-}
-
-.hero-video{
-width:100%;
-max-width:900px;
-border-radius:28px;
 overflow:hidden;
-margin:28px auto 0;
-box-shadow:0 20px 50px rgba(0,0,0,.12);
+border-radius:30px;
+margin-bottom:40px;
 }
 
-.hero-video video{
+.hero video{
+position:absolute;
+top:0;
+left:0;
 width:100%;
-display:block;
+height:100%;
+object-fit:cover;
+z-index:0;
 }
+
+.hero::after{
+content:"";
+position:absolute;
+inset:0;
+background:linear-gradient(
+180deg,
+rgba(0,0,0,.25),
+rgba(0,0,0,.42)
+);
+z-index:1;
+}
+
+.hero-content{
+position:relative;
+z-index:2;
+color:white;
+padding:20px;
+}
+
+.hero-content h1{
+font-size:3rem;
+margin:0;
+line-height:1.2;
+}
+
+.hero-content p{
+margin-top:16px;
+line-height:1.8;
+font-size:1.05rem;
+}
+
+/* cards */
 
 .cards{
 display:grid;
 grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
 gap:26px;
-margin-top:34px;
 }
 
 .card{
-background:rgba(255,255,255,.92);
-border-radius:26px;
-padding:22px;
+background:#fff;
+border-radius:24px;
+padding:20px;
 box-shadow:
-0 16px 40px rgba(15,118,110,.10),
-0 2px 8px rgba(0,0,0,.05);
+0 10px 30px rgba(0,0,0,.08);
 transition:.25s;
 }
 
 .card:hover{
-transform:translateY(-8px);
+transform:translateY(-6px);
 }
 
 .facility-image{
 width:100%;
 height:190px;
 object-fit:cover;
-border-radius:20px;
-margin-bottom:16px;
+border-radius:18px;
 }
 
 .card h2{
-margin:0;
-font-size:1.2rem;
-color:#164e63;
+margin:14px 0 0;
+font-size:1.15rem;
 }
 
-.tag-row{
+.tags{
 display:flex;
 gap:8px;
 flex-wrap:wrap;
 margin-top:12px;
 }
 
-.location{
-display:inline-block;
+/* TOKYO / KANAGAWA */
+
+.tokyo{
+background:linear-gradient(135deg,#dbeafe,#bfdbfe);
+color:#1d4ed8;
 padding:6px 12px;
 border-radius:999px;
 font-size:.78rem;
 font-weight:700;
-}
-
-.tokyo{
-background:#dbeafe;
-color:#2563eb;
 }
 
 .kanagawa{
-background:#ffedd5;
-color:#ea580c;
+background:linear-gradient(135deg,#ffedd5,#fed7aa);
+color:#c2410c;
+padding:6px 12px;
+border-radius:10px;
+font-size:.78rem;
+font-weight:700;
 }
 
-.type{
-display:inline-block;
+/* indoor outdoor */
+
+.indoor{
+background:#faf5ff;
+border:1px solid #d8b4fe;
+color:#7c3aed;
 padding:6px 12px;
 border-radius:999px;
 font-size:.78rem;
 font-weight:700;
 }
 
-.indoor{
-background:#f3e8ff;
-color:#7c3aed;
-}
-
 .outdoor{
-background:#dcfce7;
+background:#ecfdf5;
+border:1px solid #86efac;
 color:#15803d;
+padding:6px 12px;
+border-radius:10px;
+font-size:.78rem;
+font-weight:700;
 }
 
 .description{
 margin-top:14px;
 line-height:1.8;
-font-size:.95rem;
+font-size:.94rem;
 color:#4f676d;
 }
 
 .button{
 display:block;
 margin-top:18px;
-width:100%;
-text-align:center;
-background:linear-gradient(135deg,#2dd4bf,#14b8a6);
+background:linear-gradient(135deg,#14b8a6,#2dd4bf);
 color:white;
+text-align:center;
 text-decoration:none;
 padding:14px;
 border-radius:16px;
@@ -165,22 +190,22 @@ font-weight:700;
 
 .map-button{
 display:block;
-text-align:center;
 margin-top:10px;
-padding:12px;
-border-radius:16px;
+background:white;
+border:1px solid #d7f7f0;
 text-decoration:none;
-background:#fff;
+padding:12px;
+text-align:center;
+border-radius:16px;
 color:#164e63;
 font-weight:600;
-border:1px solid #d9f8f3;
 }
 
 .footer{
 text-align:center;
-margin-top:48px;
-color:#5f7b83;
+margin:48px 0 20px;
 font-size:14px;
+color:#5f7b83;
 }
 </style>
 </head>
@@ -190,144 +215,126 @@ font-size:14px;
 <div class="container">
 
 <section class="hero">
+
+<video autoplay muted loop playsinline>
+<source
+src="https://cdn.coverr.co/videos/coverr-people-playing-tennis-1567784071813?download=1080p"
+type="video/mp4">
+</video>
+
+<div class="hero-content">
 <h1>🏓 Pickleball Guide<br>Tokyo / Kanagawa</h1>
 
 <p>
-東京・神奈川でプレーできるピックルボール施設をまとめました。<br>
-お気に入りのコートを見つけて、そのまま予約できます。
+東京・神奈川のピックルボールコートをまとめました。<br>
+行きたい場所を見つけて、そのまま予約できます。
 </p>
-
-<div class="hero-video">
-<video autoplay muted loop playsinline>
-<source
-src="./pickleball-hero.mp4"
-type="video/mp4" />
-</video>
 </div>
+
 </section>
 
 <section class="cards">
 
 <div class="card">
-<img class="facility-image" src="./Pacific.png" />
+<img class="facility-image" src="./Pacific.png">
 
 <h2>Pacific PICKLE CLUB</h2>
 
-<div class="tag-row">
-<span class="location tokyo">@有明 Tokyo</span>
-<span class="type outdoor">Outdoor</span>
+<div class="tags">
+<span class="tokyo">@有明 Tokyo</span>
+<span class="outdoor">Outdoor</span>
 </div>
 
 <div class="description">
-東京湾を感じながらプレーできる、開放感たっぷりの人気スポット。<br>
-空が広くて気持ちよく、初めてでも自然と打ちたくなる雰囲気。<br>
-週末に仲間と集まって楽しむのにぴったりです。
+東京湾の空と風を感じながらプレーできる人気コート。  
+開放感が気持ちよく、週末に行きたくなる場所です。
 </div>
 
 <a class="button"
 href="https://pacificpickleclub.resv.jp/"
-target="_blank">
-予約する →
-</a>
+target="_blank">予約する →</a>
 
 <a class="map-button"
 href="https://maps.google.com/?q=Pacific+Pickle+Club+Tokyo"
-target="_blank">
-Google Map
-</a>
+target="_blank">Google Map</a>
 </div>
 
 <div class="card">
-<img class="facility-image" src="./Ginza.png" />
+<img class="facility-image" src="./Ginza.png">
 
 <h2>ピックルボールワン銀座新橋</h2>
 
-<div class="tag-row">
-<span class="location tokyo">@新橋 Tokyo</span>
-<span class="type indoor">Indoor</span>
+<div class="tags">
+<span class="tokyo">@新橋 Tokyo</span>
+<span class="indoor">Indoor</span>
 </div>
 
 <div class="description">
-新橋駅からアクセスしやすく、仕事帰りにも立ち寄りやすい都心のインドアコート。<br>
-天候に左右されず快適にプレーできるので平日の練習にもおすすめ。<br>
-初めての一回にも行きやすい場所です。
+駅近で行きやすい都心のインドア。  
+天候を気にせずしっかり打てる安心感があります。
 </div>
 
 <a class="button"
 href="https://reserva.be/pboneginza"
-target="_blank">
-予約する →
-</a>
+target="_blank">予約する →</a>
 
 <a class="map-button"
 href="https://maps.google.com/?q=Pickleball+One+Ginza+Shimbashi"
-target="_blank">
-Google Map
-</a>
+target="_blank">Google Map</a>
 </div>
 
 <div class="card">
-<img class="facility-image" src="./Seibu.png" />
+<img class="facility-image" src="./Seibu.png">
 
 <h2>SEIBU FAST SPORTS FIELD 品川</h2>
 
-<div class="tag-row">
-<span class="location tokyo">@品川 Tokyo</span>
-<span class="type indoor">Indoor</span>
+<div class="tags">
+<span class="tokyo">@品川 Tokyo</span>
+<span class="indoor">Indoor</span>
 </div>
 
 <div class="description">
-品川エリアで気軽にプレーできる、広くて使いやすいインドア施設。<br>
-アクセスが良く、しっかり打ちたい日にも集まりやすいロケーション。<br>
-練習にもゲームにも使いやすい人気のコートです。
+アクセス抜群。  
+仕事帰りにも寄りやすく、練習にもゲームにも使いやすいです。
 </div>
 
 <a class="button"
 href="https://www.tablecheck.com/ja/seibu-fast-sports/reserve/message"
-target="_blank">
-予約する →
-</a>
+target="_blank">予約する →</a>
 
 <a class="map-button"
 href="https://maps.google.com/?q=Seibu+Fast+Sports+Field+Shinagawa"
-target="_blank">
-Google Map
-</a>
+target="_blank">Google Map</a>
 </div>
 
 <div class="card">
-<img class="facility-image" src="./KPI.png" />
+<img class="facility-image" src="./KPI.png">
 
 <h2>KPI PARK</h2>
 
-<div class="tag-row">
-<span class="location kanagawa">@横浜 Kanagawa</span>
-<span class="type outdoor">Outdoor</span>
+<div class="tags">
+<span class="kanagawa">@横浜 Kanagawa</span>
+<span class="outdoor">Outdoor</span>
 </div>
 
 <div class="description">
-横浜の開放的な空気の中でプレーできる、気持ちのいいアウトドアコート。<br>
-ほどよくリラックスした雰囲気で初めてでも入りやすいのが魅力。<br>
-休日に体を動かしたい日にぴったりです。
+横浜の空気の中でのびのびプレー。  
+リラックスしながら楽しめる開放的なコートです。
 </div>
 
 <a class="button"
 href="https://yoyaku.labola.jp/r/shop/3302/calendar_week/2026/5/25/"
-target="_blank">
-予約する →
-</a>
+target="_blank">予約する →</a>
 
 <a class="map-button"
 href="https://maps.google.com/?q=KPI+Park+Yokohama"
-target="_blank">
-Google Map
-</a>
+target="_blank">Google Map</a>
 </div>
 
 </section>
 
 <div class="footer">
-🌺 Updated regularly for pickleball players
+🌿 updated regularly for pickleball players
 </div>
 
 </div>
