@@ -3,112 +3,226 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tokyo / Kanagawa Pickleball Booking Guide</title>
-  <meta name="description"
-    content="東京・神奈川のピックルボール施設をまとめています。予約ページへすぐアクセスできます。">
 
-  <!-- Adsense-->
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8543610632358101"
-     crossorigin="anonymous"></script>
-  
+  <title>東京・神奈川 Pickleball予約まとめ</title>
+
+  <meta
+    name="description"
+    content="東京・神奈川のピックルボール施設をまとめています。予約ページへすぐアクセスできます。"
+  />
+
+  <!-- Adsense -->
+  <script async
+    src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8543610632358101"
+    crossorigin="anonymous"></script>
+
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: Arial, sans-serif;
-      background: #fafafa;
       margin: 0;
-      padding: 20px;
+      font-family: Arial, sans-serif;
+      background: #f5f7fb;
+      color: #1f2937;
     }
-    h1 {
-      text-align: center;
+
+    .container {
+      max-width: 1000px;
+      margin: auto;
+      padding: 24px;
     }
+
+    .hero {
+      background: linear-gradient(135deg, #0f766e, #14b8a6);
+      color: white;
+      border-radius: 20px;
+      padding: 40px 28px;
+      margin-bottom: 28px;
+      box-shadow: 0 10px 24px rgba(0,0,0,.08);
+    }
+
+    .hero h1 {
+      margin: 0 0 12px;
+      font-size: 2rem;
+    }
+
+    .hero p {
+      margin: 0;
+      line-height: 1.7;
+      font-size: 1rem;
+      opacity: .95;
+    }
+
+    .table-wrap {
+      background: white;
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 10px 24px rgba(0,0,0,.06);
+    }
+
     table {
       width: 100%;
       border-collapse: collapse;
-      background: white;
     }
+
+    th {
+      background: #f8fafc;
+      font-size: 14px;
+      color: #475569;
+    }
+
     th, td {
-      padding: 12px;
-      border-bottom: 1px solid #ddd;
+      padding: 16px;
+      border-bottom: 1px solid #e5e7eb;
       text-align: left;
     }
-    th {
-      background: #f3f3f3;
+
+    tr:last-child td {
+      border-bottom: none;
     }
-    a.button {
+
+    .button {
       background: #0f766e;
       color: white;
       text-decoration: none;
-      padding: 8px 14px;
-      border-radius: 8px;
+      padding: 10px 16px;
+      border-radius: 10px;
       display: inline-block;
+      font-weight: 600;
+      transition: .2s;
     }
+
+    .button:hover {
+      background: #115e59;
+      transform: translateY(-1px);
+    }
+
+    .footer {
+      text-align: center;
+      font-size: 14px;
+      color: #64748b;
+      margin-top: 28px;
+    }
+
     @media (max-width: 700px) {
-      table, thead, tbody, th, td, tr {
+      table,
+      thead,
+      tbody,
+      th,
+      td,
+      tr {
         display: block;
       }
-      th {
+
+      thead {
         display: none;
       }
-      td {
-        padding: 10px;
+
+      .table-wrap {
+        background: transparent;
+        box-shadow: none;
       }
+
       tr {
-        margin-bottom: 16px;
         background: white;
-        border-radius: 10px;
-        padding: 10px;
+        border-radius: 16px;
+        padding: 16px;
+        margin-bottom: 16px;
+        box-shadow: 0 8px 18px rgba(0,0,0,.06);
+      }
+
+      td {
+        border: none;
+        padding: 8px 0;
+      }
+
+      .button {
+        margin-top: 10px;
+      }
+
+      .hero h1 {
+        font-size: 1.6rem;
       }
     }
   </style>
 </head>
+
 <body>
+  <div class="container">
 
-<h1>Tokyo / Kanagawa Pickleball Booking Guide</h1>
+    <section class="hero">
+      <h1>🏓 東京・神奈川 Pickleball予約まとめ</h1>
+      <p>
+        東京・神奈川のピックルボール施設をまとめています。<br>
+        各施設の予約ページへすぐアクセスできます。
+      </p>
+    </section>
 
-<p>
-東京・神奈川のピックルボール施設をまとめています。
-予約ページへすぐアクセスできます。
-</p>
-<table>
-  <thead>
-    <tr>
-      <th>施設名</th>
-      <th>エリア</th>
-      <th>確認方法</th>
-      <th>予約</th>
-    </tr>
-  </thead>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>施設名</th>
+            <th>エリア</th>
+            <th>確認方法</th>
+            <th>予約</th>
+          </tr>
+        </thead>
 
-  <tbody>
-    <tr>
-      <td>Pacific PICKLE CLUB</td>
-      <td>有明（東京）</td>
-      <td>利用時間 / 予約面数を選択</td>
-      <td><a class="button" href="https://pacificpickleclub.resv.jp/" target="_blank">予約</a></td>
-    </tr>
+        <tbody>
+          <tr>
+            <td>Pacific PICKLE CLUB</td>
+            <td>有明（東京）</td>
+            <td>利用時間 / 予約面数を選択</td>
+            <td>
+              <a class="button"
+                href="https://pacificpickleclub.resv.jp/"
+                target="_blank">予約する →</a>
+            </td>
+          </tr>
 
-    <tr>
-      <td>ピックルボールワン銀座新橋</td>
-      <td>新橋（東京）</td>
-      <td>表で確認可能</td>
-      <td><a class="button" href="https://reserva.be/pboneginza/reserve?mode=service_staff&search_evt_no=aaeJwzNDQwsbQEAAQoATk" target="_blank">予約</a></td>
-    </tr>
+          <tr>
+            <td>ピックルボールワン銀座新橋</td>
+            <td>新橋（東京）</td>
+            <td>表で確認可能</td>
+            <td>
+              <a class="button"
+                href="https://reserva.be/pboneginza/reserve?mode=service_staff&search_evt_no=aaeJwzNDQwsbQEAAQoATk"
+                target="_blank">予約する →</a>
+            </td>
+          </tr>
 
-    <tr>
-      <td>SEIBU FAST SPORTS FIELD 品川</td>
-      <td>品川（東京）</td>
-      <td>人数 → 日付 → 時間</td>
-      <td><a class="button" href="https://www.tablecheck.com/ja/seibu-fast-sports/reserve/message" target="_blank">予約</a></td>
-    </tr>
+          <tr>
+            <td>SEIBU FAST SPORTS FIELD 品川</td>
+            <td>品川（東京）</td>
+            <td>人数 → 日付 → 時間</td>
+            <td>
+              <a class="button"
+                href="https://www.tablecheck.com/ja/seibu-fast-sports/reserve/message"
+                target="_blank">予約する →</a>
+            </td>
+          </tr>
 
-    <tr>
-      <td>KPI PARK</td>
-      <td>横浜（神奈川）</td>
-      <td>表で確認可能</td>
-      <td><a class="button" href="https://yoyaku.labola.jp/r/shop/3302/calendar_week/2026/5/25/" target="_blank">予約</a></td>
-    </tr>
-  </tbody>
-</table>
+          <tr>
+            <td>KPI PARK</td>
+            <td>横浜（神奈川）</td>
+            <td>表で確認可能</td>
+            <td>
+              <a class="button"
+                href="https://yoyaku.labola.jp/r/shop/3302/calendar_week/2026/5/25/"
+                target="_blank">予約する →</a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
+    <div class="footer">
+      Updated regularly for Tokyo & Kanagawa pickleball players
+    </div>
+
+  </div>
 </body>
 </html>
