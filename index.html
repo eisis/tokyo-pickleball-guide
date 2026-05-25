@@ -76,7 +76,6 @@ body{
 .hero p{
   font-size:1.1rem;
   line-height:1.8;
-  opacity:.95;
 }
 
 /* container */
@@ -131,12 +130,13 @@ body{
   color:#164e63;
 }
 
-/* location inline */
+/* location */
 
 .location{
   margin-top:12px;
   font-size:.95rem;
-  color:#4d6b72;
+  color:#0f766e;
+  font-weight:600;
 
   display:flex;
   align-items:center;
@@ -160,6 +160,16 @@ body{
 .kanagawa{
   background:#ffe8d6;
   color:#c05621;
+}
+
+.indoor{
+  background:#eef7ff;
+  color:#0369a1;
+}
+
+.outdoor{
+  background:#eafcf2;
+  color:#15803d;
 }
 
 /* description */
@@ -193,10 +203,6 @@ body{
 
   box-shadow:
     0 10px 24px rgba(20,184,166,.22);
-}
-
-.button:hover{
-  transform:translateY(-2px);
 }
 
 .map-button{
@@ -271,8 +277,9 @@ Pickleball Court Guide
 <h2>Pacific PICKLE CLUB</h2>
 
 <div class="location">
-有明
+@有明
 <span class="tag-inline tokyo">Tokyo</span>
+<span class="tag-inline outdoor">Outdoor</span>
 </div>
 
 <div class="description">
@@ -307,8 +314,9 @@ target="_blank">
 <h2>ピックルボールワン銀座新橋</h2>
 
 <div class="location">
-新橋
+@新橋
 <span class="tag-inline tokyo">Tokyo</span>
+<span class="tag-inline indoor">Indoor</span>
 </div>
 
 <div class="description">
@@ -343,8 +351,9 @@ target="_blank">
 <h2>SEIBU FAST SPORTS FIELD 品川</h2>
 
 <div class="location">
-品川
+@品川
 <span class="tag-inline tokyo">Tokyo</span>
+<span class="tag-inline indoor">Indoor</span>
 </div>
 
 <div class="description">
@@ -379,8 +388,9 @@ target="_blank">
 <h2>KPI PARK</h2>
 
 <div class="location">
-横浜
+@横浜
 <span class="tag-inline kanagawa">Kanagawa</span>
+<span class="tag-inline outdoor">Outdoor</span>
 </div>
 
 <div class="description">
