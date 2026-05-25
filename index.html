@@ -72,6 +72,14 @@ body{
   transform:translateY(-4px);
 }
 
+.facility-image{
+  width:100%;
+  height:180px;
+  object-fit:cover;
+  border-radius:16px;
+  margin-bottom:16px;
+}
+
 .card h2{
   margin:0;
   font-size:1.2rem;
@@ -83,19 +91,44 @@ body{
   line-height:1.7;
 }
 
-.tag{
-  display:inline-block;
+.tag-group{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
   margin-top:12px;
-  background:#ecfeff;
-  color:#0f766e;
-  padding:6px 10px;
+}
+
+.tag-location,
+.tag-type{
+  display:inline-block;
+  padding:6px 12px;
   border-radius:999px;
-  font-size:.85rem;
-  font-weight:600;
+  font-size:.82rem;
+  font-weight:700;
+}
+
+.tag-tokyo{
+  background:#dbeafe;
+  color:#1d4ed8;
+}
+
+.tag-kanagawa{
+  background:#ede9fe;
+  color:#6d28d9;
+}
+
+.indoor{
+  background:#ecfccb;
+  color:#3f6212;
+}
+
+.outdoor{
+  background:#fef3c7;
+  color:#92400e;
 }
 
 .button{
-  display:inline-block;
+  display:block;
   margin-top:18px;
   width:100%;
   text-align:center;
@@ -105,6 +138,18 @@ body{
   padding:14px;
   border-radius:14px;
   font-weight:700;
+}
+
+.map-button{
+  display:block;
+  text-align:center;
+  margin-top:10px;
+  padding:12px;
+  border-radius:14px;
+  text-decoration:none;
+  background:#f1f5f9;
+  color:#0f172a;
+  font-weight:600;
 }
 
 .footer{
@@ -122,26 +167,6 @@ body{
   .hero h1{
     font-size:1.7rem;
   }
-}
-  
-.facility-image{
-  width:100%;
-  height:180px;
-  object-fit:cover;
-  border-radius:16px;
-  margin-bottom:16px;
-}
-
-.map-button{
-  display:block;
-  text-align:center;
-  margin-top:10px;
-  padding:12px;
-  border-radius:14px;
-  text-decoration:none;
-  background:#f1f5f9;
-  color:#0f172a;
-  font-weight:600;
 }
 </style>
 </head>
@@ -161,12 +186,10 @@ body{
 
 <section class="cards">
 
+  <!-- Pacific -->
   <div class="card">
-    <img
-      class="facility-image"
-      src="./Pacific.png"
-      alt="Pacific PICKLE CLUB"
-    />
+    <img class="facility-image" src="./Pacific.png" alt="Pacific PICKLE CLUB" />
+
     <h2>Pacific PICKLE CLUB</h2>
 
     <div class="meta">
@@ -174,49 +197,57 @@ body{
       利用時間 / 面数を選択
     </div>
 
-    <div class="tag">Tokyo</div>
+    <div class="tag-group">
+      <span class="tag-location tag-tokyo">Tokyo</span>
+      <span class="tag-type outdoor">Outdoor</span>
+    </div>
 
     <a class="button"
       href="https://pacificpickleclub.resv.jp/"
       target="_blank">
       予約する →
-      <a
-        class="map-button"
-        href="https://maps.google.com/?q=Pacific+Pickle+Club+Tokyo"
-        target="_blank">
-        📍 Google Map
-      </a>
+    </a>
+
+    <a class="map-button"
+      href="https://maps.google.com/?q=Pacific+Pickle+Club+Tokyo"
+      target="_blank">
+      📍 Google Map
     </a>
   </div>
 
+  <!-- Ginza -->
   <div class="card">
-    <img
-      class="facility-image"
-      src="./Ginza.png"
-      alt="ピックルボールワン銀座新橋"
-    />
+    <img class="facility-image" src="./ginza.png" alt="ピックルボールワン銀座新橋" />
+
     <h2>ピックルボールワン銀座新橋</h2>
-    
+
     <div class="meta">
       📍 新橋（東京）<br>
       表で確認可能
     </div>
 
-    <div class="tag">Tokyo</div>
+    <div class="tag-group">
+      <span class="tag-location tag-tokyo">Tokyo</span>
+      <span class="tag-type indoor">Indoor</span>
+    </div>
 
     <a class="button"
       href="https://reserva.be/pboneginza/reserve?mode=service_staff&search_evt_no=aaeJwzNDQwsbQEAAQoATk"
       target="_blank">
       予約する →
     </a>
+
+    <a class="map-button"
+      href="https://maps.google.com/?q=Pickleball+One+Ginza+Shimbashi"
+      target="_blank">
+      📍 Google Map
+    </a>
   </div>
 
+  <!-- Seibu -->
   <div class="card">
-    <img
-      class="facility-image"
-      src="./Seibu.png"
-      alt="SEIBU FAST SPORTS FIELD 品川"
-    />
+    <img class="facility-image" src="./Seibu.png" alt="SEIBU FAST SPORTS FIELD 品川" />
+
     <h2>SEIBU FAST SPORTS FIELD 品川</h2>
 
     <div class="meta">
@@ -224,21 +255,28 @@ body{
       人数 → 日付 → 時間
     </div>
 
-    <div class="tag">Indoor</div>
+    <div class="tag-group">
+      <span class="tag-location tag-tokyo">Tokyo</span>
+      <span class="tag-type indoor">Indoor</span>
+    </div>
 
     <a class="button"
       href="https://www.tablecheck.com/ja/seibu-fast-sports/reserve/message"
       target="_blank">
       予約する →
     </a>
+
+    <a class="map-button"
+      href="https://maps.google.com/?q=Seibu+Fast+Sports+Field+Shinagawa"
+      target="_blank">
+      📍 Google Map
+    </a>
   </div>
 
+  <!-- KPI -->
   <div class="card">
-    <img
-      class="facility-image"
-      src="./KPI.png"
-      alt="KPI Park"
-    />
+    <img class="facility-image" src="./Kpi.png" alt="KPI PARK" />
+
     <h2>KPI PARK</h2>
 
     <div class="meta">
@@ -246,12 +284,21 @@ body{
       表で確認可能
     </div>
 
-    <div class="tag">Kanagawa</div>
+    <div class="tag-group">
+      <span class="tag-location tag-kanagawa">Kanagawa</span>
+      <span class="tag-type indoor">Indoor</span>
+    </div>
 
     <a class="button"
       href="https://yoyaku.labola.jp/r/shop/3302/calendar_week/2026/5/25/"
       target="_blank">
       予約する →
+    </a>
+
+    <a class="map-button"
+      href="https://maps.google.com/?q=KPI+Park+Yokohama"
+      target="_blank">
+      📍 Google Map
     </a>
   </div>
 
