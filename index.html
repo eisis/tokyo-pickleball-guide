@@ -26,6 +26,33 @@ body{
   color:#12343b;
 }
 
+/* language switch */
+
+.lang-switch{
+  position:fixed;
+  top:20px;
+  right:20px;
+  z-index:999;
+  display:flex;
+  gap:8px;
+}
+
+.lang-switch button{
+  border:none;
+  background:rgba(255,255,255,.9);
+  color:#164e63;
+  padding:10px 14px;
+  border-radius:999px;
+  font-weight:700;
+  cursor:pointer;
+  box-shadow:0 6px 18px rgba(0,0,0,.12);
+}
+
+.lang-switch button.active{
+  background:#14b8a6;
+  color:white;
+}
+
 /* hero */
 
 .hero{
@@ -97,7 +124,7 @@ body{
   box-shadow:
   0 10px 30px rgba(0,0,0,.08);
   transition:.25s;
-  
+
   display:flex;
   flex-direction:column;
   height:100%;
@@ -117,7 +144,6 @@ body{
 
 .card-body{
   padding:24px;
-
   display:flex;
   flex-direction:column;
   flex:1;
@@ -133,15 +159,12 @@ body{
 
 .location{
   margin-top:12px;
-
   display:flex;
   align-items:center;
   gap:10px;
   flex-wrap:wrap;
-
   font-weight:600;
   color:#0f766e;
-
   min-height:36px;
 }
 
@@ -156,7 +179,7 @@ body{
   letter-spacing:.2px;
 }
 
-/* city = outline */
+/* city */
 
 .tokyo{
   padding:5px 12px;
@@ -174,40 +197,20 @@ body{
   color:#0e7490;
 }
 
-/* play type = filled */
+/* play type */
 
 .indoor{
   padding:7px 14px;
   border-radius:999px;
-
-  background:
-    linear-gradient(
-      135deg,
-      #2563eb,
-      #3b82f6
-    );
-
+  background:linear-gradient(135deg,#2563eb,#3b82f6);
   color:white;
-
-  box-shadow:
-    0 6px 14px rgba(37,99,235,.25);
 }
 
 .outdoor{
   padding:7px 14px;
   border-radius:999px;
-
-  background:
-    linear-gradient(
-      135deg,
-      #16a34a,
-      #22c55e
-    );
-
+  background:linear-gradient(135deg,#16a34a,#22c55e);
   color:white;
-
-  box-shadow:
-    0 6px 14px rgba(34,197,94,.25);
 }
 
 /* text */
@@ -261,6 +264,11 @@ body{
 
 <body>
 
+<div class="lang-switch">
+  <button id="jpBtn" class="active">JP</button>
+  <button id="enBtn">EN</button>
+</div>
+
 <section class="hero">
 
 <video
@@ -280,12 +288,16 @@ type="video/mp4" />
 
 <div class="hero-content">
 
-<h1>
+<h1
+data-ja="Tokyo & Kanagawa<br>Pickleball Court Guide"
+data-en="Tokyo & Kanagawa<br>Pickleball Court Guide">
 Tokyo & Kanagawa<br>
 Pickleball Court Guide
 </h1>
 
-<p>
+<p
+data-ja="東京・神奈川でピックルボールを楽しめるコートをまとめました。<br>屋内・屋外を比較して、そのまま予約できます。"
+data-en="Find pickleball courts in Tokyo and Kanagawa.<br>Compare indoor and outdoor courts and book directly.">
 東京・神奈川でピックルボールを楽しめるコートをまとめました。<br>
 屋内・屋外を比較して、そのまま予約できます。
 </p>
@@ -297,6 +309,8 @@ Pickleball Court Guide
 
 <section class="cards">
 
+<!-- Tokyo Tower -->
+
 <div class="card">
 <img class="facility-image" src="./TokyoTower.png" />
 <div class="card-body">
@@ -304,17 +318,23 @@ Pickleball Court Guide
 <h2>TOKYO TOWER PICKLEBALL FRIENDSHIP</h2>
 
 <div class="location">
-@東京タワー
+<span data-ja="@東京タワー" data-en="@Tokyo Tower">@東京タワー</span>
 <span class="tag-inline tokyo">Tokyo</span>
-<span class="tag-inline outdoor">Outdoor</span>
+<span class="tag-inline outdoor"
+data-ja="Outdoor"
+data-en="Outdoor">Outdoor</span>
 </div>
 
-<div class="description">
+<div class="description"
+data-ja="東京タワーの真下で、開放感たっぷりにプレーできます。昼は青空、夜はライトアップされた東京タワーを眺めながら楽しめる、特別な一面です。"
+data-en="Play right beneath Tokyo Tower. Enjoy open skies during the day and a beautifully illuminated tower at night.">
 東京タワーの真下で、開放感たっぷりにプレーできます。
 昼は青空、夜はライトアップされた東京タワーを眺めながら楽しめる、特別な一面です。
 </div>
 
 <a class="button"
+data-ja="予約する →"
+data-en="Book Now →"
 href="https://tokyotower-pickleball.jp/ticket-announce/"
 target="_blank">予約する →</a>
 
@@ -325,6 +345,8 @@ target="_blank">📍 Google Map</a>
 </div>
 </div>
 
+<!-- Pacific -->
+
 <div class="card">
 <img class="facility-image" src="./Pacific.png" />
 <div class="card-body">
@@ -332,17 +354,21 @@ target="_blank">📍 Google Map</a>
 <h2>Pacific PICKLE CLUB</h2>
 
 <div class="location">
-@有明
+<span data-ja="@有明" data-en="@Ariake">@有明</span>
 <span class="tag-inline tokyo">Tokyo</span>
 <span class="tag-inline outdoor">Outdoor</span>
 </div>
 
-<div class="description">
-東京湾の空と風を感じながらプレーできる人気コート。  
+<div class="description"
+data-ja="東京湾の空と風を感じながらプレーできる人気コート。開放感が気持ちよく、週末に行きたくなる場所です。"
+data-en="A popular outdoor court with Tokyo Bay views and a refreshing open-air atmosphere.">
+東京湾の空と風を感じながらプレーできる人気コート。
 開放感が気持ちよく、週末に行きたくなる場所です。
 </div>
 
 <a class="button"
+data-ja="予約する →"
+data-en="Book Now →"
 href="https://pacificpickleclub.resv.jp/"
 target="_blank">予約する →</a>
 
@@ -353,6 +379,8 @@ target="_blank">📍 Google Map</a>
 </div>
 </div>
 
+<!-- Ginza -->
+
 <div class="card">
 <img class="facility-image" src="./Ginza.png" />
 <div class="card-body">
@@ -360,17 +388,21 @@ target="_blank">📍 Google Map</a>
 <h2>ピックルボールワン銀座新橋</h2>
 
 <div class="location">
-@新橋
+<span data-ja="@新橋" data-en="@Shimbashi">@新橋</span>
 <span class="tag-inline tokyo">Tokyo</span>
 <span class="tag-inline indoor">Indoor</span>
 </div>
 
-<div class="description">
-駅近で行きやすい都心のインドア。  
+<div class="description"
+data-ja="駅近で行きやすい都心のインドア。天候を気にせずしっかり打てる安心感があります。"
+data-en="Convenient indoor courts near the station. Great for playing regardless of weather.">
+駅近で行きやすい都心のインドア。
 天候を気にせずしっかり打てる安心感があります。
 </div>
 
 <a class="button"
+data-ja="予約する →"
+data-en="Book Now →"
 href="https://reserva.be/pboneginza"
 target="_blank">予約する →</a>
 
@@ -381,6 +413,8 @@ target="_blank">📍 Google Map</a>
 </div>
 </div>
 
+<!-- Seibu -->
+
 <div class="card">
 <img class="facility-image" src="./Seibu.png" />
 <div class="card-body">
@@ -388,17 +422,21 @@ target="_blank">📍 Google Map</a>
 <h2>SEIBU FAST SPORTS FIELD 品川</h2>
 
 <div class="location">
-@品川
+<span data-ja="@品川" data-en="@Shinagawa">@品川</span>
 <span class="tag-inline tokyo">Tokyo</span>
 <span class="tag-inline indoor">Indoor</span>
 </div>
 
-<div class="description">
-アクセス抜群。  
+<div class="description"
+data-ja="アクセス抜群。仕事帰りにも寄りやすく、練習にもゲームにも使いやすいです。"
+data-en="Easy access and convenient after work. Great for both practice and games.">
+アクセス抜群。
 仕事帰りにも寄りやすく、練習にもゲームにも使いやすいです。
 </div>
 
 <a class="button"
+data-ja="予約する →"
+data-en="Book Now →"
 href="https://www.tablecheck.com/ja/seibu-fast-sports/reserve/message"
 target="_blank">予約する →</a>
 
@@ -409,6 +447,8 @@ target="_blank">📍 Google Map</a>
 </div>
 </div>
 
+<!-- KPI -->
+
 <div class="card">
 <img class="facility-image" src="./KPI.png" />
 <div class="card-body">
@@ -416,17 +456,21 @@ target="_blank">📍 Google Map</a>
 <h2>KPI PARK</h2>
 
 <div class="location">
-@横浜
+<span data-ja="@横浜" data-en="@Yokohama">@横浜</span>
 <span class="tag-inline kanagawa">Kanagawa</span>
 <span class="tag-inline outdoor">Outdoor</span>
 </div>
 
-<div class="description">
-横浜の空気の中でのびのびプレー。  
+<div class="description"
+data-ja="横浜の空気の中でのびのびプレー。リラックスしながら楽しめる開放的なコートです。"
+data-en="A relaxed outdoor court in Yokohama with a spacious open atmosphere.">
+横浜の空気の中でのびのびプレー。
 リラックスしながら楽しめる開放的なコートです。
 </div>
 
 <a class="button"
+data-ja="予約する →"
+data-en="Book Now →"
 href="https://yoyaku.labola.jp/r/shop/3302/calendar_week/2026/5/25/"
 target="_blank">予約する →</a>
 
@@ -439,11 +483,55 @@ target="_blank">📍 Google Map</a>
 
 </section>
 
-<div class="footer">
+<div class="footer"
+data-ja="Updated regularly for pickleball players"
+data-en="Updated regularly for pickleball players">
 Updated regularly for pickleball players
 </div>
 
 </div>
+
+<script>
+const jpBtn=document.getElementById("jpBtn");
+const enBtn=document.getElementById("enBtn");
+
+function setLanguage(lang){
+
+  document.documentElement.lang=lang;
+
+  document.querySelectorAll("[data-ja]").forEach(el=>{
+
+    const text=
+      lang==="ja"
+      ? el.dataset.ja
+      : el.dataset.en;
+
+    el.innerHTML=text;
+  });
+
+  jpBtn.classList.toggle(
+    "active",
+    lang==="ja"
+  );
+
+  enBtn.classList.toggle(
+    "active",
+    lang==="en"
+  );
+
+  localStorage.setItem(
+    "lang",
+    lang
+  );
+}
+
+jpBtn.onclick=()=>setLanguage("ja");
+enBtn.onclick=()=>setLanguage("en");
+
+setLanguage(
+  localStorage.getItem("lang") || "ja"
+);
+</script>
 
 </body>
 </html>
