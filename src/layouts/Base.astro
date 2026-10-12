@@ -1,0 +1,73 @@
+---
+// 全ページ共通の枠（ヘッダー・フッター・言語切替）。ページごとに title と description を渡す
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description: string;
+}
+const { title, description } = Astro.props;
+const siteName = 'Tokyo & Kanagawa Pickleball Court Guide';
+const fullTitle = title === siteName ? title : `${title} | ${siteName}`;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+---
+
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonical} />
+    <meta name="twitter:card" content="summary_large_image" />
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="logo" href="/">🏓 Pickleball<span class="logo-full"> Court Guide</span></a>
+      <nav>
+        <a href="/" data-ja="コート" data-en="Courts">コート</a>
+        <a href="/blog/" data-ja="記事" data-en="Articles">記事</a>
+        <div class="lang-switch">
+          <button id="jpBtn" class="active" type="button">JP</button>
+          <button id="enBtn" type="button">EN</button>
+        </div>
+      </nav>
+    </header>
+
+    <slot />
+
+    <footer class="footer">
+      <p data-ja="ピックルボールプレイヤーのために定期的に更新しています" data-en="Updated regularly for pickleball players">
+        ピックルボールプレイヤーのために定期的に更新しています
+      </p>
+    </footer>
+
+    <script is:inline>
+      // 日本語/英語の切り替え（data-ja / data-en を持つ要素を書き換える）
+      (function () {
+        var jp = document.getElementById('jpBtn');
+        var en = document.getElementById('enBtn');
+        function setLanguage(lang) {
+          document.documentElement.lang = lang;
+          document.querySelectorAll('[data-ja]').forEach(function (el) {
+            el.innerHTML = lang === 'ja' ? el.dataset.ja : el.dataset.en;
+          });
+          jp.classList.toggle('active', lang === 'ja');
+          en.classList.toggle('active', lang === 'en');
+          try { localStorage.setItem('lang', lang); } catch (e) {}
+        }
+        jp.onclick = function () { setLanguage('ja'); };
+        en.onclick = function () { setLanguage('en'); };
+        var saved = 'ja';
+        try { saved = localStorage.getItem('lang') || 'ja'; } catch (e) {}
+        setLanguage(saved);
+      })();
+    </script>
+  </body>
+</html>

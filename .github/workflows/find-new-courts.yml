@@ -1,0 +1,23 @@
+name: Find new courts
+
+on:
+  schedule:
+    - cron: '0 0 * * 1' # 毎週月曜 9:00（日本時間）
+  workflow_dispatch: {} # 手動実行ボタン
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  find:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      - run: node scripts/find-new-courts.mjs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

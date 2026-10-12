@@ -1,0 +1,53 @@
+---
+// エリア・屋内外の絞り込みボタン。
+// data-court-item を持つ要素（カード）を出し分け、地図などには 'courts:filter' イベントで知らせる。
+import { PREFECTURES, ENVIRONMENTS } from '../lib/courts';
+
+interface Props {
+  prefectures: (keyof typeof PREFECTURES)[]; // 実際にコートがある都道府県だけボタンを出す
+  total: number;
+}
+const { prefectures, total } = Astro.props;
+---
+
+<div class="filters" id="court-filters">
+  <button type="button" class="active" data-key="pref" data-value="all" data-ja="すべて" data-en="All">すべて</button>
+  {prefectures.map((p) => (
+    <button type="button" data-key="pref" data-value={p} data-ja={PREFECTURES[p].ja} data-en={PREFECTURES[p].en}>{PREFECTURES[p].ja}</button>
+  ))}
+  <span class="filters-sep" aria-hidden="true"></span>
+  <button type="button" class="active" data-key="env" data-value="all" data-ja="屋内・屋外" data-en="Indoor & Outdoor">屋内・屋外</button>
+  {Object.entries(ENVIRONMENTS).map(([k, v]) => (
+    <button type="button" data-key="env" data-value={k} data-ja={v.ja} data-en={v.en}>{v.ja}</button>
+  ))}
+</div>
+<p class="count"><span id="court-count">{total}</span> courts</p>
+
+<script>
+  type FilterState = { pref: string; env: string };
+  const state: FilterState = { pref: 'all', env: 'all' };
+  const root = document.getElementById('court-filters')!;
+  const buttons = root.querySelectorAll<HTMLButtonElement>('button');
+
+  const matches = (pref: string, envs: string[]) =>
+    (state.pref === 'all' || pref === state.pref) && (state.env === 'all' || envs.includes(state.env));
+
+  function apply() {
+    let n = 0;
+    document.querySelectorAll<HTMLElement>('[data-court-item]').forEach((el) => {
+      const ok = matches(el.dataset.pref ?? '', (el.dataset.env ?? '').split(' '));
+      el.hidden = !ok;
+      if (ok) n++;
+    });
+    document.getElementById('court-count')!.textContent = String(n);
+    window.dispatchEvent(new CustomEvent<FilterState>('courts:filter', { detail: { ...state } }));
+  }
+
+  buttons.forEach((b) =>
+    b.addEventListener('click', () => {
+      state[b.dataset.key as keyof FilterState] = b.dataset.value!;
+      buttons.forEach((x) => x.dataset.key === b.dataset.key && x.classList.toggle('active', x === b));
+      apply();
+    })
+  );
+</script>
