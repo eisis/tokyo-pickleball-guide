@@ -1,3 +1,11 @@
 {
-  "framework": "astro"
+  "framework": "astro",
+  "redirects": [
+    {
+      "source": "/(.*)",
+      "has": [{ "type": "host", "value": "tokyo-pickleball-guide.vercel.app" }],
+      "destination": "https://www.pickleball-tokyo.com/$1",
+      "permanent": true
+    }
+  ]
 }

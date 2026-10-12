@@ -1,6 +1,10 @@
 # Tokyo & Kanagawa Pickleball Court Guide
 
-東京・神奈川のピックルボールコートまとめサイト。https://tokyo-pickleball-guide.vercel.app/
+首都圏（東京・神奈川・千葉・埼玉）のピックルボールコートまとめサイト。https://www.pickleball-tokyo.com/
+
+- ドメイン：お名前.com で管理（DNS: A @ → Vercel / CNAME www → Vercel）
+- ホスティング：Vercel（GitHub の main に入ると自動で公開）
+- 旧URL tokyo-pickleball-guide.vercel.app は vercel.json で新ドメインへ転送
 
 ## 仕組み
 
