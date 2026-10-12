@@ -1,13 +1,14 @@
 ---
 // 全ページ共通の枠（ヘッダー・フッター・言語切替）。ページごとに title と description を渡す
 import '../styles/global.css';
+import { SITE } from '../lib/site';
 
 interface Props {
   title: string;
   description: string;
 }
 const { title, description } = Astro.props;
-const siteName = 'Tokyo & Kanagawa Pickleball Court Guide';
+const siteName = SITE.name;
 const fullTitle = title === siteName ? title : `${title} | ${siteName}`;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 ---
@@ -29,7 +30,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
   </head>
   <body>
     <header class="site-header">
-      <a class="logo" href="/">🏓 Pickleball<span class="logo-full"> Court Guide</span></a>
+      <a class="logo" href="/">🏓 {SITE.name}</a>
       <nav>
         <a href="/" data-ja="コート" data-en="Courts">コート</a>
         <a href="/blog/" data-ja="記事" data-en="Articles">記事</a>
