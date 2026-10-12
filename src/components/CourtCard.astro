@@ -1,6 +1,6 @@
 ---
 // コート1件分のカード。一覧ページや記事の関連コートで使い回す
-import { PREFECTURES, ENVIRONMENTS, courtUrl, mapUrl, bookingLabel, isNew, type Court } from '../lib/courts';
+import { PREFECTURES, ENVIRONMENTS, CATEGORIES, courtUrl, mapUrl, bookingLabel, isNew, type Court } from '../lib/courts';
 
 interface Props {
   court: Court;
@@ -20,12 +20,14 @@ const detail = courtUrl(court);
     )}
   </a>
   <div class="card-body">
-    <h3><a href={detail}>{d.name}</a></h3>
+    <h3><a href={detail}>{d.name}</a>{isNew(court) && <span class="new-label">NEW</span>}</h3>
     <div class="location">
       <span data-ja={`@${d.area.ja}`} data-en={`@${d.area.en}`}>@{d.area.ja}</span>
       <span class={`tag ${d.prefecture}`}>{PREFECTURES[d.prefecture].en}</span>
       {d.environment.map((e) => <span class={`tag ${e}`}>{ENVIRONMENTS[e].en}</span>)}
-      {isNew(court) && <span class="tag new">NEW</span>}
+      {d.category !== 'dedicated' && (
+        <span class="tag category" data-ja={CATEGORIES[d.category].ja} data-en={CATEGORIES[d.category].en}>{CATEGORIES[d.category].ja}</span>
+      )}
     </div>
     <p class="description" data-ja={d.description.ja} data-en={d.description.en}>{d.description.ja}</p>
     <a class="button" href={d.booking.url} target="_blank" rel="noopener" data-ja={label.ja} data-en={label.en}>{label.ja}</a>

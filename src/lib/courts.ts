@@ -13,6 +13,14 @@ export const PREFECTURES = {
   chiba: { ja: '千葉', full: '千葉県', en: 'Chiba' },
 } as const;
 
+// 施設の種類（専用コート以外はカードに小さく表示）
+export const CATEGORIES = {
+  dedicated: { ja: '専用コート', en: 'Dedicated' },
+  fitness: { ja: 'ジム・スクール', en: 'Gym / School' },
+  public: { ja: '公共施設', en: 'Public' },
+  circle: { ja: 'サークル', en: 'Club' },
+} as const;
+
 export const ENVIRONMENTS = {
   indoor: { ja: '屋内', en: 'Indoor' },
   outdoor: { ja: '屋外', en: 'Outdoor' },

@@ -126,7 +126,8 @@ img { max-width: 100%; }
 .tag.saitama, .tag.chiba { border: 2px solid #a855f7; color: #7e22ce; }
 .tag.indoor { background: var(--indoor); color: #fff; }
 .tag.outdoor { background: var(--outdoor); color: #fff; }
-.tag.new { color: #dc2626; padding-left: 2px; padding-right: 2px; letter-spacing: .05em; }
+.tag.category { border: 1px solid #cbd5e1; color: var(--ink-soft); }
+.new-label { margin-left: 8px; color: #dc2626; font-size: .75rem; font-weight: 800; letter-spacing: .05em; vertical-align: middle; }
 
 .description { margin-top: 14px; font-size: .94rem; color: var(--ink-soft); flex-grow: 1; }
 
