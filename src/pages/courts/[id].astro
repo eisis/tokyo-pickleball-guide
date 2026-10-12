@@ -1,0 +1,59 @@
+---
+// コート詳細ページ：コート1ファイルにつき1ページ自動で作られる（例: /courts/kpi-park/）
+import { getCollection, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+
+export async function getStaticPaths() {
+  const courts = await getCollection('courts', (c) => !c.data.hidden);
+  return courts.map((court) => ({ params: { id: court.id }, props: { court } }));
+}
+
+const { court } = Astro.props;
+const d = court.data;
+const { Content } = await render(court);
+const env = d.environment.map((e) => (e === 'indoor' ? '屋内' : '屋外')).join('・');
+const pref = { tokyo: '東京都', kanagawa: '神奈川県', saitama: '埼玉県', chiba: '千葉県' }[d.prefecture];
+const bookLabel = d.booking.label === 'info' ? '公式サイトで詳細を見る →' : '公式サイトで予約する →';
+const ymd = (date: Date) => date.toISOString().slice(0, 10);
+const desc = `${d.name}（${pref}・${d.area.ja}）のピックルボールコート情報。${d.description.ja}`;
+---
+
+<Base title={`${d.name}｜${d.area.ja}のピックルボールコート`} description={desc}>
+  <main class="container narrow">
+    <p class="meta"><a href="/">← コート一覧</a></p>
+    <h1 style="margin:12px 0 20px;color:var(--navy)">{d.name}</h1>
+
+    {d.image ? (
+      <img class="detail-hero" src={d.image} alt={d.name} />
+    ) : (
+      <div class="detail-hero image-placeholder" aria-hidden="true">🏓</div>
+    )}
+
+    <p class="description" style="margin-top:20px">{d.description.ja}</p>
+
+    <dl class="facts">
+      <dt>エリア</dt><dd>{pref} {d.area.ja}</dd>
+      <dt>屋内/屋外</dt><dd>{env}</dd>
+      {d.courts && (<><dt>面数</dt><dd>{d.courts}面</dd></>)}
+      {d.address && (<><dt>住所</dt><dd>{d.address}</dd></>)}
+      {d.access && (<><dt>アクセス</dt><dd>{d.access.ja}</dd></>)}
+      {d.hours && (<><dt>営業時間</dt><dd>{d.hours}</dd></>)}
+      {d.price && (<><dt>料金の目安</dt><dd>{d.price}</dd></>)}
+      {d.openedAt && (<><dt>オープン</dt><dd>{ymd(d.openedAt)}</dd></>)}
+    </dl>
+
+    <a class="button" href={d.booking.url} target="_blank" rel="noopener">{bookLabel}</a>
+    {d.availabilityUrl && <a class="button secondary" href={d.availabilityUrl} target="_blank" rel="noopener">空き状況を見る</a>}
+    <a class="map-button" href={`https://maps.google.com/?q=${encodeURIComponent(d.mapQuery)}`} target="_blank" rel="noopener">📍 Google Map</a>
+
+    <div class="prose"><Content /></div>
+
+    <p class="meta">情報確認日：{ymd(d.updatedAt)}　料金・営業時間は変わることがあるため、最新情報は公式サイトでご確認ください。</p>
+    {d.sources.length > 0 && (
+      <div class="sources">
+        <p>参考</p>
+        <ul>{d.sources.map((s) => <li><a href={s} target="_blank" rel="noopener">{new URL(s).hostname}</a></li>)}</ul>
+      </div>
+    )}
+  </main>
+</Base>

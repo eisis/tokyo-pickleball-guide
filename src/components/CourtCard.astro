@@ -1,0 +1,39 @@
+---
+// コート1件分のカード。一覧ページや記事の関連コートで使い回す
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  court: CollectionEntry<'courts'>;
+}
+const { court } = Astro.props;
+const d = court.data;
+const prefLabel = { tokyo: 'Tokyo', kanagawa: 'Kanagawa', saitama: 'Saitama', chiba: 'Chiba' }[d.prefecture];
+const isNew = d.openedAt && Date.now() - d.openedAt.getTime() < 1000 * 60 * 60 * 24 * 180; // 開業半年以内
+const bookLabel = d.booking.label === 'info' ? { ja: '詳細を見る →', en: 'Learn More →' } : { ja: '予約する →', en: 'Book Now →' };
+const detailUrl = `/courts/${court.id}/`;
+---
+
+<article class="card" data-pref={d.prefecture} data-env={d.environment.join(' ')}>
+  <a href={detailUrl}>
+    {d.image ? (
+      <img class="facility-image" src={d.image} alt={d.name} loading="lazy" />
+    ) : (
+      <div class="facility-image image-placeholder" aria-hidden="true">🏓</div>
+    )}
+  </a>
+  <div class="card-body">
+    <h3><a href={detailUrl}>{d.name}</a></h3>
+    <div class="location">
+      <span data-ja={`@${d.area.ja}`} data-en={`@${d.area.en}`}>@{d.area.ja}</span>
+      <span class={`tag ${d.prefecture}`}>{prefLabel}</span>
+      {d.environment.map((e) => <span class={`tag ${e}`}>{e === 'indoor' ? 'Indoor' : 'Outdoor'}</span>)}
+      {isNew && <span class="tag new">NEW</span>}
+    </div>
+    <p class="description" data-ja={d.description.ja} data-en={d.description.en}>{d.description.ja}</p>
+    <a class="button" href={d.booking.url} target="_blank" rel="noopener" data-ja={bookLabel.ja} data-en={bookLabel.en}>{bookLabel.ja}</a>
+    {d.availabilityUrl && (
+      <a class="button secondary" href={d.availabilityUrl} target="_blank" rel="noopener" data-ja="空き状況を見る" data-en="Check Availability">空き状況を見る</a>
+    )}
+    <a class="map-button" href={`https://maps.google.com/?q=${encodeURIComponent(d.mapQuery)}`} target="_blank" rel="noopener">📍 Google Map</a>
+  </div>
+</article>

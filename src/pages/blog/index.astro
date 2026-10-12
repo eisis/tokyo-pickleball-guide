@@ -1,0 +1,24 @@
+---
+// 記事一覧：src/content/posts/ のファイルを新しい順に並べる
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+
+const posts = (await getCollection('posts', (p) => !p.data.draft)).sort(
+  (a, b) => b.data.publishedAt.getTime() - a.data.publishedAt.getTime()
+);
+---
+
+<Base title="記事" description="東京・神奈川のピックルボール情報。新しいコート、初心者向けガイド、イベント情報など。">
+  <main class="container narrow">
+    <h1 class="section-title">記事</h1>
+    <div class="post-list">
+      {posts.map((p) => (
+        <div class="post-item">
+          <a href={`/blog/${p.id}/`}>{p.data.title}</a>
+          <p class="meta">{p.data.publishedAt.toISOString().slice(0, 10)}　{p.data.description}</p>
+        </div>
+      ))}
+      {posts.length === 0 && <p>記事はまだありません。</p>}
+    </div>
+  </main>
+</Base>

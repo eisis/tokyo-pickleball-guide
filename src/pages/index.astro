@@ -1,0 +1,93 @@
+---
+// トップページ：src/content/courts/ のファイルを全部読み込んで一覧にする
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import CourtCard from '../components/CourtCard.astro';
+
+const order = ['tokyo', 'kanagawa', 'saitama', 'chiba'];
+const courts = (await getCollection('courts', (c) => !c.data.hidden)).sort(
+  (a, b) => order.indexOf(a.data.prefecture) - order.indexOf(b.data.prefecture) || a.data.name.localeCompare(b.data.name, 'ja')
+);
+const posts = (await getCollection('posts', (p) => !p.data.draft))
+  .sort((a, b) => b.data.publishedAt.getTime() - a.data.publishedAt.getTime())
+  .slice(0, 3);
+---
+
+<Base
+  title="Tokyo & Kanagawa Pickleball Court Guide"
+  description="東京・神奈川のピックルボールコートまとめ。屋内・屋外コートをエリア別に比較して、そのまま予約できます。"
+>
+  <section class="hero">
+    <video class="hero-video" autoplay muted loop playsinline>
+      <source src="/pickleball-hero.mp4" type="video/mp4" />
+    </video>
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <h1>Tokyo & Kanagawa<br />Pickleball Court Guide</h1>
+      <p
+        data-ja="東京・神奈川でピックルボールを楽しめるコートをまとめました。<br>屋内・屋外を比較して、そのまま予約できます。"
+        data-en="Find pickleball courts in Tokyo and Kanagawa.<br>Compare indoor and outdoor courts and book directly."
+      >
+        東京・神奈川でピックルボールを楽しめるコートをまとめました。<br />屋内・屋外を比較して、そのまま予約できます。
+      </p>
+    </div>
+  </section>
+
+  <main class="container">
+    <div class="filters" id="filters">
+      <button type="button" class="active" data-key="pref" data-value="all" data-ja="すべて" data-en="All">すべて</button>
+      <button type="button" data-key="pref" data-value="tokyo" data-ja="東京" data-en="Tokyo">東京</button>
+      <button type="button" data-key="pref" data-value="kanagawa" data-ja="神奈川" data-en="Kanagawa">神奈川</button>
+      <button type="button" class="active" data-key="env" data-value="all" data-ja="屋内・屋外" data-en="Indoor & Outdoor">屋内・屋外</button>
+      <button type="button" data-key="env" data-value="indoor" data-ja="屋内" data-en="Indoor">屋内</button>
+      <button type="button" data-key="env" data-value="outdoor" data-ja="屋外" data-en="Outdoor">屋外</button>
+    </div>
+    <p class="count"><span id="count">{courts.length}</span> courts</p>
+
+    <section class="cards" id="cards">
+      {courts.map((court) => <CourtCard court={court} />)}
+    </section>
+
+    {posts.length > 0 && (
+      <section style="margin-top:56px">
+        <h2 class="section-title" data-ja="新着記事" data-en="Latest Articles">新着記事</h2>
+        <div class="post-list">
+          {posts.map((p) => (
+            <div class="post-item">
+              <a href={`/blog/${p.id}/`}>{p.data.title}</a>
+              <p class="meta">{p.data.publishedAt.toISOString().slice(0, 10)}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+    )}
+  </main>
+
+  <script is:inline>
+    // エリア・屋内外の絞り込み
+    (function () {
+      var state = { pref: 'all', env: 'all' };
+      var buttons = document.querySelectorAll('#filters button');
+      function apply() {
+        var n = 0;
+        document.querySelectorAll('#cards .card').forEach(function (card) {
+          var ok =
+            (state.pref === 'all' || card.dataset.pref === state.pref) &&
+            (state.env === 'all' || card.dataset.env.split(' ').indexOf(state.env) !== -1);
+          card.hidden = !ok;
+          if (ok) n++;
+        });
+        document.getElementById('count').textContent = n;
+      }
+      buttons.forEach(function (b) {
+        b.addEventListener('click', function () {
+          state[b.dataset.key] = b.dataset.value;
+          buttons.forEach(function (x) {
+            if (x.dataset.key === b.dataset.key) x.classList.toggle('active', x === b);
+          });
+          apply();
+        });
+      });
+    })();
+  </script>
+</Base>

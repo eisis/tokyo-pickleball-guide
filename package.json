@@ -1,0 +1,15 @@
+{
+  "name": "tokyo-pickleball-guide",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "find-courts": "node scripts/find-new-courts.mjs"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "^3.7.3",
+    "astro": "^7.3.8"
+  }
+}
