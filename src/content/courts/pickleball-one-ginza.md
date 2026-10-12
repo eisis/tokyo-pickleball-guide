@@ -14,6 +14,7 @@ description:
 image: /images/courts/pickleball-one-ginza.png
 booking: { url: "https://reserva.be/pboneginza", label: book }
 availabilityUrl: https://reserva.be/pboneginza/availability
+location: { lat: 35.66649, lng: 139.75874 }
 mapQuery: Pickleball One Ginza Shimbashi
 updatedAt: 2026-10-12
 sources:

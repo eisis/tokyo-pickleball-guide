@@ -12,6 +12,7 @@ description:
   ja: 元プール施設を改装した天井の高いインドア3面と、屋上のアウトドア4面。天気に合わせて選べます。
   en: Three high-ceiling indoor courts in a converted pool facility plus four rooftop outdoor courts.
 booking: { url: "https://sansan-pickleball.com/", label: book }
+location: { lat: 35.72527, lng: 139.72017 }
 mapQuery: Sansan Pickleball Court Ikebukuro
 openedAt: 2026-07-10
 updatedAt: 2026-10-12

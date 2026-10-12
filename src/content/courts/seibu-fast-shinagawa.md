@@ -11,6 +11,7 @@ description:
   en: Easy access and convenient after work. Great for both practice and games.
 image: /images/courts/seibu-fast-shinagawa.png
 booking: { url: "https://www.tablecheck.com/ja/seibu-fast-sports/reserve/message", label: book }
+location: { lat: 35.62764, lng: 139.7367 }
 mapQuery: Seibu Fast Sports Field Shinagawa
 updatedAt: 2026-10-12
 sources:

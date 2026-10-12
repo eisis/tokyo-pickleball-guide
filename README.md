@@ -23,7 +23,11 @@ src/
       _template.md   コピーして使うひな形
     posts/       ← 記事。1記事＝1ファイル
   pages/         ← ページの作り（トップ・コート詳細・記事一覧・記事）
-  components/    ← 部品（コートのカード）
+  components/    ← 部品
+    CourtCard.astro     コートのカード
+    CourtMap.astro      コートの地図（ピンの色＝屋内:青／屋外:緑／両方:半々）
+    CourtFilters.astro  エリア・屋内外の絞り込み（カードと地図が連動）
+  lib/courts.ts  ← コート共通の決まりごと（都道府県の表示名・並び順・リンクの作り方）
   layouts/       ← 全ページ共通の枠（ヘッダー・フッター・言語切替）
   styles/        ← デザイン（色・余白など）
   content.config.ts ← コート・記事に書く項目のルール
@@ -41,7 +45,14 @@ scripts/         ← 自動化スクリプト（新コート探し）
 2. `_template.md` を開いて中身を全部コピー
 3. 「Add file」→「Create new file」→ ファイル名を `コートの英語名.md`（例: `sansan-ikebukuro.md`）にして貼り付け、中身を書き換える
 4. 写真があれば `public/images/courts/` に「Add file」→「Upload files」で追加し、`image:` に `/images/courts/ファイル名` と書く
-5. Commit → 1〜2分でトップに追加され、詳細ページ `/courts/ファイル名/` もできる
+5. 地図のピン位置：Googleマップでその場所を右クリック → 一番上に出る数字（例 `35.6812, 139.7671`）をクリックでコピー → `location: { lat: 35.6812, lng: 139.7671 }` と書く
+6. Commit → 1〜2分でトップのカード・地図のピン・詳細ページ `/courts/ファイル名/` が全部できる
+
+### 新しい都道府県を増やす（埼玉・千葉など）
+`src/lib/courts.ts` の `PREFECTURES` に1行、`src/content.config.ts` の `prefecture` に1語足す。絞り込みボタンはコートがある都道府県だけ自動で出る。
+
+### 色を変える
+`src/styles/global.css` の先頭（`--indoor` `--outdoor` など）を変えると、タグと地図のピンの色がまとめて変わる。
 
 ### コートを一時的に非表示にする
 そのコートのファイルに `hidden: true` の1行を足す。

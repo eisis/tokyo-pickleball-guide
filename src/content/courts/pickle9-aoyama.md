@@ -9,6 +9,7 @@ description:
   ja: 青山・表参道エリア初の屋内専用コート。ゴルフシミュレーターも併設された都心のスポットです。
   en: The first indoor pickleball court in the Aoyama/Omotesando area, with golf simulators on site.
 booking: { url: "https://www.pickle9.jp/", label: book }
+location: { lat: 35.66656, lng: 139.71559 }
 mapQuery: Pickle9 Minami Aoyama
 openedAt: 2026-07-15
 updatedAt: 2026-10-12

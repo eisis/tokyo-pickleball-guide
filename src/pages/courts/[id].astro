@@ -1,18 +1,20 @@
 ---
 // コート詳細ページ：コート1ファイルにつき1ページ自動で作られる（例: /courts/kpi-park/）
-import { getCollection, render } from 'astro:content';
+import { render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
+import CourtMap from '../../components/CourtMap.astro';
+import { getCourts, PREFECTURES, ENVIRONMENTS, mapUrl, type Court } from '../../lib/courts';
 
 export async function getStaticPaths() {
-  const courts = await getCollection('courts', (c) => !c.data.hidden);
+  const courts = await getCourts();
   return courts.map((court) => ({ params: { id: court.id }, props: { court } }));
 }
 
-const { court } = Astro.props;
+const { court } = Astro.props as { court: Court };
 const d = court.data;
 const { Content } = await render(court);
-const env = d.environment.map((e) => (e === 'indoor' ? '屋内' : '屋外')).join('・');
-const pref = { tokyo: '東京都', kanagawa: '神奈川県', saitama: '埼玉県', chiba: '千葉県' }[d.prefecture];
+const env = d.environment.map((e) => ENVIRONMENTS[e].ja).join('・');
+const pref = PREFECTURES[d.prefecture].full;
 const bookLabel = d.booking.label === 'info' ? '公式サイトで詳細を見る →' : '公式サイトで予約する →';
 const ymd = (date: Date) => date.toISOString().slice(0, 10);
 const desc = `${d.name}（${pref}・${d.area.ja}）のピックルボールコート情報。${d.description.ja}`;
@@ -44,9 +46,11 @@ const desc = `${d.name}（${pref}・${d.area.ja}）のピックルボールコ�
 
     <a class="button" href={d.booking.url} target="_blank" rel="noopener">{bookLabel}</a>
     {d.availabilityUrl && <a class="button secondary" href={d.availabilityUrl} target="_blank" rel="noopener">空き状況を見る</a>}
-    <a class="map-button" href={`https://maps.google.com/?q=${encodeURIComponent(d.mapQuery)}`} target="_blank" rel="noopener">📍 Google Map</a>
+    <a class="map-button" href={mapUrl(court)} target="_blank" rel="noopener">📍 Google Map</a>
 
     <div class="prose"><Content /></div>
+
+    {d.location && <div style="margin-top:28px"><CourtMap courts={[court]} /></div>}
 
     <p class="meta">情報確認日：{ymd(d.updatedAt)}　料金・営業時間は変わることがあるため、最新情報は公式サイトでご確認ください。</p>
     {d.sources.length > 0 && (

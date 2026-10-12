@@ -17,6 +17,7 @@ description:
 image: /images/courts/ファイル名.png   # 写真がなければこの行を消す（🏓が表示される）
 booking: { url: "https://example.com/", label: book }   # label: book=予約する / info=詳細を見る
 availabilityUrl: https://example.com/availability       # 空き状況ページがなければこの行を消す
+location: { lat: 35.6812, lng: 139.7671 }   # 地図のピン位置。Googleマップで場所を右クリック→一番上の数字をコピー（左が lat、右が lng）
 mapQuery: Googleマップで検索する名前
 openedAt: 2026-10-01         # オープン日（半年以内なら NEW が付く）。不明なら消す
 updatedAt: 2026-10-12        # 情報を確認した日

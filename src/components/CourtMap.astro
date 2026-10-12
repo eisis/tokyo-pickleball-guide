@@ -1,0 +1,102 @@
+---
+// コートの地図。location（緯度・経度）があるコートに自動でピンを立てる。
+// ピンの色：屋内=青、屋外=緑、両方=半々（色は global.css の --indoor / --outdoor）
+// 地図データは OpenStreetMap（無料・APIキー不要）
+import 'leaflet/dist/leaflet.css';
+import { PREFECTURES, ENVIRONMENTS, courtUrl, mapUrl, bookingLabel, envKind, type Court } from '../lib/courts';
+
+interface Props {
+  courts: Court[];
+}
+const { courts } = Astro.props;
+
+// 地図に渡すデータ（ピン1本分）
+const points = courts
+  .filter((c) => c.data.location)
+  .map((c) => ({
+    id: c.id,
+    name: c.data.name,
+    lat: c.data.location!.lat,
+    lng: c.data.location!.lng,
+    pref: c.data.prefecture,
+    env: c.data.environment,
+    kind: envKind(c),
+    area: c.data.area,
+    prefLabel: PREFECTURES[c.data.prefecture].en,
+    envLabels: c.data.environment.map((e) => ENVIRONMENTS[e]),
+    detailUrl: courtUrl(c),
+    bookingUrl: c.data.booking.url,
+    bookingLabel: bookingLabel(c),
+    mapUrl: mapUrl(c),
+  }));
+---
+
+<section class="court-map-wrap">
+  <div id="court-map" class="court-map" data-points={JSON.stringify(points)}></div>
+  <div class="map-legend">
+    <span><i class="legend-dot indoor"></i><span data-ja="屋内" data-en="Indoor">屋内</span></span>
+    <span><i class="legend-dot outdoor"></i><span data-ja="屋外" data-en="Outdoor">屋外</span></span>
+    <span><i class="legend-dot both"></i><span data-ja="屋内・屋外あり" data-en="Both">屋内・屋外あり</span></span>
+  </div>
+</section>
+
+<script>
+  import L from 'leaflet';
+
+  type Point = {
+    id: string; name: string; lat: number; lng: number; pref: string; env: string[];
+    kind: 'indoor' | 'outdoor' | 'both';
+    area: { ja: string; en: string }; prefLabel: string; envLabels: { ja: string; en: string }[];
+    detailUrl: string; bookingUrl: string; bookingLabel: { ja: string; en: string }; mapUrl: string;
+  };
+
+  const el = document.getElementById('court-map')!;
+  const points: Point[] = JSON.parse(el.dataset.points ?? '[]');
+
+  const map = L.map(el, { scrollWheelZoom: false }).setView([35.6, 139.7], 10);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 18,
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+  }).addTo(map);
+
+  const icon = (kind: Point['kind']) =>
+    L.divIcon({ className: '', html: `<span class="pin pin-${kind}"></span>`, iconSize: [26, 26], iconAnchor: [13, 26], popupAnchor: [0, -24] });
+
+  const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
+  const lang = () => (document.documentElement.lang === 'en' ? 'en' : 'ja');
+
+  // 吹き出しの中身（開くたびに、その時の言語で作る）
+  const popup = (p: Point) => () => {
+    const l = lang();
+    return `<div class="map-popup">
+      <a class="map-popup-title" href="${p.detailUrl}">${esc(p.name)}</a>
+      <div class="map-popup-meta">@${esc(p.area[l])} · ${p.prefLabel} · ${p.envLabels.map((e) => e[l]).join(' / ')}</div>
+      <div class="map-popup-links">
+        <a href="${p.detailUrl}">${l === 'ja' ? '詳細' : 'Details'}</a>
+        <a href="${p.bookingUrl}" target="_blank" rel="noopener">${p.bookingLabel[l]}</a>
+        <a href="${p.mapUrl}" target="_blank" rel="noopener">Google Map</a>
+      </div>
+    </div>`;
+  };
+
+  const markers = points.map((p) => ({ p, m: L.marker([p.lat, p.lng], { icon: icon(p.kind), title: p.name }).bindPopup(popup(p)).addTo(map) }));
+
+  // 表示中のピンが全部入るように地図の範囲を合わせる
+  function fit(list: typeof markers) {
+    if (list.length === 1) map.setView(list[0].m.getLatLng(), 14);
+    else if (list.length > 1) map.fitBounds(L.latLngBounds(list.map((x) => x.m.getLatLng())), { padding: [40, 40], maxZoom: 14 });
+  }
+  fit(markers);
+
+  // 絞り込みボタン（CourtFilters）と連動
+  window.addEventListener('courts:filter', (e) => {
+    const { pref, env } = (e as CustomEvent<{ pref: string; env: string }>).detail;
+    const visible = markers.filter(({ p, m }) => {
+      const ok = (pref === 'all' || p.pref === pref) && (env === 'all' || p.env.includes(env));
+      if (ok) m.addTo(map);
+      else m.remove();
+      return ok;
+    });
+    fit(visible);
+  });
+</script>

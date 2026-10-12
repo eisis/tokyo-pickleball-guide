@@ -8,6 +8,7 @@ description:
   en: Play right beneath Tokyo Tower. Enjoy open skies during the day and a beautifully illuminated tower at night.
 image: /images/courts/tokyo-tower.png
 booking: { url: "https://tokyotower-pickleball.jp/ticket-announce/", label: book }
+location: { lat: 35.65845, lng: 139.74554 }
 mapQuery: Tokyo Tower Pickleball Friendship
 updatedAt: 2026-10-12
 ---

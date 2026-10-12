@@ -26,6 +26,7 @@ const courts = defineCollection({
       label: z.enum(['book', 'info']).default('book'), // book=予約する / info=詳細を見る
     }),
     availabilityUrl: z.string().url().optional(), // 空き状況ページ（あれば）
+    location: z.object({ lat: z.number(), lng: z.number() }).optional(), // 地図のピン位置（なければ地図に出ない）
     mapQuery: z.string(), // Googleマップ検索語
     openedAt: z.coerce.date().optional(),
     updatedAt: z.coerce.date(), // 情報を最後に確認した日
