@@ -3,7 +3,7 @@
 import { render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import CourtMap from '../../components/CourtMap.astro';
-import { getCourts, PREFECTURES, ENVIRONMENTS, mapUrl, type Court } from '../../lib/courts';
+import { getCourts, PREFECTURES, ENVIRONMENTS, mapUrl, isNew, type Court } from '../../lib/courts';
 
 export async function getStaticPaths() {
   const courts = await getCourts();
@@ -23,7 +23,7 @@ const desc = `${d.name}（${pref}・${d.area.ja}）のピックルボールコ�
 <Base title={`${d.name}｜${d.area.ja}のピックルボールコート`} description={desc}>
   <main class="container narrow">
     <p class="meta"><a href="/">← コート一覧</a></p>
-    <h1 style="margin:12px 0 20px;color:var(--navy)">{d.name}</h1>
+    <h1 style="margin:12px 0 20px;color:var(--navy)">{d.name}{isNew(court) && <span class="new-label">NEW</span>}</h1>
 
     {d.image ? (
       <img class="detail-hero" src={d.image} alt={d.name} />
