@@ -7,6 +7,7 @@ import CourtMap from '../components/CourtMap.astro';
 import CourtFilters from '../components/CourtFilters.astro';
 import CourtCard from '../components/CourtCard.astro';
 import { getCourts } from '../lib/courts';
+import { SITE } from '../lib/site';
 
 const courts = await getCourts();
 const prefectures = [...new Set(courts.map((c) => c.data.prefecture))];
@@ -16,8 +17,8 @@ const posts = (await getCollection('posts', (p) => !p.data.draft))
 ---
 
 <Base
-  title="Tokyo & Kanagawa Pickleball Court Guide"
-  description="東京・神奈川のピックルボールコートまとめ。地図とエリア別一覧で屋内・屋外コートを比較して、そのまま予約できます。"
+  title={SITE.name}
+  description={SITE.description}
 >
   <section class="hero">
     <video class="hero-video" autoplay muted loop playsinline>
@@ -25,13 +26,8 @@ const posts = (await getCollection('posts', (p) => !p.data.draft))
     </video>
     <div class="hero-overlay"></div>
     <div class="hero-content">
-      <h1>Tokyo & Kanagawa<br />Pickleball Court Guide</h1>
-      <p
-        data-ja="東京・神奈川でピックルボールを楽しめるコートをまとめました。<br>屋内・屋外を比較して、そのまま予約できます。"
-        data-en="Find pickleball courts in Tokyo and Kanagawa.<br>Compare indoor and outdoor courts and book directly."
-      >
-        東京・神奈川でピックルボールを楽しめるコートをまとめました。<br />屋内・屋外を比較して、そのまま予約できます。
-      </p>
+      <h1>{SITE.name}</h1>
+      <p data-ja={SITE.lead.ja} data-en={SITE.lead.en} set:html={SITE.lead.ja} />
     </div>
   </section>
 

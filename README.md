@@ -1,6 +1,10 @@
-# Tokyo & Kanagawa Pickleball Court Guide
+# Pickleball Tokyo
 
-東京・神奈川のピックルボールコートまとめサイト。https://tokyo-pickleball-guide.vercel.app/
+首都圏（東京・神奈川・千葉・埼玉）のピックルボールコートまとめサイト。https://www.pickleball-tokyo.com/
+
+- ドメイン：お名前.com で管理（DNS: A @ → Vercel / CNAME www → Vercel）
+- ホスティング：Vercel（GitHub の main に入ると自動で公開）
+- 旧URL tokyo-pickleball-guide.vercel.app は vercel.json で新ドメインへ転送
 
 ## 仕組み
 
@@ -27,6 +31,7 @@ src/
     CourtCard.astro     コートのカード
     CourtMap.astro      コートの地図（ピンの色＝屋内:青／屋外:緑／両方:半々）
     CourtFilters.astro  エリア・屋内外の絞り込み（カードと地図が連動）
+  lib/site.ts    ← サイト名・キャッチコピー・説明文（文言を変えるときはここ）
   lib/courts.ts  ← コート共通の決まりごと（都道府県の表示名・並び順・リンクの作り方）
   layouts/       ← 全ページ共通の枠（ヘッダー・フッター・言語切替）
   styles/        ← デザイン（色・余白など）
@@ -67,4 +72,4 @@ scripts/         ← 自動化スクリプト（新コート探し）
 
 ## 自動化
 
-- **新コート探し**（毎週土曜9時）：ニュースから東京・神奈川周辺の新しいピックルボールコートの記事を探し、候補を GitHub の Issues タブにまとめる。掲載するかは人が判断する。Actions タブの「Find new courts」→「Run workflow」で手動実行もできる。
+- **新コート探し**（毎週土曜9時）：ニュースから東京近郊（東京・神奈川・千葉・埼玉）の新しいピックルボールコートの記事を探し、候補を GitHub の Issues タブにまとめる。掲載するかは人が判断する。Actions タブの「Find new courts」→「Run workflow」で手動実行もできる。
