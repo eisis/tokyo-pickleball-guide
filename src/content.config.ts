@@ -21,6 +21,8 @@ const courts = defineCollection({
     price: z.string().optional(), // 料金の目安
     description: ja_en, // カードに出る短い紹介文
     image: z.string().optional(), // public/images/courts/ の画像。なければ🏓を表示
+    imageSource: z.string().url().optional(), // 画像の取得元（自動取得したとき書き込まれる）
+    officialUrl: z.string().url().optional(), // 施設の公式サイト（画像の自動取得に使う）
     booking: z.object({
       url: z.string().url(),
       label: z.enum(['book', 'info']).default('book'), // book=予約する / info=詳細を見る

@@ -1,0 +1,31 @@
+name: Fetch court images
+
+on:
+  push:
+    branches: [main]
+    paths: ['src/content/courts/**'] # コートのファイルが追加・変更されたとき
+  workflow_dispatch: {} # 手動実行ボタン
+
+permissions:
+  contents: write
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: node scripts/fetch-court-images.mjs
+      - name: 画像があれば保存
+        run: |
+          git add -A public/images/courts src/content/courts
+          if git diff --cached --quiet; then echo "追加なし"; exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
+          git commit -m "コート画像を自動追加"
+          git push
