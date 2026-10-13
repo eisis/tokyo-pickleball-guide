@@ -26,8 +26,10 @@ const posts = (await getCollection('posts', (p) => !p.data.draft))
     </video>
     <div class="hero-overlay"></div>
     <div class="hero-content">
-      <h1>{SITE.name}</h1>
-      <p data-ja={SITE.lead.ja} data-en={SITE.lead.en} set:html={SITE.lead.ja} />
+      <p class="hero-eyebrow">Tokyo · Kanagawa · Chiba · Saitama</p>
+      <h1 data-ja="東京で、<br>ピックルボールを。" data-en="Find your court<br>in Tokyo." set:html="東京で、<br>ピックルボールを。" />
+      <p class="hero-lead" data-ja={SITE.lead.ja} data-en={SITE.lead.en} set:html={SITE.lead.ja} />
+      <a class="hero-cta" href="#court-map"><span data-ja={`${courts.length}コートを探す`} data-en={`Explore ${courts.length} courts`}>{courts.length}コートを探す</span> <span aria-hidden="true">↓</span></a>
     </div>
   </section>
 
