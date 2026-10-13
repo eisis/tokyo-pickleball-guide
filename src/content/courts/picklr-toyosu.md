@@ -9,7 +9,6 @@ description:
   ja: 世界最大級のピックルボールクラブ「Picklr」の東京拠点。全天候型インドアにハードコート7面。会員制です。
   en: Tokyo location of Picklr, one of the world's largest pickleball club chains. Seven indoor hard courts. Membership-based.
 image: /images/courts/picklr-toyosu.jpg
-imageSource: https://www.picklr.jp/locations/tokyo-toyosu
 booking: { url: "https://www.picklr.jp/locations/tokyo-toyosu", label: info }
 location: { lat: 35.66128, lng: 139.80001 }
 mapQuery: PICKLR TOKYO TOYOSU

@@ -9,6 +9,7 @@ price: 1時間 ¥1,650前後（instabase掲載時点）
 description:
   ja: ジム内のスペースをピックルボール用に時間貸し。パドル・ボール完備で、手ぶらで気軽に始められます。
   en: Gym space rentable by the hour for pickleball, with paddles and balls provided.
+image: /images/courts/golds-gym-chiba-newtown.jpg
 booking: { url: "https://www.instabase.jp/space/4731017233", label: book }
 location: { lat: 35.79978, lng: 140.11782 }
 mapQuery: ゴールドジム千葉ニュータウン
