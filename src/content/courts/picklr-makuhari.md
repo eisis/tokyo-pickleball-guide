@@ -11,6 +11,7 @@ image: /images/courts/picklr-makuhari.jpg
 imageSource: https://www.picklr.jp/
 booking: { url: "https://www.picklr.jp/", label: info }
 location: { lat: 35.65468, lng: 140.03045 }
+hidden: true   # 2026-10-13 幕張はPicklr豊洲開業前のパイロットコート。公式サイトの拠点一覧から消えたため非表示
 mapQuery: PICKLR MAKUHARI イオンモール幕張新都心
 updatedAt: 2026-10-12
 sources:
