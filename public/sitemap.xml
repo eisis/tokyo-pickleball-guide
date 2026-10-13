@@ -1,18 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://www.pickleball-tokyo.com/</loc><lastmod>2026-10-13</lastmod></url>
-  <url><loc>https://www.pickleball-tokyo.com/blog/</loc><lastmod>2026-10-13</lastmod></url>
-  <url><loc>https://www.pickleball-tokyo.com/blog/new-courts-2026-autumn/</loc><lastmod>2026-10-13</lastmod></url>
-  <url><loc>https://www.pickleball-tokyo.com/courts/pacific-pickle-club/</loc><lastmod>2026-10-13</lastmod></url>
-  <url><loc>https://www.pickleball-tokyo.com/courts/pickle9-aoyama/</loc><lastmod>2026-10-13</lastmod></url>
-  <url><loc>https://www.pickleball-tokyo.com/courts/pickleball-park-toyosu/</loc><lastmod>2026-10-13</lastmod></url>
-  <url><loc>https://www.pickleball-tokyo.com/courts/picklr-toyosu/</loc><lastmod>2026-10-13</lastmod></url>
-  <url><loc>https://www.pickleball-tokyo.com/courts/sansan-ikebukuro/</loc><lastmod>2026-10-13</lastmod></url>
-  <url><loc>https://www.pickleball-tokyo.com/courts/seibu-fast-shinagawa/</loc><lastmod>2026-10-13</lastmod></url>
-  <url><loc>https://www.pickleball-tokyo.com/courts/tokyo-tower/</loc><lastmod>2026-10-13</lastmod></url>
-  <url><loc>https://www.pickleball-tokyo.com/courts/pickleball-one-ginza/</loc><lastmod>2026-10-13</lastmod></url>
-  <url><loc>https://www.pickleball-tokyo.com/courts/kpi-park/</loc><lastmod>2026-10-13</lastmod></url>
-  <url><loc>https://www.pickleball-tokyo.com/courts/tokigawa-pickleball/</loc><lastmod>2026-10-13</lastmod></url>
-  <url><loc>https://www.pickleball-tokyo.com/courts/picklr-makuhari/</loc><lastmod>2026-10-13</lastmod></url>
-  <url><loc>https://www.pickleball-tokyo.com/courts/golds-gym-chiba-newtown/</loc><lastmod>2026-10-13</lastmod></url>
-</urlset>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <sitemap><loc>https://www.pickleball-tokyo.com/sitemap-0.xml</loc></sitemap>
+</sitemapindex>
