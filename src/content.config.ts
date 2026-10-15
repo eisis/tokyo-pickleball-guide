@@ -48,7 +48,9 @@ const posts = defineCollection({
     tags: z.array(z.string()).default([]), // 自由なタグ（エリア名・テーマなど）。タグごとの一覧ページが自動で作られる
     cover: z.string().optional(), // 一覧やSNSで使う画像（なければ本文の最初の画像 → 紹介コートの画像の順で自動）
     coverAlt: z.string().optional(),
-    featured: z.boolean().default(false), // true にすると記事一覧の一番上に大きく出る
+    featured: z.boolean().default(false),
+    points: z.array(z.string()).max(4).default([]), // 記事の冒頭に出す「この記事のポイント」（3つがおすすめ）
+    facts: z.array(z.object({ label: z.string(), value: z.string() })).default([]), // 冒頭に出す情報の表（コートレビューの料金・アクセスなど） // true にすると記事一覧の一番上に大きく出る
     author: z.string().default('Pickleball Tokyo 編集部'),
     courts: z.array(z.string()).default([]), // 記事で紹介するコートのファイル名（関連リンクを出す）
     draft: z.boolean().default(false), // trueの間は公開しない

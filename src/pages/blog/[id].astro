@@ -83,6 +83,23 @@ const jsonLd = {
       </figure>
     )}
 
+    {(d.points.length > 0 || d.facts.length > 0) && (
+      <div class="article-summary">
+        {d.points.length > 0 && (
+          <section class="points" aria-label="この記事のポイント">
+            <p class="points-label">この記事のポイント</p>
+            <ol>{d.points.map((pt) => <li>{pt}</li>)}</ol>
+          </section>
+        )}
+        {d.facts.length > 0 && (
+          <section class="facts-box" aria-label="基本情報">
+            <p class="points-label">{d.category === 'review' ? 'コート情報' : '基本情報'}</p>
+            <dl>{d.facts.map((f) => <><dt>{f.label}</dt><dd>{f.value}</dd></>)}</dl>
+          </section>
+        )}
+      </div>
+    )}
+
     <div class="article-layout">
       {toc.length >= 2 && (
         <aside class="toc" aria-label="目次">
