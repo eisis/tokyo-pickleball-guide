@@ -409,6 +409,79 @@ html[lang="en"] .hero h1 { font-family: var(--display); font-weight: 800; letter
 .article-body .prose a { text-underline-offset: 3px; }
 .article-body .prose table { width: 100%; border-collapse: collapse; font-size: .92rem; display: block; overflow-x: auto; }
 .article-body .prose th, .article-body .prose td { border-bottom: 1px solid var(--line); padding: 8px 10px; text-align: left; }
+/* ===== 記事の本文デザイン（どの記事も同じルールで表示） =====
+   見出し（##）＝番号つきの大見出し / ### ＝左に線の小見出し / **太字** ＝黄色いマーカー
+   > [!POINT] などのボックス、写真の説明、表 は src/lib/rehype-article.mjs で変換している */
+.article-summary { max-width: 760px; margin: 28px auto 0; display: grid; gap: 16px; }
+@media (min-width: 900px) { .article-summary:has(.points):has(.facts-box) { max-width: 960px; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
+.points, .facts-box { border-radius: var(--radius-sm); padding: 18px 20px; }
+.points { background: var(--sand); border: 1px solid var(--sand-deep); }
+.facts-box { background: #fff; border: 1px solid var(--line); }
+.points-label {
+  display: inline-flex; align-items: center; gap: 6px; margin-bottom: 12px;
+  font-weight: 900; font-size: .9rem; color: var(--navy);
+}
+.points-label::before { content: ''; width: 10px; height: 10px; border-radius: 50%; background: var(--ball); box-shadow: 0 0 0 2px var(--ball-ink); }
+.points ol { list-style: none; counter-reset: pt; display: grid; gap: 10px; }
+.points li { counter-increment: pt; position: relative; padding-left: 2.1em; font-weight: 700; line-height: 1.65; }
+.points li::before {
+  content: counter(pt); position: absolute; left: 0; top: .05em; width: 1.5em; height: 1.5em; border-radius: 50%;
+  display: grid; place-items: center; font-family: var(--display); font-size: .82rem; background: var(--teal-dark); color: #fff;
+}
+.facts-box dl { display: grid; grid-template-columns: 6.5em 1fr; font-size: .9rem; }
+.facts-box dt, .facts-box dd { padding: 7px 0; border-bottom: 1px solid var(--line); }
+.facts-box dt { color: var(--ink-soft); font-weight: 700; }
+.facts-box dd { font-weight: 500; }
+.facts-box dl > :nth-last-child(-n + 2) { border-bottom: 0; }
+
+.article-body .prose { font-size: 1.06rem; line-height: 2.05; letter-spacing: .02em; counter-reset: sec; }
+.article-body .prose > p { margin: 0 0 1.5em; }
+.article-body .prose h2 {
+  counter-increment: sec; font-size: clamp(1.35rem, 3vw, 1.6rem); line-height: 1.45; font-weight: 900; color: var(--navy);
+  margin: 3em 0 1em; padding: 0 0 .5em; border-bottom: 2px solid var(--line); position: relative;
+}
+.article-body .prose h2::before {
+  content: counter(sec, decimal-leading-zero); display: block; margin-bottom: 2px;
+  font-family: var(--display); font-weight: 800; font-size: .95rem; letter-spacing: .1em; color: var(--teal);
+}
+.article-body .prose h2::after { content: ''; position: absolute; left: 0; bottom: -2px; width: 3.2em; height: 2px; background: var(--teal-dark); }
+.article-body .prose h3 { font-size: 1.18rem; font-weight: 800; color: var(--navy); margin: 2.2em 0 .8em; padding-left: 12px; border-left: 4px solid var(--teal); line-height: 1.5; }
+.article-body .prose strong {
+  font-weight: 800; color: var(--ink);
+  background: linear-gradient(transparent 60%, rgba(215, 242, 58, .8) 60%);
+  padding: 0 1px;
+}
+.article-body .prose a { color: var(--teal-dark); font-weight: 700; text-decoration-thickness: 1px; text-underline-offset: 4px; }
+.article-body .prose ul, .article-body .prose ol { margin: 0 0 1.6em; padding: 0; list-style: none; display: grid; gap: .4em; }
+.article-body .prose ul > li { position: relative; padding-left: 1.4em; }
+.article-body .prose ul > li::before { content: ''; position: absolute; left: .2em; top: .78em; width: .5em; height: .5em; border-radius: 50%; background: var(--ball); box-shadow: 0 0 0 2px var(--ball-ink); }
+.article-body .prose ol { counter-reset: li; }
+.article-body .prose ol > li { counter-increment: li; position: relative; padding-left: 2em; }
+.article-body .prose ol > li::before { content: counter(li); position: absolute; left: 0; top: .35em; width: 1.45em; height: 1.45em; border-radius: 50%; display: grid; place-items: center; font-family: var(--display); font-size: .8rem; font-weight: 800; background: var(--foam); color: var(--teal-dark); }
+
+.callout { margin: 1.8em 0; padding: 16px 20px 6px; border-radius: 14px; border: 1px solid; font-size: .98rem; line-height: 1.9; }
+.callout p { margin: 0 0 .8em; }
+.callout-label { display: inline-block; margin-bottom: 8px !important; padding: 2px 12px; border-radius: 999px; font-size: .78rem; font-weight: 900; letter-spacing: .06em; }
+.callout-point { background: var(--foam); border-color: #bfe9df; }
+.callout-point .callout-label { background: var(--teal-dark); color: #fff; }
+.callout-tip { background: #f9fbe3; border-color: #e3ee9a; }
+.callout-tip .callout-label { background: var(--ball); color: var(--ball-ink); }
+.callout-caution { background: #fff3ef; border-color: #f8d2c6; }
+.callout-caution .callout-label { background: var(--coral); color: #fff; }
+.callout-note { background: #f4f7f9; border-color: #dde5ea; }
+.callout-note .callout-label { background: var(--navy); color: #fff; }
+.callout strong { background: none; }
+
+.photo { margin: 2em 0; }
+.photo img { width: 100%; border-radius: var(--radius-sm); display: block; margin: 0 !important; }
+.photo figcaption { margin-top: 8px; font-size: .8rem; color: var(--ink-soft); text-align: center; line-height: 1.6; }
+.table-wrap { overflow-x: auto; margin: 1.6em 0; border: 1px solid var(--line); border-radius: var(--radius-sm); }
+.article-body .prose .table-wrap table { display: table; width: 100%; border-collapse: collapse; font-size: .92rem; margin: 0; }
+.article-body .prose th { background: var(--foam); color: var(--navy); font-weight: 800; white-space: nowrap; }
+.article-body .prose th, .article-body .prose td { padding: 10px 14px; border-bottom: 1px solid var(--line); text-align: left; }
+.article-body .prose tr:last-child td { border-bottom: 0; }
+.article-body .prose hr { border: 0; height: 1px; background: var(--line); margin: 2.4em 0; }
+
 .article-foot { margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--line); display: grid; gap: 16px; }
 .article-tags { display: flex; flex-wrap: wrap; gap: 8px; }
 .article-tags a { font-size: .86rem; font-weight: 700; color: var(--teal-dark); text-decoration: none; padding: 4px 12px; border-radius: 999px; background: var(--foam); }
