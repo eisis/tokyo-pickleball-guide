@@ -1,0 +1,18 @@
+---
+// タグ別の記事一覧（例: /blog/tag/東京/）。記事にタグを書くと自動で作られる
+import Base from '../../../layouts/Base.astro';
+import BlogArchive from '../../../components/BlogArchive.astro';
+import { getPosts } from '../../../lib/posts';
+
+export async function getStaticPaths() {
+  const tags = new Set((await getPosts()).flatMap((p) => p.data.tags));
+  return [...tags].map((tag) => ({ params: { tag } }));
+}
+const tag = Astro.params.tag!;
+const all = await getPosts();
+const posts = all.filter((p) => p.data.tags.includes(tag));
+---
+
+<Base title={`#${tag} の記事`} description={`「${tag}」に関するピックルボールの記事一覧。東京近郊のコート情報サイト Pickleball Tokyo。`}>
+  <BlogArchive posts={posts} allPosts={all} eyebrow="Tag" title={`#${tag}`} lead={`「${tag}」に関する記事をまとめています。`} activeTag={tag} />
+</Base>

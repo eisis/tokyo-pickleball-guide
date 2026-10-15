@@ -1,0 +1,29 @@
+---
+// 記事1件分のカード。記事一覧・トップ・関連記事で使い回す。
+// variant: feature=大きく1枚 / default=写真つき / compact=写真を小さく横に
+import { POST_CATEGORIES, postUrl, coverOf, ymd, readingMinutes, searchText, type Post } from '../lib/posts';
+
+interface Props {
+  post: Post;
+  variant?: 'feature' | 'default' | 'compact';
+}
+const { post, variant = 'default' } = Astro.props;
+const d = post.data;
+const cover = await coverOf(post);
+const cat = POST_CATEGORIES[d.category];
+---
+
+<article class={`pcard pcard-${variant}`} data-post-item data-category={d.category} data-search={searchText(post).toLowerCase()}>
+  <a class="pcard-media" href={postUrl(post)} tabindex="-1" aria-hidden="true">
+    {cover ? <img src={cover.src} alt="" loading="lazy" /> : <span class="pcard-noimg">{cat.en}</span>}
+  </a>
+  <div class="pcard-body">
+    <p class="pcard-kicker">
+      <span class={`pcat pcat-${d.category}`}>{cat.ja}</span>
+      <time datetime={d.publishedAt.toISOString()}>{ymd(d.publishedAt)}</time>
+    </p>
+    <h3 class="pcard-title"><a href={postUrl(post)}>{d.title}</a></h3>
+    {variant !== 'compact' && <p class="pcard-desc">{d.description}</p>}
+    <p class="pcard-meta">{readingMinutes(post)}分で読めます</p>
+  </div>
+</article>

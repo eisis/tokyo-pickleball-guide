@@ -2,6 +2,7 @@
 title: 2026年に東京でオープンした注目のピックルボールコート3選
 description: 池袋・豊洲・南青山に新しくできたピックルボール専用コートを紹介。屋内外の違いや予約方法をまとめました。
 publishedAt: 2026-10-12
+category: news
 tags: [新コート, 東京]
 courts: [sansan-ikebukuro, picklr-toyosu, pickle9-aoyama]
 ---

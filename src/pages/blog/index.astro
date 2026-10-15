@@ -1,24 +1,18 @@
 ---
-// 記事一覧：src/content/posts/ のファイルを新しい順に並べる
-import { getCollection } from 'astro:content';
+// 記事トップ：src/content/posts/ のファイルを新しい順に並べる
 import Base from '../../layouts/Base.astro';
+import BlogArchive from '../../components/BlogArchive.astro';
+import { getPosts } from '../../lib/posts';
 
-const posts = (await getCollection('posts', (p) => !p.data.draft)).sort(
-  (a, b) => b.data.publishedAt.getTime() - a.data.publishedAt.getTime()
-);
+const posts = await getPosts();
 ---
 
-<Base title="記事" description="東京近郊のピックルボール情報。新しいコート、初心者向けガイド、イベント情報など。">
-  <main class="container narrow">
-    <h1 class="section-title">記事</h1>
-    <div class="post-list">
-      {posts.map((p) => (
-        <div class="post-item">
-          <a href={`/blog/${p.id}/`}>{p.data.title}</a>
-          <p class="meta">{p.data.publishedAt.toISOString().slice(0, 10)}　{p.data.description}</p>
-        </div>
-      ))}
-      {posts.length === 0 && <p>記事はまだありません。</p>}
-    </div>
-  </main>
+<Base title="記事" description="東京近郊のピックルボール情報。コートの体験レビュー、はじめ方やルールのガイド、新しいコートのニュースなど。">
+  <BlogArchive
+    posts={posts}
+    allPosts={posts}
+    eyebrow="Journal"
+    title="記事"
+    lead="実際にコートへ行って書いたレビューや、これから始める人のためのガイド、新しいコートのニュースを届けています。"
+  />
 </Base>

@@ -6,8 +6,10 @@ import { SITE } from '../lib/site';
 interface Props {
   title: string;
   description: string;
+  image?: string; // SNSで共有したときの画像（/images/... または https://...）
 }
-const { title, description } = Astro.props;
+const { title, description, image } = Astro.props;
+const ogImage = image ? new URL(image, Astro.site).href : undefined;
 const siteName = SITE.name;
 const fullTitle = title === siteName ? title : `${title} | ${siteName}`;
 const canonical = new URL(Astro.url.pathname, Astro.site);
@@ -34,6 +36,8 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <meta property="og:type" content="website" />
     <meta property="og:url" content={canonical} />
     <meta name="twitter:card" content="summary_large_image" />
+    {ogImage && <meta property="og:image" content={ogImage} />}
+    <slot name="head" />
   </head>
   <body>
     <header class="site-header">
