@@ -39,7 +39,8 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <header class="site-header">
       <a class="logo" href="/" aria-label={SITE.name}><img src="/favicon.svg" alt="" width="30" height="30" /><span class="logo-word">Pickleball<span class="logo-accent">Tokyo</span></span></a>
       <nav>
-        <a href="/" data-ja="コート" data-en="Courts">コート</a>
+        <a href="/#courts" data-ja="コート" data-en="Courts">コート</a>
+        <a class="nav-sub" href="/#areas" data-ja="エリア" data-en="Areas">エリア</a>
         <a href="/blog/" data-ja="記事" data-en="Articles">記事</a>
         <div class="lang-switch">
           <button id="jpBtn" class="active" type="button">JP</button>
@@ -51,9 +52,20 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <slot />
 
     <footer class="footer">
-      <p data-ja="ピックルボールプレイヤーのために定期的に更新しています" data-en="Updated regularly for pickleball players">
-        ピックルボールプレイヤーのために定期的に更新しています
-      </p>
+      <div class="footer-inner">
+        <div>
+          <p class="footer-name">{SITE.name}</p>
+          <p data-ja="東京近郊のピックルボールコートまとめ。ピックルボールプレイヤーのために定期的に更新しています。" data-en="Pickleball courts in and around Tokyo, updated regularly for players.">
+            東京近郊のピックルボールコートまとめ。ピックルボールプレイヤーのために定期的に更新しています。
+          </p>
+        </div>
+        <nav class="footer-nav" aria-label="フッター">
+          <a href="/#courts" data-ja="コート一覧" data-en="Courts">コート一覧</a>
+          <a href="/#areas" data-ja="エリア" data-en="Areas">エリア</a>
+          <a href="/blog/" data-ja="記事" data-en="Articles">記事</a>
+        </nav>
+      </div>
+      <p class="footer-note" data-ja="料金・営業時間は変わることがあります。最新情報は各施設の公式サイトでご確認ください。" data-en="Prices and hours may change. Please check each facility's official site.">料金・営業時間は変わることがあります。最新情報は各施設の公式サイトでご確認ください。</p>
     </footer>
 
     <script is:inline>

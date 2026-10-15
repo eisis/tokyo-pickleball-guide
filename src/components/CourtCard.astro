@@ -1,5 +1,6 @@
 ---
-// コート1件分のカード。一覧ページや記事の関連コートで使い回す
+// コート1件分のカード。トップの一覧や記事の関連コートで使い回す。
+// data-* はトップの絞り込み・近い順検索・地図との連動に使う
 import { PREFECTURES, ENVIRONMENTS, CATEGORIES, courtUrl, mapUrl, bookingLabel, isNew, type Court } from '../lib/courts';
 
 interface Props {
@@ -9,31 +10,52 @@ const { court } = Astro.props;
 const d = court.data;
 const label = bookingLabel(court);
 const detail = courtUrl(court);
+const searchText = [d.name, d.area.ja, d.area.en, PREFECTURES[d.prefecture].ja, PREFECTURES[d.prefecture].en, d.description.ja].join(' ');
 ---
 
-<article class="card" data-court-item data-pref={d.prefecture} data-env={d.environment.join(' ')}>
-  <a href={detail}>
+<article
+  class="card"
+  data-court-item
+  data-id={court.id}
+  data-pref={d.prefecture}
+  data-env={d.environment.join(' ')}
+  data-lat={d.location?.lat}
+  data-lng={d.location?.lng}
+  data-search={searchText}
+  data-name={d.name}
+  data-opened={d.openedAt ? d.openedAt.getTime() : 0}
+>
+  <a class="card-media" href={detail} tabindex="-1" aria-hidden="true">
     {d.image ? (
-      <img class="facility-image" src={d.image} alt={d.name} loading="lazy" />
+      <img class="facility-image" src={d.image} alt="" loading="lazy" />
     ) : (
-      <div class="facility-image image-placeholder" aria-hidden="true">🏓</div>
+      <div class="facility-image image-placeholder">🏓</div>
     )}
+    <span class="card-badges">
+      {isNew(court) && <span class="badge-new">NEW</span>}
+      <span class="dist" data-dist hidden></span>
+    </span>
   </a>
   <div class="card-body">
-    <h3><a href={detail}>{d.name}</a>{isNew(court) && <span class="new-label">NEW</span>}</h3>
+    <p class="card-area">
+      <span data-ja={d.area.ja} data-en={d.area.en}>{d.area.ja}</span>
+      <span class="card-pref" data-ja={PREFECTURES[d.prefecture].ja} data-en={PREFECTURES[d.prefecture].en}>{PREFECTURES[d.prefecture].ja}</span>
+    </p>
+    <h3><a href={detail}>{d.name}</a></h3>
     <div class="location">
-      <span data-ja={`@${d.area.ja}`} data-en={`@${d.area.en}`}>@{d.area.ja}</span>
-      <span class={`tag ${d.prefecture}`}>{PREFECTURES[d.prefecture].en}</span>
-      {d.environment.map((e) => <span class={`tag ${e}`}>{ENVIRONMENTS[e].en}</span>)}
+      {d.environment.map((e) => <span class={`tag ${e}`} data-ja={ENVIRONMENTS[e].ja} data-en={ENVIRONMENTS[e].en}>{ENVIRONMENTS[e].ja}</span>)}
       {d.category !== 'dedicated' && (
         <span class="tag category" data-ja={CATEGORIES[d.category].ja} data-en={CATEGORIES[d.category].en}>{CATEGORIES[d.category].ja}</span>
       )}
+      {d.courts && <span class="tag category" data-ja={`${d.courts}面`} data-en={`${d.courts} courts`}>{d.courts}面</span>}
     </div>
     <p class="description" data-ja={d.description.ja} data-en={d.description.en}>{d.description.ja}</p>
-    <a class="button" href={d.booking.url} target="_blank" rel="noopener" data-ja={label.ja} data-en={label.en}>{label.ja}</a>
-    {d.availabilityUrl && (
-      <a class="button secondary" href={d.availabilityUrl} target="_blank" rel="noopener" data-ja="空き状況を見る" data-en="Check Availability">空き状況を見る</a>
-    )}
-    <a class="map-button" href={mapUrl(court)} target="_blank" rel="noopener">📍 Google Map</a>
+    <div class="card-actions">
+      <a class="button" href={d.booking.url} target="_blank" rel="noopener" data-ja={label.ja} data-en={label.en}>{label.ja}</a>
+      {d.availabilityUrl && (
+        <a class="button secondary" href={d.availabilityUrl} target="_blank" rel="noopener" data-ja="空き状況" data-en="Availability">空き状況</a>
+      )}
+      <a class="map-button" href={mapUrl(court)} target="_blank" rel="noopener" data-ja="地図" data-en="Map">地図</a>
+    </div>
   </div>
 </article>
