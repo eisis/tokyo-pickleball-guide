@@ -1,27 +1,31 @@
 ---
-// トップページ：地図 → 絞り込み → コートカード → 新着記事
+// トップページ：動画のヒーロー（検索）→ 絞り込み → 地図とコート一覧 → エリア → 新着記事
 // コートは src/content/courts/ のファイルから自動で読み込まれる
 import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import CourtMap from '../components/CourtMap.astro';
 import CourtFilters from '../components/CourtFilters.astro';
 import CourtCard from '../components/CourtCard.astro';
-import { getCourts } from '../lib/courts';
+import { getCourts, PREFECTURES } from '../lib/courts';
 import { SITE } from '../lib/site';
 
 const courts = await getCourts();
-const prefectures = [...new Set(courts.map((c) => c.data.prefecture))];
+const indoor = courts.filter((c) => c.data.environment.includes('indoor')).length;
+const outdoor = courts.filter((c) => c.data.environment.includes('outdoor')).length;
+const prefCount = new Set(courts.map((c) => c.data.prefecture)).size;
+const areas = (Object.keys(PREFECTURES) as (keyof typeof PREFECTURES)[]).map((p) => {
+  const list = courts.filter((c) => c.data.prefecture === p);
+  return { id: p, ...PREFECTURES[p], count: list.length, spots: [...new Set(list.map((c) => c.data.area.ja))] };
+});
 const posts = (await getCollection('posts', (p) => !p.data.draft))
   .sort((a, b) => b.data.publishedAt.getTime() - a.data.publishedAt.getTime())
   .slice(0, 3);
+const ymd = (d: Date) => d.toISOString().slice(0, 10).replaceAll('-', '.');
 ---
 
-<Base
-  title="東京近郊のピックルボールコートまとめ"
-  description={SITE.description}
->
+<Base title="東京近郊のピックルボールコートまとめ" description={SITE.description}>
   <section class="hero">
-    <video class="hero-video" autoplay muted loop playsinline>
+    <video class="hero-video" autoplay muted loop playsinline preload="metadata">
       <source src="/pickleball-hero.mp4" type="video/mp4" />
     </video>
     <div class="hero-overlay"></div>
@@ -29,31 +33,105 @@ const posts = (await getCollection('posts', (p) => !p.data.draft))
       <p class="hero-eyebrow">Tokyo · Kanagawa · Chiba · Saitama</p>
       <h1 data-ja="東京で、<br>ピックルボールを。" data-en="Find your court<br>in Tokyo." set:html="東京で、<br>ピックルボールを。" />
       <p class="hero-lead" data-ja={SITE.lead.ja} data-en={SITE.lead.en} set:html={SITE.lead.ja} />
-      <a class="hero-cta" href="#court-map"><span data-ja={`${courts.length}コートを探す`} data-en={`Explore ${courts.length} courts`}>{courts.length}コートを探す</span> <span aria-hidden="true">↓</span></a>
+
+      <form class="hero-search" id="hero-search" role="search">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
+        <input id="hero-q" type="search" list="court-places" autocomplete="off" placeholder="駅名・エリアを入力（例：豊洲、横浜）" aria-label="駅名・エリアでコートを探す" />
+        <button type="submit" data-ja="探す" data-en="Search">探す</button>
+      </form>
+      <div class="hero-quick">
+        <button type="button" data-hero-set="here"><span aria-hidden="true">📍</span> <span data-ja="現在地から近い順" data-en="Near me">現在地から近い順</span></button>
+        <button type="button" data-hero-set="indoor"><span aria-hidden="true">☔</span> <span data-ja="雨でも打てる屋内" data-en="Indoor courts">雨でも打てる屋内</span></button>
+      </div>
+    </div>
+    <dl class="hero-stats">
+      <div><dt data-ja="掲載コート" data-en="Courts">掲載コート</dt><dd>{courts.length}</dd></div>
+      <div><dt data-ja="屋内" data-en="Indoor">屋内</dt><dd>{indoor}</dd></div>
+      <div><dt data-ja="屋外" data-en="Outdoor">屋外</dt><dd>{outdoor}</dd></div>
+      <div><dt data-ja="都県" data-en="Prefectures">都県</dt><dd>{prefCount}</dd></div>
+    </dl>
+  </section>
+
+  <section id="courts" class="finder-section">
+    <CourtFilters courts={courts} />
+    <div class="explore">
+      <div class="explore-list">
+        <div class="near-note" id="near-note" hidden></div>
+        <div class="cards">
+          {courts.map((court) => <CourtCard court={court} />)}
+        </div>
+        <div class="empty" id="court-empty" hidden>
+          <p data-ja="条件に合うコートが見つかりませんでした。" data-en="No courts match these filters.">条件に合うコートが見つかりませんでした。</p>
+          <button type="button" class="chip" data-reset data-ja="条件をリセット" data-en="Reset filters">条件をリセット</button>
+        </div>
+      </div>
+      <aside class="explore-map" aria-label="コートマップ">
+        <CourtMap courts={courts} />
+      </aside>
     </div>
   </section>
 
   <main class="container">
-    <h2 class="section-title" data-ja="コートマップ" data-en="Court Map">コートマップ</h2>
-    <CourtMap courts={courts} />
-    <CourtFilters prefectures={prefectures} total={courts.length} />
-
-    <section class="cards">
-      {courts.map((court) => <CourtCard court={court} />)}
+    <section class="home-block" id="areas">
+      <div class="block-head">
+        <div>
+          <p class="eyebrow">By Area</p>
+          <h2 class="section-title" data-ja="エリアから探す" data-en="Browse by area">エリアから探す</h2>
+        </div>
+      </div>
+      <div class="area-grid">
+        {areas.map((a) => (
+          <button type="button" class={`area-tile area-${a.id}`} data-area-pref={a.id} disabled={a.count === 0}>
+            <span class="area-en">{a.en}</span>
+            <span class="area-ja">{a.ja}</span>
+            <span class="area-count">{a.count}<small data-ja="コート" data-en="courts">コート</small></span>
+            <span class="area-spots">{a.spots.join('・') || '掲載準備中'}</span>
+          </button>
+        ))}
+      </div>
     </section>
 
     {posts.length > 0 && (
-      <section style="margin-top:56px">
-        <h2 class="section-title" data-ja="新着記事" data-en="Latest Articles">新着記事</h2>
-        <div class="post-list">
-          {posts.map((p) => (
-            <div class="post-item">
-              <a href={`/blog/${p.id}/`}>{p.data.title}</a>
-              <p class="meta">{p.data.publishedAt.toISOString().slice(0, 10)}</p>
-            </div>
+      <section class="home-block" id="posts">
+        <div class="block-head">
+          <div>
+            <p class="eyebrow">Journal</p>
+            <h2 class="section-title" data-ja="新着記事" data-en="Latest Articles">新着記事</h2>
+          </div>
+          <a class="more-link" href="/blog/" data-ja="記事一覧 →" data-en="All articles →">記事一覧 →</a>
+        </div>
+        <div class="post-grid">
+          {posts.map((p, i) => (
+            <a class={`post-card${i === 0 ? ' feature' : ''}`} href={`/blog/${p.id}/`}>
+              <span class="post-kicker">
+                {p.data.tags[0] && <span class="post-tag">{p.data.tags[0]}</span>}
+                <span>{ymd(p.data.publishedAt)}</span>
+              </span>
+              <span class="post-title">{p.data.title}</span>
+              {i === 0 && <span class="post-desc">{p.data.description}</span>}
+            </a>
           ))}
         </div>
       </section>
     )}
   </main>
+
+  <script>
+    // ヒーローの検索窓・クイックボタン・エリアのタイル → 絞り込みバーに条件を渡す
+    const send = (detail: object) => window.dispatchEvent(new CustomEvent('courts:set', { detail }));
+    const heroInput = document.getElementById('hero-q') as HTMLInputElement;
+    document.getElementById('hero-search')!.addEventListener('submit', (e) => {
+      e.preventDefault();
+      send({ q: heroInput.value });
+    });
+    document.querySelectorAll<HTMLButtonElement>('[data-hero-set]').forEach((b) =>
+      b.addEventListener('click', () => send(b.dataset.heroSet === 'here' ? { here: true } : { env: 'indoor' }))
+    );
+    document.querySelectorAll<HTMLButtonElement>('[data-area-pref]').forEach((b) =>
+      b.addEventListener('click', () => send({ pref: b.dataset.areaPref }))
+    );
+    const setPh = () => (heroInput.placeholder = document.documentElement.lang === 'en' ? 'Station or area (e.g. Toyosu)' : '駅名・エリアを入力（例：豊洲、横浜）');
+    document.querySelectorAll('#jpBtn, #enBtn').forEach((b) => b.addEventListener('click', setPh));
+    setPh();
+  </script>
 </Base>

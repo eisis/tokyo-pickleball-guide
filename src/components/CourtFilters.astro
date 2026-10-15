@@ -1,53 +1,214 @@
 ---
-// エリア・屋内外の絞り込みボタン。
-// data-court-item を持つ要素（カード）を出し分け、地図などには 'courts:filter' イベントで知らせる。
-import { PREFECTURES, ENVIRONMENTS } from '../lib/courts';
+// 絞り込みバー（検索・エリア・屋内外・並び順）。
+// data-court-item を持つカードを出し分け・並べ替えし、地図には 'courts:filter' イベントで知らせる。
+// 他の場所（ヒーローの検索窓・エリアのタイル）からは 'courts:set' イベントで条件を渡せる。
+import { PREFECTURES, ENVIRONMENTS, type Court } from '../lib/courts';
+import { PLACES } from '../lib/places';
 
 interface Props {
-  prefectures: (keyof typeof PREFECTURES)[]; // 実際にコートがある都道府県だけボタンを出す
-  total: number;
+  courts: Court[];
 }
-const { prefectures, total } = Astro.props;
+const { courts } = Astro.props;
+const prefectures = (Object.keys(PREFECTURES) as (keyof typeof PREFECTURES)[]).filter((p) => courts.some((c) => c.data.prefecture === p));
+const suggestions = [...new Set([...Object.keys(PLACES), ...courts.map((c) => c.data.area.ja)])];
+const courtAreas = courts
+  .filter((c) => c.data.location)
+  .map((c) => ({ name: c.data.area.ja, lat: c.data.location!.lat, lng: c.data.location!.lng }));
 ---
 
-<div class="filters" id="court-filters">
-  <button type="button" class="active" data-key="pref" data-value="all" data-ja="すべて" data-en="All">すべて</button>
-  {prefectures.map((p) => (
-    <button type="button" data-key="pref" data-value={p} data-ja={PREFECTURES[p].ja} data-en={PREFECTURES[p].en}>{PREFECTURES[p].ja}</button>
-  ))}
-  <span class="filters-sep" aria-hidden="true"></span>
-  <button type="button" class="active" data-key="env" data-value="all" data-ja="屋内・屋外" data-en="Indoor & Outdoor">屋内・屋外</button>
-  {Object.entries(ENVIRONMENTS).map(([k, v]) => (
-    <button type="button" data-key="env" data-value={k} data-ja={v.ja} data-en={v.en}>{v.ja}</button>
-  ))}
+<div class="finder" id="court-filters" data-areas={JSON.stringify(courtAreas)}>
+  <div class="finder-inner">
+    <label class="finder-search">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
+      <input id="court-q" type="search" list="court-places" autocomplete="off"
+        placeholder="駅名・エリアで近い順に（例：豊洲）" aria-label="駅名・エリア・施設名で探す"
+        data-ph-ja="駅名・エリアで近い順に（例：豊洲）" data-ph-en="Station or area (e.g. Toyosu)" />
+      <datalist id="court-places">{suggestions.map((s) => <option value={s} />)}</datalist>
+    </label>
+    <div class="chips" role="group" aria-label="エリア">
+      <button type="button" class="chip active" data-key="pref" data-value="all"><span data-ja="すべて" data-en="All">すべて</span> <span class="n"></span></button>
+      {prefectures.map((p) => (
+        <button type="button" class="chip" data-key="pref" data-value={p}><span data-ja={PREFECTURES[p].ja} data-en={PREFECTURES[p].en}>{PREFECTURES[p].ja}</span> <span class="n"></span></button>
+      ))}
+    </div>
+    <div class="chips" role="group" aria-label="屋内・屋外">
+      <button type="button" class="chip active" data-key="env" data-value="all"><span data-ja="屋内・屋外" data-en="Both">屋内・屋外</span></button>
+      {Object.entries(ENVIRONMENTS).map(([k, v]) => (
+        <button type="button" class="chip" data-key="env" data-value={k}><span data-ja={v.ja} data-en={v.en}>{v.ja}</span> <span class="n"></span></button>
+      ))}
+    </div>
+    <div class="finder-meta">
+      <span class="count"><b id="court-count">{courts.length}</b> courts</span>
+      <select id="court-sort" class="sort" aria-label="並び順">
+        <option value="default">エリア順 / By area</option>
+        <option value="new">新着順 / Newest</option>
+        <option value="name">名前順 / A–Z</option>
+      </select>
+    </div>
+  </div>
 </div>
-<p class="count"><span id="court-count">{total}</span> courts</p>
 
 <script>
-  type FilterState = { pref: string; env: string };
-  const state: FilterState = { pref: 'all', env: 'all' };
+  import { findPlace, km, RADIUS_KM, type Origin } from '../lib/places';
+
+  type Item = {
+    el: HTMLElement; i: number; id: string; pref: string; env: string[];
+    lat: number; lng: number; hay: string; opened: number; name: string; distEl: HTMLElement | null;
+  };
+
   const root = document.getElementById('court-filters')!;
-  const buttons = root.querySelectorAll<HTMLButtonElement>('button');
+  const courtAreas = JSON.parse(root.dataset.areas ?? '[]');
+  const input = document.getElementById('court-q') as HTMLInputElement;
+  const sortSel = document.getElementById('court-sort') as HTMLSelectElement;
+  const note = document.getElementById('near-note');
+  const empty = document.getElementById('court-empty');
+  const lang = () => (document.documentElement.lang === 'en' ? 'en' : 'ja');
 
-  const matches = (pref: string, envs: string[]) =>
-    (state.pref === 'all' || pref === state.pref) && (state.env === 'all' || envs.includes(state.env));
+  const state = { pref: 'all', env: 'all', q: '', sort: 'default', origin: null as Origin | null, geoErr: false };
 
-  function apply() {
-    let n = 0;
-    document.querySelectorAll<HTMLElement>('[data-court-item]').forEach((el) => {
-      const ok = matches(el.dataset.pref ?? '', (el.dataset.env ?? '').split(' '));
-      el.hidden = !ok;
-      if (ok) n++;
-    });
-    document.getElementById('court-count')!.textContent = String(n);
-    window.dispatchEvent(new CustomEvent<FilterState>('courts:filter', { detail: { ...state } }));
+  const items: Item[] = [...document.querySelectorAll<HTMLElement>('.cards [data-court-item]')].map((el, i) => ({
+    el, i,
+    id: el.dataset.id!,
+    pref: el.dataset.pref ?? '',
+    env: (el.dataset.env ?? '').split(' '),
+    lat: Number(el.dataset.lat), lng: Number(el.dataset.lng),
+    hay: (el.dataset.search ?? '').toLowerCase(),
+    opened: Number(el.dataset.opened ?? 0),
+    name: el.dataset.name ?? '',
+    distEl: el.querySelector<HTMLElement>('[data-dist]'),
+  }));
+
+  function nearMap() {
+    if (!state.origin) return { near: null as Map<string, number> | null, fallback: false };
+    const o = state.origin;
+    const ds = items.filter((x) => !isNaN(x.lat)).map((x) => [x.id, km(o, x)] as [string, number]).sort((a, b) => a[1] - b[1]);
+    const within = ds.filter((d) => d[1] <= RADIUS_KM);
+    const fallback = within.length < 3;
+    return { near: new Map(fallback ? ds.slice(0, 3) : within), fallback };
   }
 
-  buttons.forEach((b) =>
-    b.addEventListener('click', () => {
-      state[b.dataset.key as keyof FilterState] = b.dataset.value!;
-      buttons.forEach((x) => x.dataset.key === b.dataset.key && x.classList.toggle('active', x === b));
-      apply();
-    })
-  );
+  function apply() {
+    const { near, fallback } = nearMap();
+    const ok = (x: Item, ignore?: 'pref' | 'env') =>
+      (!near || near.has(x.id)) &&
+      (ignore === 'pref' || state.pref === 'all' || x.pref === state.pref) &&
+      (ignore === 'env' || state.env === 'all' || x.env.includes(state.env)) &&
+      (!!near || !state.q || x.hay.includes(state.q.toLowerCase()));
+
+    const visible = items.filter((x) => ok(x));
+    items.forEach((x) => {
+      const show = visible.includes(x);
+      x.el.hidden = !show;
+      const d = near?.get(x.id);
+      if (x.distEl) {
+        x.distEl.hidden = d == null;
+        if (d != null) x.distEl.textContent = `${d.toFixed(1)} km`;
+      }
+    });
+
+    const cmp = (a: Item, b: Item) =>
+      near ? near.get(a.id)! - near.get(b.id)! :
+      state.sort === 'new' ? b.opened - a.opened || a.i - b.i :
+      state.sort === 'name' ? a.name.localeCompare(b.name, 'ja') :
+      a.i - b.i;
+    [...visible].sort(cmp).forEach((x, rank) => (x.el.style.order = String(rank)));
+
+    // ボタンの件数
+    root.querySelectorAll<HTMLButtonElement>('.chip').forEach((b) => {
+      const key = b.dataset.key as 'pref' | 'env';
+      const v = b.dataset.value!;
+      b.classList.toggle('active', state[key] === v);
+      const n = b.querySelector('.n');
+      if (n) n.textContent = String(items.filter((x) => ok(x, key) && (v === 'all' || (key === 'pref' ? x.pref === v : x.env.includes(v)))).length);
+    });
+    document.getElementById('court-count')!.textContent = String(visible.length);
+    if (empty) empty.hidden = visible.length > 0;
+    sortSel.disabled = !!near;
+    renderNote(fallback);
+
+    window.dispatchEvent(new CustomEvent('courts:filter', {
+      detail: { ids: visible.map((x) => x.id), origin: state.origin, radius: near && !fallback ? RADIUS_KM : null },
+    }));
+  }
+
+  function renderNote(fallback: boolean) {
+    if (!note) return;
+    const en = lang() === 'en';
+    if (state.geoErr) {
+      note.hidden = false;
+      note.className = 'near-note err';
+      note.innerHTML = `<span>${en ? 'Could not get your location. Try a station or area name.' : '位置情報を取得できませんでした。駅名やエリア名で探してください。'}</span><button type="button" class="chip" data-clear-near>${en ? 'Close' : '閉じる'}</button>`;
+      return;
+    }
+    if (!state.origin) { note.hidden = true; return; }
+    const o = state.origin;
+    const name = o.here ? (en ? 'your location' : '現在地') : `「${o.name.replace(/[<>&"]/g, '')}」`;
+    const sub = fallback
+      ? (en ? `No courts within ${RADIUS_KM} km — showing the 3 closest` : `${RADIUS_KM}km以内にないため、近い3コートを表示`)
+      : (en ? `Within ${RADIUS_KM} km` : `半径${RADIUS_KM}km以内`);
+    note.hidden = false;
+    note.className = 'near-note';
+    note.innerHTML = `<span>${en ? `Nearest to <b>${name}</b>` : `<b>${name}</b>から近い順`}</span><span class="sub">${sub} · ${en ? 'straight-line distance' : '直線距離'}</span><button type="button" class="chip" data-clear-near>${en ? 'Clear' : '解除'}</button>`;
+  }
+
+  function setQuery(v: string) {
+    state.geoErr = false;
+    const place = findPlace(v, courtAreas);
+    if (place) { state.origin = place; state.q = ''; state.pref = 'all'; }
+    else { state.origin = null; state.q = v.trim(); }
+    apply();
+  }
+
+  function useMyLocation() {
+    const fail = () => { state.origin = null; state.geoErr = true; apply(); };
+    if (!navigator.geolocation) return fail();
+    navigator.geolocation.getCurrentPosition(
+      (p) => {
+        Object.assign(state, { origin: { name: 'here', here: true, lat: p.coords.latitude, lng: p.coords.longitude }, geoErr: false, q: '', pref: 'all' });
+        input.value = '';
+        apply();
+      },
+      fail,
+      { timeout: 8000, maximumAge: 600000 }
+    );
+  }
+
+  function scrollToList() {
+    document.getElementById('courts')?.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+  }
+
+  root.addEventListener('click', (e) => {
+    const b = (e.target as HTMLElement).closest<HTMLButtonElement>('.chip[data-key]');
+    if (!b) return;
+    state[b.dataset.key as 'pref' | 'env'] = b.dataset.value!;
+    apply();
+  });
+  document.addEventListener('click', (e) => {
+    const t = e.target as HTMLElement;
+    if (t.closest('[data-clear-near]')) { Object.assign(state, { origin: null, geoErr: false, q: '' }); input.value = ''; apply(); }
+    if (t.closest('[data-reset]')) { Object.assign(state, { pref: 'all', env: 'all', q: '', origin: null, geoErr: false }); input.value = ''; apply(); }
+    if (t.closest('#jpBtn, #enBtn')) setTimeout(() => { input.placeholder = input.dataset[lang() === 'en' ? 'phEn' : 'phJa'] ?? ''; apply(); }, 0);
+  });
+  input.addEventListener('input', () => setQuery(input.value));
+  sortSel.addEventListener('change', () => { state.sort = sortSel.value; apply(); });
+
+  // ヒーローの検索窓・エリアのタイルなどから条件を受け取る
+  window.addEventListener('courts:set', (e) => {
+    const d = (e as CustomEvent<{ q?: string; pref?: string; env?: string; here?: boolean }>).detail;
+    if (d.here) { useMyLocation(); scrollToList(); return; }
+    if (d.q !== undefined) { input.value = d.q; setQuery(d.q); }
+    if (d.pref) { Object.assign(state, { pref: d.pref, origin: null, q: '' }); input.value = ''; }
+    if (d.env) state.env = d.env;
+    apply();
+    scrollToList();
+  });
+
+  // カードにマウスを乗せると地図のピンが目立つ
+  items.forEach((x) => {
+    x.el.addEventListener('mouseenter', () => window.dispatchEvent(new CustomEvent('courts:focus', { detail: { id: x.id } })));
+    x.el.addEventListener('mouseleave', () => window.dispatchEvent(new CustomEvent('courts:focus', { detail: { id: null } })));
+  });
+
+  if (lang() === 'en') input.placeholder = input.dataset.phEn ?? '';
+  apply();
 </script>
