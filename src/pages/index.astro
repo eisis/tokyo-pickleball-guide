@@ -1,11 +1,12 @@
 ---
 // トップページ：動画のヒーロー（検索）→ 絞り込み → 地図とコート一覧 → エリア → 新着記事
 // コートは src/content/courts/ のファイルから自動で読み込まれる
-import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import CourtMap from '../components/CourtMap.astro';
 import CourtFilters from '../components/CourtFilters.astro';
 import CourtCard from '../components/CourtCard.astro';
+import PostCard from '../components/PostCard.astro';
+import { getPosts } from '../lib/posts';
 import { getCourts, PREFECTURES } from '../lib/courts';
 import { SITE } from '../lib/site';
 
@@ -17,10 +18,9 @@ const areas = (Object.keys(PREFECTURES) as (keyof typeof PREFECTURES)[]).map((p)
   const list = courts.filter((c) => c.data.prefecture === p);
   return { id: p, ...PREFECTURES[p], count: list.length, spots: [...new Set(list.map((c) => c.data.area.ja))] };
 });
-const posts = (await getCollection('posts', (p) => !p.data.draft))
-  .sort((a, b) => b.data.publishedAt.getTime() - a.data.publishedAt.getTime())
-  .slice(0, 3);
-const ymd = (d: Date) => d.toISOString().slice(0, 10).replaceAll('-', '.');
+const allPosts = await getPosts();
+const top = allPosts.find((p) => p.data.featured) ?? allPosts[0];
+const posts = top ? [top, ...allPosts.filter((p) => p !== top).slice(0, 3)] : [];
 ---
 
 <Base title="東京近郊のピックルボールコートまとめ" description={SITE.description}>
@@ -101,16 +101,7 @@ const ymd = (d: Date) => d.toISOString().slice(0, 10).replaceAll('-', '.');
           <a class="more-link" href="/blog/" data-ja="記事一覧 →" data-en="All articles →">記事一覧 →</a>
         </div>
         <div class="post-grid">
-          {posts.map((p, i) => (
-            <a class={`post-card${i === 0 ? ' feature' : ''}`} href={`/blog/${p.id}/`}>
-              <span class="post-kicker">
-                {p.data.tags[0] && <span class="post-tag">{p.data.tags[0]}</span>}
-                <span>{ymd(p.data.publishedAt)}</span>
-              </span>
-              <span class="post-title">{p.data.title}</span>
-              {i === 0 && <span class="post-desc">{p.data.description}</span>}
-            </a>
-          ))}
+          {posts.map((p, i) => <PostCard post={p} variant={i === 0 ? 'feature' : 'compact'} />)}
         </div>
       </section>
     )}

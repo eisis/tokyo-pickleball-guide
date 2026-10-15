@@ -1,0 +1,22 @@
+---
+// カテゴリ別の記事一覧（例: /blog/category/review/）。カテゴリは src/lib/posts.ts で管理
+import Base from '../../../layouts/Base.astro';
+import BlogArchive from '../../../components/BlogArchive.astro';
+import { getPosts, POST_CATEGORIES, type PostCategory } from '../../../lib/posts';
+
+// 記事が1本以上あるカテゴリだけページを作る（空のページは作らない）
+export async function getStaticPaths() {
+  const posts = await getPosts();
+  return (Object.keys(POST_CATEGORIES) as PostCategory[])
+    .filter((c) => posts.some((p) => p.data.category === c))
+    .map((category) => ({ params: { category } }));
+}
+const category = Astro.params.category as PostCategory;
+const all = await getPosts();
+const posts = all.filter((p) => p.data.category === category);
+const c = POST_CATEGORIES[category];
+---
+
+<Base title={`${c.ja}の記事`} description={`${c.desc} 東京近郊のピックルボール情報サイト Pickleball Tokyo の${c.ja}記事一覧。`}>
+  <BlogArchive posts={posts} allPosts={all} eyebrow={c.en} title={c.ja} lead={c.desc} activeCategory={category} />
+</Base>

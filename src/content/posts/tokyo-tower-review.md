@@ -2,6 +2,10 @@
 title: 東京タワーの真下でピックルボール！屋上コートが想像以上に楽しかった
 description: 東京タワー屋上のピックルボールコートに4人で行ってきました。料金・レンタル・着替えまで実体験でレビューします。
 publishedAt: 2026-10-14
+category: review
+cover: /images/posts/tokyo-tower-court.jpeg
+coverAlt: 東京タワーの真下にある屋上のピックルボールコート
+featured: true
 tags: [コートレビュー, 東京, 港区]
 courts: [tokyo-tower]
 ---

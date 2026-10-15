@@ -44,7 +44,12 @@ const posts = defineCollection({
     description: z.string(),
     publishedAt: z.coerce.date(),
     updatedAt: z.coerce.date().optional(),
-    tags: z.array(z.string()).default([]),
+    category: z.enum(['review', 'guide', 'roundup', 'news', 'event']).default('news'), // 種類（src/lib/posts.ts の POST_CATEGORIES）
+    tags: z.array(z.string()).default([]), // 自由なタグ（エリア名・テーマなど）。タグごとの一覧ページが自動で作られる
+    cover: z.string().optional(), // 一覧やSNSで使う画像（なければ本文の最初の画像 → 紹介コートの画像の順で自動）
+    coverAlt: z.string().optional(),
+    featured: z.boolean().default(false), // true にすると記事一覧の一番上に大きく出る
+    author: z.string().default('Pickleball Tokyo 編集部'),
     courts: z.array(z.string()).default([]), // 記事で紹介するコートのファイル名（関連リンクを出す）
     draft: z.boolean().default(false), // trueの間は公開しない
   }),

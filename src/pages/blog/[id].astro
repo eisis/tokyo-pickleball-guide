@@ -1,34 +1,142 @@
 ---
-// 記事ページ：記事1ファイルにつき1ページ自動で作られる（例: /blog/new-courts-autumn-2026/）
-import { getCollection, getEntries, render } from 'astro:content';
+// 記事ページ：記事1ファイルにつき1ページ自動で作られる（例: /blog/tokyo-tower-review/）
+// 上から：パンくず → タイトル → カバー画像 → 本文（横に目次）→ タグ・共有 → 紹介したコート → 関連記事
+import { getEntries, render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import CourtCard from '../../components/CourtCard.astro';
+import PostCard from '../../components/PostCard.astro';
+import { SITE } from '../../lib/site';
+import {
+  getPosts, POST_CATEGORIES, categoryUrl, tagUrl, postUrl, ymd, readingMinutes, coverOf, relatedPosts, type Post,
+} from '../../lib/posts';
 
 export async function getStaticPaths() {
-  const posts = await getCollection('posts', (p) => !p.data.draft);
+  const posts = await getPosts();
   return posts.map((post) => ({ params: { id: post.id }, props: { post } }));
 }
 
-const { post } = Astro.props;
-const { Content } = await render(post);
-const related = await getEntries(post.data.courts.map((id) => ({ collection: 'courts' as const, id })));
+const { post } = Astro.props as { post: Post };
+const d = post.data;
+const { Content, headings } = await render(post);
+const toc = headings.filter((h) => h.depth === 2);
+const courts = (await getEntries(d.courts.map((id) => ({ collection: 'courts' as const, id })))).filter(Boolean);
+const related = relatedPosts(post, await getPosts());
+const cover = await coverOf(post);
+const cat = POST_CATEGORIES[d.category];
+// 本文にも同じ写真があるときは、上に重ねて出さない
+const showCover = cover && !(post.body ?? '').includes(cover.src);
+const url = new URL(postUrl(post), SITE.url).href;
+const shareText = encodeURIComponent(`${d.title} | ${SITE.name}`);
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'BlogPosting',
+      headline: d.title,
+      description: d.description,
+      datePublished: d.publishedAt.toISOString(),
+      dateModified: (d.updatedAt ?? d.publishedAt).toISOString(),
+      author: { '@type': 'Organization', name: d.author },
+      publisher: { '@type': 'Organization', name: SITE.name, url: SITE.url },
+      mainEntityOfPage: url,
+      ...(cover ? { image: new URL(cover.src, SITE.url).href } : {}),
+      keywords: d.tags.join(', '),
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'トップ', item: SITE.url + '/' },
+        { '@type': 'ListItem', position: 2, name: '記事', item: SITE.url + '/blog/' },
+        { '@type': 'ListItem', position: 3, name: cat.ja, item: SITE.url + categoryUrl(d.category) },
+        { '@type': 'ListItem', position: 4, name: d.title, item: url },
+      ],
+    },
+  ],
+};
 ---
 
-<Base title={post.data.title} description={post.data.description}>
-  <main class="container narrow">
-    <p class="meta"><a href="/blog/">← 記事一覧</a></p>
-    <h1 style="margin:12px 0 8px;color:var(--navy)">{post.data.title}</h1>
-    <p class="meta">
-      {post.data.publishedAt.toISOString().slice(0, 10)}
-      {post.data.updatedAt && `（更新 ${post.data.updatedAt.toISOString().slice(0, 10)}）`}
-    </p>
-    <article class="prose"><Content /></article>
+<Base title={d.title} description={d.description} image={cover?.src}>
+  <script slot="head" type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
 
-    {related.length > 0 && (
-      <section style="margin-top:40px">
+  <article class="article">
+    <header class="article-head">
+      <nav class="crumbs" aria-label="パンくず">
+        <a href="/">トップ</a><span aria-hidden="true">›</span>
+        <a href="/blog/">記事</a><span aria-hidden="true">›</span>
+        <a href={categoryUrl(d.category)}>{cat.ja}</a>
+      </nav>
+      <a class={`pcat pcat-${d.category}`} href={categoryUrl(d.category)}>{cat.ja}</a>
+      <h1 class="article-title">{d.title}</h1>
+      <p class="article-lead">{d.description}</p>
+      <p class="article-meta">
+        <time datetime={d.publishedAt.toISOString()}>{ymd(d.publishedAt)}</time>
+        {d.updatedAt && <span>更新 {ymd(d.updatedAt)}</span>}
+        <span>{readingMinutes(post)}分で読めます</span>
+        <span>{d.author}</span>
+      </p>
+    </header>
+
+    {showCover && (
+      <figure class="article-cover">
+        <img src={cover.src} alt={cover.alt} />
+      </figure>
+    )}
+
+    <div class="article-layout">
+      {toc.length >= 2 && (
+        <aside class="toc" aria-label="目次">
+          <details open>
+            <summary>この記事の目次</summary>
+            <ol>{toc.map((h) => <li><a href={`#${h.slug}`}>{h.text}</a></li>)}</ol>
+          </details>
+        </aside>
+      )}
+
+      <div class="article-body">
+        <div class="prose"><Content /></div>
+
+        <footer class="article-foot">
+          {d.tags.length > 0 && (
+            <div class="article-tags">{d.tags.map((t) => <a href={tagUrl(t)}>#{t}</a>)}</div>
+          )}
+          <div class="share">
+            <span class="share-label">この記事をシェア</span>
+            <a href={`https://x.com/intent/post?text=${shareText}&url=${encodeURIComponent(url)}`} target="_blank" rel="noopener">X</a>
+            <a href={`https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(url)}`} target="_blank" rel="noopener">LINE</a>
+            <button type="button" id="copy-link" data-url={url}>リンクをコピー</button>
+          </div>
+        </footer>
+      </div>
+    </div>
+
+    {courts.length > 0 && (
+      <section class="article-section">
         <h2 class="section-title">この記事で紹介したコート</h2>
-        <div class="cards">{related.filter(Boolean).map((c) => <CourtCard court={c} />)}</div>
+        <div class="cards">{courts.map((c) => <CourtCard court={c!} />)}</div>
       </section>
     )}
-  </main>
+
+    {related.length > 0 && (
+      <section class="article-section">
+        <h2 class="section-title">あわせて読みたい</h2>
+        <div class="post-cards">{related.map((p) => <PostCard post={p} />)}</div>
+      </section>
+    )}
+
+    <p class="article-back"><a href="/blog/">← 記事一覧へ</a></p>
+  </article>
+
+  <script>
+    const btn = document.getElementById('copy-link') as HTMLButtonElement | null;
+    btn?.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(btn.dataset.url ?? location.href);
+        btn.textContent = 'コピーしました';
+      } catch {
+        btn.textContent = 'コピーできませんでした';
+      }
+      setTimeout(() => (btn.textContent = 'リンクをコピー'), 2000);
+    });
+  </script>
 </Base>
