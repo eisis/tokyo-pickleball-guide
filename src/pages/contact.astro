@@ -1,0 +1,324 @@
+---
+// お問い合わせページ（/contact/）
+// 種別や入力項目は api/_lib/contact-types.js で管理。このページはそれを読み込んで自動で組み立てる。
+// 種別を選んだ状態で開くリンク：/contact/?type=court（掲載）・/contact/?type=fix（情報修正）
+import Base from '../layouts/Base.astro';
+---
+
+<Base title="お問い合わせ" description="Pickleball Tokyo へのお問い合わせ。コート掲載のご依頼（無料）、掲載情報の修正、取材・協業などはこちらから。">
+  <main class="container narrow contact">
+    <header class="contact-head">
+      <p class="contact-eyebrow">Contact</p>
+      <h1>お問い合わせ</h1>
+      <p class="contact-lead">コート掲載のご依頼（無料）、掲載情報の修正、取材・協業などはこちらからどうぞ。</p>
+    </header>
+
+    <ol class="contact-steps" id="steps" aria-label="入力の流れ">
+      <li data-step="1"><span>1</span><b>種別</b></li>
+      <li data-step="2"><span>2</span><b>入力</b></li>
+      <li data-step="3"><span>3</span><b>確認</b></li>
+      <li data-step="4"><span>4</span><b>完了</b></li>
+    </ol>
+
+    <div class="contact-alert" id="notReady" hidden>
+      お問い合わせフォームは現在準備中です。公開まで今しばらくお待ちください。
+    </div>
+
+    <!-- STEP1: 種別選択 -->
+    <section class="contact-panel" id="step1">
+      <h2>お問い合わせの種類を選んでください</h2>
+      <div class="contact-types" id="types"><p class="meta">読み込み中…</p></div>
+    </section>
+
+    <!-- STEP2: 入力 -->
+    <section class="contact-panel" id="step2" hidden>
+      <div class="contact-chosen"><span id="chosenLabel"></span><button type="button" id="changeType">種類を変える</button></div>
+      <form id="form" novalidate>
+        <div id="fields"></div>
+        <div class="contact-hp" aria-hidden="true"><label>Website<input type="text" name="website" tabindex="-1" autocomplete="off" /></label></div>
+        <div class="contact-field" id="f-agree">
+          <label class="contact-agree"><input type="checkbox" id="agree" /> <span><a href="/privacy/" target="_blank" rel="noopener">プライバシーポリシー</a>に同意します</span></label>
+        </div>
+        <div class="contact-actions"><button class="contact-btn" type="submit">入力内容を確認する</button></div>
+      </form>
+    </section>
+
+    <!-- STEP3: 確認 -->
+    <section class="contact-panel" id="step3" hidden>
+      <h2>入力内容のご確認</h2>
+      <div class="contact-alert" id="sendError" hidden></div>
+      <dl class="contact-confirm" id="confirm"></dl>
+      <div id="ts"></div>
+      <div class="contact-actions">
+        <button class="contact-btn ghost" type="button" id="back">修正する</button>
+        <button class="contact-btn" type="button" id="send">この内容で送信する</button>
+      </div>
+    </section>
+
+    <!-- STEP4: 完了 -->
+    <section class="contact-panel contact-done" id="step4" hidden>
+      <div class="contact-ball" aria-hidden="true">🏓</div>
+      <h2>送信が完了しました</h2>
+      <p>お問い合わせありがとうございます。<br />受付番号は以下のとおりです。</p>
+      <div class="contact-receipt" id="receipt"></div>
+      <p class="meta">ご入力のメールアドレス宛に確認メールをお送りしました。<br />届かない場合は迷惑メールフォルダもご確認ください。</p>
+      <div class="contact-actions"><a class="contact-btn" href="/">トップへ戻る</a></div>
+    </section>
+  </main>
+
+  <script is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
+  <script is:inline>
+  (() => {
+    const $ = (s) => document.querySelector(s);
+    const state = { config: null, type: null, values: {}, startedAt: Date.now(), tsWidget: null, tsToken: '' };
+    const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+    // ---------- 初期化 ----------
+    fetch('/api/contact').then((r) => r.json()).then((cfg) => {
+      state.config = cfg;
+      if (!cfg.ready) { $('#notReady').hidden = false; $('#steps').hidden = true; $('#step1').hidden = true; return; }
+      renderTypes();
+      const pre = new URLSearchParams(location.search).get('type');
+      if (pre && cfg.types.some((t) => t.id === pre)) selectType(pre, true);
+      else showStep(1, true);
+    }).catch(() => { $('#types').innerHTML = '<p class="contact-alert">フォームを読み込めませんでした。時間をおいて再度お試しください。</p>'; });
+
+    window.addEventListener('popstate', (e) => { if (state.type) showStep((e.state && e.state.step) || 1, true); });
+
+    function showStep(n, noPush) {
+      [1, 2, 3, 4].forEach((i) => ($('#step' + i).hidden = i !== n));
+      document.querySelectorAll('#steps li').forEach((li) => li.classList.toggle('on', +li.dataset.step <= n));
+      if (!noPush) history.pushState({ step: n }, '');
+      if (n === 3) renderTurnstile();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // ---------- STEP1 ----------
+    function renderTypes() {
+      $('#types').innerHTML = '';
+      state.config.types.forEach((t) => {
+        const b = document.createElement('button');
+        b.type = 'button'; b.className = 'contact-type';
+        b.innerHTML = `<span class="ic">${t.icon || ''}</span><b>${esc(t.label)}</b><small>${esc(t.description || '')}</small>`;
+        b.onclick = () => selectType(t.id);
+        $('#types').appendChild(b);
+      });
+    }
+
+    function selectType(id, noPush) {
+      state.type = state.config.types.find((t) => t.id === id);
+      $('#chosenLabel').textContent = `${state.type.icon || ''} ${state.type.label}`;
+      renderFields();
+      const u = new URL(location.href); u.searchParams.set('type', id);
+      history.replaceState(history.state, '', u);
+      showStep(2, noPush);
+    }
+    $('#changeType').onclick = () => showStep(1);
+
+    // ---------- STEP2 ----------
+    const allFields = () => [...state.config.common, ...state.type.fields];
+
+    function renderFields() {
+      const box = $('#fields'); box.innerHTML = '';
+      allFields().forEach((f) => {
+        const id = 'in-' + f.name;
+        const wrap = document.createElement('div');
+        wrap.className = 'contact-field'; wrap.id = 'f-' + f.name;
+        const badge = f.required ? '<span class="req">必須</span>' : '<span class="opt">任意</span>';
+        const val = state.values[f.name];
+        let html = '';
+        if (f.type === 'radio' || f.type === 'checkbox') {
+          html = `<span class="lbl">${esc(f.label)}${badge}</span><div class="contact-choices" role="group" aria-label="${esc(f.label)}">` +
+            f.options.map((o) => {
+              const on = f.type === 'checkbox' ? (val || []).includes(o) : val === o;
+              return `<label><input type="${f.type}" name="${f.name}" value="${esc(o)}" ${on ? 'checked' : ''}>${esc(o)}</label>`;
+            }).join('') + '</div>';
+        } else {
+          html = `<label for="${id}">${esc(f.label)}${badge}</label>`;
+          const attrs = `id="${id}" name="${f.name}" ${f.maxLength ? `maxlength="${f.maxLength}"` : ''} ${f.placeholder ? `placeholder="${esc(f.placeholder)}"` : ''} ${f.autocomplete ? `autocomplete="${f.autocomplete}"` : ''}`;
+          if (f.type === 'select') {
+            html += `<select ${attrs}><option value="">選択してください</option>` +
+              f.options.map((o) => `<option ${val === o ? 'selected' : ''}>${esc(o)}</option>`).join('') + '</select>';
+          } else if (f.type === 'textarea') {
+            html += `<textarea ${attrs}>${esc(val || '')}</textarea>`;
+          } else {
+            const mm = f.type === 'number' ? `min="${f.min ?? ''}" max="${f.max ?? ''}" inputmode="numeric"` : '';
+            html += `<input type="${f.type}" ${attrs} ${mm} value="${esc(val || '')}">`;
+          }
+        }
+        if (f.help) html += `<div class="help">${esc(f.help)}</div>`;
+        html += '<div class="error" hidden></div>';
+        wrap.innerHTML = html;
+        box.appendChild(wrap);
+      });
+    }
+
+    function collect() {
+      const form = $('#form'); const v = {};
+      allFields().forEach((f) => {
+        if (f.type === 'checkbox') v[f.name] = [...form.querySelectorAll(`[name="${f.name}"]:checked`)].map((i) => i.value);
+        else if (f.type === 'radio') v[f.name] = (form.querySelector(`[name="${f.name}"]:checked`) || {}).value || '';
+        else v[f.name] = form.elements[f.name].value.trim();
+      });
+      return v;
+    }
+
+    function check(v) {
+      const errs = {};
+      allFields().forEach((f) => {
+        const x = v[f.name];
+        const empty = Array.isArray(x) ? !x.length : !x;
+        if (empty) { if (f.required) errs[f.name] = f.type === 'checkbox' ? '1つ以上選択してください。' : '必須項目です。'; return; }
+        if (f.type === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(x)) errs[f.name] = 'メールアドレスの形式が正しくありません。';
+        if (f.type === 'url' && !/^https?:\/\/\S+$/.test(x)) errs[f.name] = 'http(s):// から始まるURLを入力してください。';
+        if (f.type === 'number' && (!Number.isInteger(+x) || (f.min != null && +x < f.min) || (f.max != null && +x > f.max))) errs[f.name] = `${f.min}〜${f.max}の数字で入力してください。`;
+      });
+      if (!$('#agree').checked) errs.agree = 'プライバシーポリシーへの同意が必要です。';
+      return errs;
+    }
+
+    function showErrors(errs) {
+      document.querySelectorAll('.contact-field').forEach((w) => {
+        const name = w.id.slice(2); let e = w.querySelector('.error');
+        const msg = errs[name];
+        w.classList.toggle('invalid', !!msg);
+        if (!e && msg) { e = document.createElement('div'); e.className = 'error'; w.appendChild(e); }
+        if (e) { e.hidden = !msg; e.textContent = msg || ''; }
+      });
+      const first = Object.keys(errs)[0];
+      if (first) $('#f-' + first)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    $('#form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const v = collect(); state.values = v;
+      const errs = check(v); showErrors(errs);
+      if (Object.keys(errs).length) return;
+      $('#confirm').innerHTML = allFields().map((f) => {
+        const x = Array.isArray(v[f.name]) ? v[f.name].join('、') : v[f.name];
+        return `<div><dt>${esc(f.label)}</dt><dd>${x ? esc(x) : '<span class="empty">（未入力）</span>'}</dd></div>`;
+      }).join('');
+      $('#sendError').hidden = true;
+      showStep(3);
+    });
+
+    // ---------- STEP3 ----------
+    function renderTurnstile() {
+      const key = state.config.turnstileSiteKey;
+      if (!key) return;
+      const go = () => {
+        if (!window.turnstile) return setTimeout(go, 200);
+        if (state.tsWidget !== null) { turnstile.reset(state.tsWidget); state.tsToken = ''; return; }
+        state.tsWidget = turnstile.render('#ts', { sitekey: key, language: 'ja', callback: (t) => (state.tsToken = t), 'expired-callback': () => (state.tsToken = '') });
+      };
+      go();
+    }
+
+    $('#back').onclick = () => history.back();
+
+    $('#send').onclick = async () => {
+      const btn = $('#send');
+      if (state.config.turnstileSiteKey && !state.tsToken) { showSendError('自動確認（ロボットでないことの確認）が終わるまで少しお待ちください。'); return; }
+      btn.disabled = true; btn.textContent = '送信中…';
+      try {
+        const r = await fetch('/api/contact', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            type: state.type.id, data: state.values, agree: $('#agree').checked,
+            website: $('#form').elements.website.value, startedAt: state.startedAt,
+            turnstileToken: state.tsToken, source: document.referrer,
+          }),
+        });
+        const j = await r.json();
+        if (!j.ok) {
+          if (j.fieldErrors) { showStep(2); showErrors(j.fieldErrors); }
+          else showSendError(j.error);
+          if (state.tsWidget !== null) { turnstile.reset(state.tsWidget); state.tsToken = ''; }
+          return;
+        }
+        $('#receipt').textContent = j.id;
+        history.replaceState(null, '', location.pathname);
+        showStep(4, true);
+      } catch { showSendError('通信に失敗しました。電波の良い場所で再度お試しください。'); }
+      finally { btn.disabled = false; btn.textContent = 'この内容で送信する'; }
+    };
+
+    function showSendError(m) { const a = $('#sendError'); a.textContent = m; a.hidden = false; }
+  })();
+  </script>
+</Base>
+
+<style is:global>
+  /* お問い合わせページ専用。色はサイト共通（global.css の :root）を使う */
+  .contact-head { text-align: center; margin-bottom: 24px; }
+  .contact-eyebrow { font-family: var(--display); font-weight: 800; color: var(--teal-dark); letter-spacing: .08em; text-transform: uppercase; font-size: .85rem; }
+  .contact-head h1 { color: var(--navy); font-size: clamp(1.7rem, 4vw, 2.3rem); margin: 4px 0 8px; }
+  .contact-lead { color: var(--ink-soft); }
+
+  .contact-steps { display: flex; gap: 8px; justify-content: center; margin: 0 0 20px; list-style: none; font-size: .82rem; color: var(--ink-soft); }
+  .contact-steps li { display: flex; align-items: center; gap: 6px; }
+  .contact-steps li span { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; background: var(--sand-deep); font-weight: 700; }
+  .contact-steps li.on { color: var(--navy); font-weight: 700; }
+  .contact-steps li.on span { background: var(--teal-dark); color: #fff; }
+  .contact-steps li + li::before { content: ""; width: 16px; height: 2px; background: var(--line); }
+
+  .contact-panel { background: #fff; border: 1px solid var(--line); border-radius: var(--radius); padding: 28px; box-shadow: var(--shadow); }
+  .contact-panel h2 { color: var(--navy); font-size: 1.15rem; margin-bottom: 18px; }
+
+  .contact-types { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+  .contact-type { text-align: left; cursor: pointer; background: var(--sand); border: 2px solid transparent; border-radius: var(--radius-sm); padding: 18px; color: var(--ink); transition: .15s; }
+  .contact-type:hover { border-color: var(--teal); transform: translateY(-2px); box-shadow: var(--shadow); }
+  .contact-type .ic { font-size: 1.6rem; }
+  .contact-type b { display: block; margin: 6px 0 2px; color: var(--navy); }
+  .contact-type small { color: var(--ink-soft); font-size: .85rem; }
+
+  .contact-chosen { display: flex; align-items: center; justify-content: space-between; gap: 8px; background: var(--foam); border-radius: var(--radius-sm); padding: 10px 14px; margin-bottom: 22px; font-weight: 700; color: var(--navy); }
+  .contact-chosen button { border: 0; background: none; cursor: pointer; color: var(--teal-dark); font-size: .85rem; text-decoration: underline; }
+
+  .contact-field { margin-bottom: 20px; }
+  .contact-field > label, .contact-field > .lbl { display: block; font-weight: 700; margin-bottom: 6px; font-size: .95rem; }
+  .contact .req, .contact .opt { font-size: .7rem; padding: 1px 7px; border-radius: 4px; margin-left: 6px; vertical-align: 2px; }
+  .contact .req { background: var(--coral); color: #fff; }
+  .contact .opt { background: var(--sand-deep); color: var(--ink-soft); }
+  .contact input[type=text], .contact input[type=email], .contact input[type=url], .contact input[type=tel], .contact input[type=number], .contact select, .contact textarea {
+    width: 100%; font: inherit; font-size: 16px; padding: 12px 14px; border: 1.5px solid var(--line); border-radius: var(--radius-sm); background: #fff; color: var(--ink);
+  }
+  .contact textarea { min-height: 130px; resize: vertical; }
+  .contact input:focus, .contact select:focus, .contact textarea:focus { outline: none; border-color: var(--teal); box-shadow: 0 0 0 3px var(--foam); }
+  .contact-choices { display: flex; flex-wrap: wrap; gap: 8px; }
+  .contact-choices label { display: flex; align-items: center; gap: 6px; border: 1.5px solid var(--line); border-radius: 999px; padding: 6px 14px; cursor: pointer; background: #fff; font-size: .92rem; }
+  .contact-choices input, .contact-agree input { accent-color: var(--teal-dark); }
+  .contact-choices label:has(input:checked) { border-color: var(--teal); background: var(--foam); }
+  .contact .help { color: var(--ink-soft); font-size: .82rem; margin-top: 4px; }
+  .contact .error { color: #c83b2a; font-size: .85rem; margin-top: 4px; }
+  .contact .invalid input, .contact .invalid select, .contact .invalid textarea { border-color: #c83b2a; }
+  .contact-agree { display: flex; gap: 8px; align-items: flex-start; font-size: .92rem; }
+  .contact-agree input { margin-top: 6px; }
+  .contact-hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+
+  .contact-actions { display: flex; gap: 12px; justify-content: center; margin-top: 24px; flex-wrap: wrap; }
+  .contact-btn { display: inline-block; font-weight: 700; border: 0; border-radius: 999px; padding: 14px 32px; cursor: pointer; background: var(--ball); color: var(--ball-ink); text-decoration: none; box-shadow: 0 4px 0 #a9c21d; transition: .1s; }
+  .contact-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #a9c21d; }
+  .contact-btn[disabled] { opacity: .6; cursor: wait; }
+  .contact-btn.ghost { background: #fff; color: var(--navy); border: 1.5px solid var(--line); box-shadow: none; }
+
+  .contact-confirm { border: 1px solid var(--line); border-radius: var(--radius-sm); overflow: hidden; }
+  .contact-confirm div { display: grid; grid-template-columns: minmax(110px, 32%) 1fr; border-top: 1px solid var(--line); }
+  .contact-confirm div:first-child { border-top: 0; }
+  .contact-confirm dt { background: var(--sand); padding: 10px 12px; font-weight: 700; font-size: .88rem; }
+  .contact-confirm dd { padding: 10px 12px; white-space: pre-wrap; word-break: break-word; }
+  .contact-confirm .empty { color: var(--ink-soft); opacity: .7; }
+  #ts { display: flex; justify-content: center; margin-top: 18px; }
+
+  .contact-done { text-align: center; }
+  .contact-ball { font-size: 3rem; }
+  .contact-receipt { display: inline-block; background: var(--foam); color: var(--navy); border-radius: var(--radius-sm); padding: 8px 18px; font-weight: 700; letter-spacing: .06em; margin: 8px 0 16px; }
+  .contact-alert { background: #fdecea; color: #a23224; border-radius: var(--radius-sm); padding: 12px 16px; margin-bottom: 16px; }
+  #notReady { background: var(--foam); color: var(--navy); text-align: center; }
+
+  @media (max-width: 480px) {
+    .contact-panel { padding: 20px 16px; }
+    .contact-steps li b { display: none; }
+    .contact-confirm div { grid-template-columns: 1fr; }
+  }
+</style>

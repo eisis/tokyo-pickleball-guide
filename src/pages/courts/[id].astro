@@ -53,6 +53,7 @@ const desc = `${d.name}（${pref}・${d.area.ja}）のピックルボールコ�
     {d.location && <div style="margin-top:28px"><CourtMap courts={[court]} /></div>}
 
     <p class="meta">情報確認日：{ymd(d.updatedAt)}　料金・営業時間は変わることがあるため、最新情報は公式サイトでご確認ください。</p>
+    <p class="meta"><a href="/contact/?type=fix">掲載情報の誤りを報告する</a>　／　<a href="/contact/?type=court">このコートの運営者の方へ（掲載内容のご相談）</a></p>
     {d.sources.length > 0 && (
       <div class="sources">
         <p>参考</p>
