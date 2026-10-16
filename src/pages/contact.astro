@@ -172,6 +172,7 @@ import Base from '../layouts/Base.astro';
         if (f.type === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(x)) errs[f.name] = 'メールアドレスの形式が正しくありません。';
         if (f.type === 'url' && !/^https?:\/\/\S+$/.test(x)) errs[f.name] = 'http(s):// から始まるURLを入力してください。';
         if (f.type === 'number' && (!Number.isInteger(+x) || (f.min != null && +x < f.min) || (f.max != null && +x > f.max))) errs[f.name] = `${f.min}〜${f.max}の数字で入力してください。`;
+        if (f.confirmOf && !errs[f.name] && x !== v[f.confirmOf]) errs[f.name] = 'メールアドレスが一致しません。';
       });
       if (!$('#agree').checked) errs.agree = 'プライバシーポリシーへの同意が必要です。';
       return errs;
@@ -194,7 +195,7 @@ import Base from '../layouts/Base.astro';
       const v = collect(); state.values = v;
       const errs = check(v); showErrors(errs);
       if (Object.keys(errs).length) return;
-      $('#confirm').innerHTML = allFields().map((f) => {
+      $('#confirm').innerHTML = allFields().filter((f) => !f.confirmOf).map((f) => {
         const x = Array.isArray(v[f.name]) ? v[f.name].join('、') : v[f.name];
         return `<div><dt>${esc(f.label)}</dt><dd>${x ? esc(x) : '<span class="empty">（未入力）</span>'}</dd></div>`;
       }).join('');

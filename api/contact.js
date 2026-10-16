@@ -44,13 +44,17 @@ export default async function handler(req, res) {
 
     const fields = [...COMMON_FIELDS, ...type.fields];
     const { values, errors } = validate(fields, body.data || {});
+    for (const f of fields) {
+      if (f.confirmOf && !errors[f.name] && values[f.name] !== values[f.confirmOf]) errors[f.name] = 'メールアドレスが一致しません。';
+    }
     if (body.agree !== true) errors.agree = 'プライバシーポリシーへの同意が必要です。';
     if (Object.keys(errors).length) return res.status(400).json({ ok: false, error: '入力内容をご確認ください。', fieldErrors: errors });
 
     // 4) 受付番号
     const id = makeReceiptId();
     const receivedAt = new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' });
-    const record = { id, receivedAt, type, fields, values, source: String(body.source || '').slice(0, 300) };
+    // 確認用の項目は記録・メールに含めない
+    const record = { id, receivedAt, type, fields: fields.filter((f) => !f.confirmOf), values, source: String(body.source || '').slice(0, 300) };
 
     // 5) 台帳保存とメール送信（台帳失敗でもメールは送る）
     const [sheet, notify] = await Promise.allSettled([saveToSheet(record), sendNotification(record)]);

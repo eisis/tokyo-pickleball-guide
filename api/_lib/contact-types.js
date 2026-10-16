@@ -9,6 +9,9 @@
 const COMMON_FIELDS = [
   { name: 'name', label: 'お名前', type: 'text', required: true, maxLength: 60, autocomplete: 'name', placeholder: '山田 太郎' },
   { name: 'email', label: 'メールアドレス', type: 'email', required: true, maxLength: 120, autocomplete: 'email', placeholder: 'you@example.com' },
+  // 打ち間違い防止の確認欄。confirmOf の項目と一致するかチェックし、メール・台帳には出さない
+  { name: 'emailConfirm', label: 'メールアドレス（確認用）', type: 'email', required: true, maxLength: 120, autocomplete: 'email',
+    placeholder: 'もう一度入力してください', confirmOf: 'email' },
 ];
 
 const PREFECTURES = ['東京都', '神奈川県', '千葉県', '埼玉県'];
