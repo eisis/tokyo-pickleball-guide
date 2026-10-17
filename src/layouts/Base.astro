@@ -110,6 +110,12 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
           }
         }
         document.addEventListener('click', send, true);
+        // 別タブで開くリンクをマウス・タップで押したときは、戻ってきたときにフォーカスの枠が残らないようにする
+        // （キーボード操作のときは e.detail が 0 なので、枠はそのまま表示される）
+        document.addEventListener('click', function (e) {
+          var a = e.target.closest && e.target.closest('a[target="_blank"]');
+          if (a && e.detail > 0) a.blur();
+        });
         // SNS リンクのクリックは GA4 にだけ送る
         document.addEventListener('click', function (e) {
           var a = e.target.closest && e.target.closest('a[data-sns]');
