@@ -49,7 +49,7 @@ const jsonLd = {
     <p class="event-tags" style="margin-top:16px">
       <span class={`etag etag-${d.type}`}>{type.ja}</span>
       {d.organizer.self && <span class="etag etag-self">Pickleball Tokyo 主催</span>}
-      <span class="etag etag-level">{LEVELS[d.level].ja}</span>
+      {d.level && <span class="etag etag-level">{LEVELS[d.level].ja}</span>}
       {!d.entry.required && <span class="etag etag-level">予約不要</span>}
     </p>
     <h1 style="margin:10px 0 12px;color:var(--navy)">{d.title}</h1>
@@ -60,13 +60,14 @@ const jsonLd = {
     <dl class="facts">
       <dt>日程</dt>
       <dd>
+        {d.schedule && <p style="margin-bottom:8px;font-weight:700">{d.schedule}</p>}
         <ul class="event-dates" id="event-dates">
           {dates.map((x) => <li data-date={iso(x)}>{md(x)}</li>)}
         </ul>
       </dd>
       {d.time && (<><dt>時間</dt><dd>{d.time}</dd></>)}
       <dt>会場</dt><dd>{venue.court ? <a href={`/courts/${venue.court.id}/`}>{venue.name}</a> : venue.name}{venue.address && <><br /><small>{venue.address}</small></>}</dd>
-      <dt>対象</dt><dd>{LEVELS[d.level].ja}</dd>
+      {d.level && (<><dt>対象</dt><dd>{LEVELS[d.level].ja}</dd></>)}
       {d.price && (<><dt>参加費</dt><dd>{d.price}</dd></>)}
       <dt>申込</dt><dd>{d.entry.required ? '事前申込が必要' : '予約不要（当日参加OK）'}{d.entry.deadline && `・締切 ${md(d.entry.deadline)}`}{d.entry.note && <><br /><small>{d.entry.note}</small></>}</dd>
       <dt>主催</dt><dd>{d.organizer.name}</dd>
@@ -103,6 +104,15 @@ const jsonLd = {
   const today = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
   const items = [...document.querySelectorAll<HTMLElement>('#event-dates [data-date]')];
   items.forEach((li) => li.classList.toggle('past', li.dataset.date! < today));
+  // 定期開催で日付が多いときは、近い8日だけ出す
+  const left = items.filter((li) => li.dataset.date! >= today);
+  if (left.length > 8) {
+    left.slice(8).forEach((li) => (li.hidden = true));
+    const more = document.createElement('li');
+    more.className = 'more';
+    more.textContent = `ほか${left.length - 8}日`;
+    document.getElementById('event-dates')!.append(more);
+  }
   if (items.every((li) => li.dataset.date! < today)) {
     document.getElementById('event-ended')!.hidden = false;
     document.getElementById('event-dates')!.classList.add('ended');

@@ -626,7 +626,8 @@ html[lang="en"] .hero h1 { font-family: var(--display); font-weight: 800; letter
 .event-note { padding: 16px 20px; border-radius: var(--radius-sm); background: var(--sand); border: 1px dashed var(--sand-deep); display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; justify-content: space-between; }
 .facts .event-dates { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 6px; }
 .facts .event-dates li { display: inline-block; width: auto; margin: 0; padding: 3px 10px; border-radius: 999px; background: var(--foam); font-weight: 700; font-size: .9rem; }
-.facts .event-dates li.past { display: none; }
+.facts .event-dates li.past, .facts .event-dates li[hidden] { display: none; }
+.facts .event-dates li.more { background: none; color: var(--ink-soft); }
 .facts .event-dates.ended li.past { display: inline-block; opacity: .6; text-decoration: line-through; }
 .event-note-link { font-weight: 700; color: var(--teal-dark); }
 .event-ended { margin: 16px 0; padding: 12px 16px; border-radius: var(--radius-sm); background: #fff1ec; color: #b4402a; font-weight: 700; }

@@ -8,7 +8,7 @@ time: "10:00〜13:00"
 court: pacific-pickle-club   # 掲載中のコートで開催するときはコートのファイル名。違う会場なら この行を消して venue を書く
 # venue: { name: 会場名, address: 住所 }
 # prefecture: tokyo           # venue を書いたときだけ必要（tokyo / kanagawa / saitama / chiba）
-level: all                   # beginner=初心者向け / all=どなたでも / intermediate=中級以上 / advanced=上級
+level: all                   # 主催者が書いていなければこの行を消す。beginner=初心者向け / all=どなたでも / intermediate=中級以上 / advanced=上級
 price: 1人 2,000円
 entry:
   required: true             # false=予約不要・当日参加OK

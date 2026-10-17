@@ -36,7 +36,7 @@ const pref = venue.prefecture ? PREFECTURES[venue.prefecture] : null;
     <p class="event-tags">
       <span class={`etag etag-${d.type}`} data-ja={type.ja} data-en={type.en}>{type.ja}</span>
       {d.organizer.self && <span class="etag etag-self">Pickleball Tokyo 主催</span>}
-      {beginnerOk(event) && <span class="etag etag-level" data-ja={LEVELS[d.level].ja} data-en={LEVELS[d.level].en}>{LEVELS[d.level].ja}</span>}
+      {d.level && beginnerOk(event) && <span class="etag etag-level" data-ja={LEVELS[d.level].ja} data-en={LEVELS[d.level].en}>{LEVELS[d.level].ja}</span>}
       {!d.entry.required && <span class="etag etag-level">予約不要</span>}
     </p>
     <h3><a href={eventUrl(event)}>{d.title}</a></h3>
@@ -45,8 +45,12 @@ const pref = venue.prefecture ? PREFECTURES[venue.prefecture] : null;
       <span>{venue.area ? `${venue.area}・` : ''}{venue.name}</span>
     </p>
     <p class="event-when">
-      {d.time && <span>{d.time}</span>}
-      <span class="event-more" data-rest hidden={rest === 0}>{rest > 0 ? `ほか${rest}日` : ''}</span>
+      {d.schedule ? <span>{d.schedule}</span> : (
+        <>
+          {d.time && <span>{d.time}</span>}
+          <span class="event-more" data-rest hidden={rest === 0}>{rest > 0 ? `ほか${rest}日` : ''}</span>
+        </>
+      )}
       {d.price && <span>{d.price}</span>}
     </p>
   </div>
