@@ -598,3 +598,39 @@ html[lang="en"] .hero h1 { font-family: var(--display); font-weight: 800; letter
   .owner-band-actions { width: 100%; }
   .owner-btn { width: 100%; text-align: center; }
 }
+
+/* ===== イベント（大会・練習会・体験会） ===== */
+.event-list { display: flex; flex-direction: column; gap: 12px; }
+.event-card { display: flex; gap: 16px; align-items: stretch; background: #fff; border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 14px; box-shadow: var(--shadow); }
+.event-card.self { border: 2px solid var(--coral); }
+.event-date { flex: none; width: 72px; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 10px; background: var(--foam); color: var(--navy); text-decoration: none; line-height: 1.1; }
+.event-card.self .event-date { background: #fff1ec; }
+.event-m { font-size: .75rem; font-weight: 700; color: var(--teal-dark); }
+.event-d { font-family: var(--display); font-size: 1.9rem; font-weight: 800; }
+.event-w { font-size: .75rem; font-weight: 700; color: var(--ink-soft); }
+.event-body { min-width: 0; flex: 1; }
+.event-body h3 { font-size: 1.02rem; margin: 6px 0 4px; line-height: 1.45; }
+.event-body h3 a { color: var(--navy); text-decoration: none; }
+.event-body h3 a:hover { color: var(--teal-dark); }
+.event-where, .event-when { font-size: .86rem; color: var(--ink-soft); display: flex; flex-wrap: wrap; gap: 4px 12px; }
+.event-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.etag { display: inline-flex; align-items: center; font-size: .72rem; font-weight: 700; padding: 3px 9px; border-radius: 999px; background: #e3eef8; color: var(--navy); }
+.etag-tournament { background: #fde7e1; color: #b4402a; }
+.etag-practice { background: #def3e9; color: #116149; }
+.etag-trial { background: #fff4d6; color: #8a5a00; }
+.etag-lesson { background: #ece6fb; color: #5b3fa8; }
+.etag-self { background: var(--coral); color: #fff; }
+.etag-level { background: #fff; border: 1px solid var(--line); color: var(--ink-soft); }
+.event-filters { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+.event-bands { margin-top: 40px; display: grid; gap: 16px; }
+.event-note { padding: 16px 20px; border-radius: var(--radius-sm); background: var(--sand); border: 1px dashed var(--sand-deep); display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; justify-content: space-between; }
+.facts .event-dates { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.facts .event-dates li { display: inline-block; width: auto; margin: 0; padding: 3px 10px; border-radius: 999px; background: var(--foam); font-weight: 700; font-size: .9rem; }
+.facts .event-dates li.past { display: none; }
+.facts .event-dates.ended li.past { display: inline-block; opacity: .6; text-decoration: line-through; }
+.event-note-link { font-weight: 700; color: var(--teal-dark); }
+.event-ended { margin: 16px 0; padding: 12px 16px; border-radius: var(--radius-sm); background: #fff1ec; color: #b4402a; font-weight: 700; }
+.event-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 8px; }
+.event-actions[hidden], .event-ended[hidden] { display: none; }
+@media (max-width: 520px) { .event-date { width: 60px; } .event-d { font-size: 1.6rem; } }
+@media (max-width: 520px) { .facts { grid-template-columns: 5.5em 1fr; padding: 16px; } .facts .event-dates li { font-size: .82rem; padding: 2px 8px; } }

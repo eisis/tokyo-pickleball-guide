@@ -1,0 +1,71 @@
+---
+// イベント1件分のカード。イベント一覧・トップ・コート詳細で使い回す。
+// 日付が過ぎたかどうかは、見た人の「今日」でスクリプトがもう一度判定する（サイトを更新しなくても終わったイベントは消える）
+import { EVENT_TYPES, LEVELS, eventUrl, upcomingDates, venueOf, iso, beginnerOk, type Event } from '../lib/events';
+import { PREFECTURES } from '../lib/courts';
+
+interface Props {
+  event: Event;
+}
+const { event } = Astro.props;
+const d = event.data;
+const venue = await venueOf(event);
+const dates = d.dates.map(iso).sort();
+const next = upcomingDates(event)[0] ?? dates[dates.length - 1];
+const [, m, day] = next.split('-').map(Number);
+const wd = ['日', '月', '火', '水', '木', '金', '土'][new Date(next + 'T00:00:00Z').getUTCDay()];
+const rest = dates.filter((x) => x > next).length;
+const type = EVENT_TYPES[d.type];
+const pref = venue.prefecture ? PREFECTURES[venue.prefecture] : null;
+---
+
+<article
+  class:list={['event-card', { self: d.organizer.self }]}
+  data-event-item
+  data-dates={dates.join(' ')}
+  data-type={d.type}
+  data-pref={venue.prefecture ?? ''}
+  data-beginner={beginnerOk(event) ? '1' : '0'}
+>
+  <a class="event-date" href={eventUrl(event)} aria-hidden="true" tabindex="-1">
+    <span class="event-m" data-m>{m}月</span>
+    <span class="event-d" data-d>{day}</span>
+    <span class="event-w" data-w>{wd}</span>
+  </a>
+  <div class="event-body">
+    <p class="event-tags">
+      <span class={`etag etag-${d.type}`} data-ja={type.ja} data-en={type.en}>{type.ja}</span>
+      {d.organizer.self && <span class="etag etag-self">Pickleball Tokyo 主催</span>}
+      {beginnerOk(event) && <span class="etag etag-level" data-ja={LEVELS[d.level].ja} data-en={LEVELS[d.level].en}>{LEVELS[d.level].ja}</span>}
+      {!d.entry.required && <span class="etag etag-level">予約不要</span>}
+    </p>
+    <h3><a href={eventUrl(event)}>{d.title}</a></h3>
+    <p class="event-where">
+      {pref && <span>{pref.ja}</span>}
+      <span>{venue.area ? `${venue.area}・` : ''}{venue.name}</span>
+    </p>
+    <p class="event-when">
+      {d.time && <span>{d.time}</span>}
+      <span class="event-more" data-rest hidden={rest === 0}>{rest > 0 ? `ほか${rest}日` : ''}</span>
+      {d.price && <span>{d.price}</span>}
+    </p>
+  </div>
+</article>
+
+<script>
+  // 見た人の今日（日本時間）で、終わった日付を除いて表示を直す
+  const today = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
+  const WEEK = ['日', '月', '火', '水', '木', '金', '土'];
+  document.querySelectorAll<HTMLElement>('[data-event-item]').forEach((el) => {
+    const left = (el.dataset.dates ?? '').split(' ').filter((x) => x && x >= today);
+    if (left.length === 0) { el.hidden = true; el.dataset.ended = '1'; return; }
+    const [, m, d] = left[0].split('-').map(Number);
+    el.querySelector('[data-m]')!.textContent = `${m}月`;
+    el.querySelector('[data-d]')!.textContent = String(d);
+    el.querySelector('[data-w]')!.textContent = WEEK[new Date(left[0] + 'T00:00:00Z').getUTCDay()];
+    const rest = el.querySelector<HTMLElement>('[data-rest]');
+    if (rest) { rest.hidden = left.length < 2; rest.textContent = `ほか${left.length - 1}日`; }
+    el.dataset.next = left[0];
+  });
+  window.dispatchEvent(new Event('events:ready'));
+</script>

@@ -1,0 +1,113 @@
+---
+// イベント一覧：src/content/events/ のうち、まだ開催日が残っているものを近い順に並べる
+// 上から：見出し → 絞り込み（種類・エリア・初心者OK）→ 一覧 → 主催者向けの案内
+import Base from '../../layouts/Base.astro';
+import EventCard from '../../components/EventCard.astro';
+import { getUpcomingEvents, EVENT_TYPES, venueOf } from '../../lib/events';
+import { PREFECTURES } from '../../lib/courts';
+
+const events = await getUpcomingEvents();
+const venues = await Promise.all(events.map(venueOf));
+const types = (Object.keys(EVENT_TYPES) as (keyof typeof EVENT_TYPES)[]).filter((t) => events.some((e) => e.data.type === t));
+const prefs = (Object.keys(PREFECTURES) as (keyof typeof PREFECTURES)[]).filter((p) => venues.some((v) => v.prefecture === p));
+---
+
+<Base
+  title="ピックルボールの大会・練習会・体験会（東京近郊）"
+  description="東京・神奈川・千葉・埼玉で開催されるピックルボールの大会・練習会・体験会をまとめました。初心者OKのイベントやコートごとのイベントも探せます。"
+>
+  <header class="blog-head">
+    <div class="blog-head-inner">
+      <nav class="crumbs" aria-label="パンくず"><a href="/">トップ</a><span aria-hidden="true">›</span><span>イベント</span></nav>
+      <p class="eyebrow">Events</p>
+      <h1 class="blog-title">大会・練習会・体験会</h1>
+      <p class="blog-lead">東京近郊で開かれるピックルボールのイベントをまとめています。日程と会場を確認したら、申し込みは主催者のページからどうぞ。</p>
+    </div>
+  </header>
+
+  <main class="container events-page">
+    <div class="event-filters" id="event-filters">
+      <div class="chips" role="group" aria-label="種類">
+        <button type="button" class="chip active" data-key="type" data-value="all">すべて</button>
+        {types.map((t) => <button type="button" class="chip" data-key="type" data-value={t}>{EVENT_TYPES[t].ja}</button>)}
+      </div>
+      {prefs.length > 1 && (
+        <div class="chips" role="group" aria-label="エリア">
+          <button type="button" class="chip active" data-key="pref" data-value="all">全エリア</button>
+          {prefs.map((p) => <button type="button" class="chip" data-key="pref" data-value={p}>{PREFECTURES[p].ja}</button>)}
+        </div>
+      )}
+      <div class="chips" role="group" aria-label="その他の条件">
+        <button type="button" class="chip" data-toggle="beginner" aria-pressed="false">初心者OK</button>
+      </div>
+    </div>
+
+    <div class="event-list" id="event-list">
+      {events.map((e) => <EventCard event={e} />)}
+    </div>
+    <p class="empty" id="event-empty" hidden>
+      条件に合うイベントは今のところありません。<br />
+      <button type="button" class="chip" data-reset>条件をリセット</button>
+    </p>
+
+    <section class="event-bands">
+      <div class="owner-band">
+        <div class="owner-band-text">
+          <p class="eyebrow">For Organizers</p>
+          <h2>イベントを主催している方へ</h2>
+          <p>大会・練習会・体験会の掲載は無料です。開催日・会場・申込ページを送っていただければ、確認のうえ掲載します。</p>
+        </div>
+        <div class="owner-band-actions">
+          <a class="owner-btn" href="/contact/?type=event" data-track="event_submit" data-track-from="イベント一覧">イベントを掲載する</a>
+        </div>
+      </div>
+      <div class="event-note">
+        <p><b>Pickleball Tokyo の練習会、準備中です。</b>開催のお知らせはInstagramで最初にお届けします。</p>
+        <a class="event-note-link" href="https://www.instagram.com/pickleballtokyo/" target="_blank" rel="noopener">@pickleballtokyo をフォロー →</a>
+      </div>
+    </section>
+
+    <p class="meta">内容は変更されることがあります。参加前に必ず主催者のページで最新情報をご確認ください。</p>
+  </main>
+</Base>
+
+<script>
+  const root = document.getElementById('event-filters')!;
+  const empty = document.getElementById('event-empty')!;
+  const state = { type: 'all', pref: 'all', beginner: false };
+
+  function apply() {
+    const items = [...document.querySelectorAll<HTMLElement>('#event-list [data-event-item]')].filter((el) => !el.dataset.ended);
+    let shown = 0;
+    items.forEach((el) => {
+      const ok =
+        (state.type === 'all' || el.dataset.type === state.type) &&
+        (state.pref === 'all' || el.dataset.pref === state.pref) &&
+        (!state.beginner || el.dataset.beginner === '1');
+      el.hidden = !ok;
+      if (ok) shown++;
+    });
+    // 次の開催日が近い順（主催イベントは先頭のまま）
+    items
+      .sort((a, b) => Number(b.classList.contains('self')) - Number(a.classList.contains('self')) || (a.dataset.next ?? '').localeCompare(b.dataset.next ?? ''))
+      .forEach((el, i) => (el.style.order = String(i)));
+    root.querySelectorAll<HTMLButtonElement>('.chip[data-key]').forEach((b) => b.classList.toggle('active', state[b.dataset.key as 'type' | 'pref'] === b.dataset.value));
+    const t = root.querySelector<HTMLButtonElement>('[data-toggle="beginner"]')!;
+    t.classList.toggle('active', state.beginner);
+    t.setAttribute('aria-pressed', String(state.beginner));
+    empty.hidden = shown > 0;
+  }
+
+  root.addEventListener('click', (e) => {
+    const el = e.target as HTMLElement;
+    if (el.closest('[data-toggle="beginner"]')) state.beginner = !state.beginner;
+    const b = el.closest<HTMLButtonElement>('.chip[data-key]');
+    if (b) state[b.dataset.key as 'type' | 'pref'] = b.dataset.value!;
+    apply();
+  });
+  empty.addEventListener('click', (e) => {
+    if ((e.target as HTMLElement).closest('[data-reset]')) { Object.assign(state, { type: 'all', pref: 'all', beginner: false }); apply(); }
+  });
+  apply();
+  window.addEventListener('events:ready', apply);
+</script>

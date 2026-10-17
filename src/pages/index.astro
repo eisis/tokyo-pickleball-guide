@@ -7,6 +7,8 @@ import CourtFilters from '../components/CourtFilters.astro';
 import CourtCard from '../components/CourtCard.astro';
 import PostCard from '../components/PostCard.astro';
 import { getPosts } from '../lib/posts';
+import EventCard from '../components/EventCard.astro';
+import { getUpcomingEvents } from '../lib/events';
 import { getCourts, PREFECTURES } from '../lib/courts';
 import { SITE } from '../lib/site';
 
@@ -21,6 +23,7 @@ const areas = (Object.keys(PREFECTURES) as (keyof typeof PREFECTURES)[]).map((p)
 const allPosts = await getPosts();
 const top = allPosts.find((p) => p.data.featured) ?? allPosts[0];
 const posts = top ? [top, ...allPosts.filter((p) => p !== top).slice(0, 3)] : [];
+const upcoming = (await getUpcomingEvents()).slice(0, 4);
 ---
 
 <Base title="東京近郊のピックルボールコートまとめ" description={SITE.description}>
@@ -72,6 +75,19 @@ const posts = top ? [top, ...allPosts.filter((p) => p !== top).slice(0, 3)] : []
   </section>
 
   <main class="container">
+    {upcoming.length > 0 && (
+      <section class="home-block" id="events">
+        <div class="block-head">
+          <div>
+            <p class="eyebrow">Events</p>
+            <h2 class="section-title" data-ja="近日のイベント" data-en="Upcoming Events">近日のイベント</h2>
+          </div>
+          <a class="more-link" href="/events/" data-ja="イベント一覧 →" data-en="All events →">イベント一覧 →</a>
+        </div>
+        <div class="event-list">{upcoming.map((e) => <EventCard event={e} />)}</div>
+      </section>
+    )}
+
     <section class="home-block" id="areas">
       <div class="block-head">
         <div>

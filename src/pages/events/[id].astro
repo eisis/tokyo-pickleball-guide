@@ -1,0 +1,111 @@
+---
+// イベント詳細ページ：イベント1ファイルにつき1ページ自動で作られる（例: /events/tocho-challenge-days-2026/）
+// 終わったイベントもページは残し、「終了しました」と出す（検索や過去のSNS投稿から来た人が迷わないように）
+import { render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import CourtCard from '../../components/CourtCard.astro';
+import { SITE } from '../../lib/site';
+import { PREFECTURES } from '../../lib/courts';
+import { getAllEvents, EVENT_TYPES, LEVELS, venueOf, iso, md, upcomingDates, type Event } from '../../lib/events';
+
+export async function getStaticPaths() {
+  return (await getAllEvents()).map((event) => ({ params: { id: event.id }, props: { event } }));
+}
+
+const { event } = Astro.props as { event: Event };
+const d = event.data;
+const { Content } = await render(event);
+const venue = await venueOf(event);
+const type = EVENT_TYPES[d.type];
+const pref = venue.prefecture ? PREFECTURES[venue.prefecture].full : '';
+const dates = [...d.dates].sort((a, b) => a.getTime() - b.getTime());
+const entryUrl = d.entry.url ?? d.url;
+const selfEntry = d.organizer.self && !entryUrl ? `/contact/?type=tournament` : null; // 主催イベントはサイトのフォームで受ける
+const next = upcomingDates(event)[0] ?? iso(dates[dates.length - 1]);
+const desc = `${md(new Date(next + 'T00:00:00Z'))}開催。${venue.name}（${pref}）で行われるピックルボールの${type.ja}。${d.summary}`;
+
+// 検索結果にイベントとして出やすくするための構造化データ（次の開催日）
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'SportsEvent',
+  name: d.title,
+  description: d.summary,
+  sport: 'Pickleball',
+  startDate: d.time && /^\d{1,2}:\d{2}/.test(d.time) ? `${next}T${d.time.slice(0, 5).padStart(5, '0')}:00+09:00` : next,
+  eventStatus: 'https://schema.org/EventScheduled',
+  eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+  location: { '@type': 'Place', name: venue.name, address: venue.address ?? pref },
+  organizer: { '@type': 'Organization', name: d.organizer.name },
+  ...(d.url ? { url: d.url } : {}),
+  ...(d.price === '無料' ? { isAccessibleForFree: true } : {}),
+};
+---
+
+<Base title={`${d.title}｜ピックルボールの${type.ja}`} description={desc} image={d.image ?? venue.court?.data.image}>
+  <script slot="head" type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  <main class="container narrow">
+    <nav class="crumbs" aria-label="パンくず"><a href="/">トップ</a><span aria-hidden="true">›</span><a href="/events/">イベント</a></nav>
+
+    <p class="event-tags" style="margin-top:16px">
+      <span class={`etag etag-${d.type}`}>{type.ja}</span>
+      {d.organizer.self && <span class="etag etag-self">Pickleball Tokyo 主催</span>}
+      <span class="etag etag-level">{LEVELS[d.level].ja}</span>
+      {!d.entry.required && <span class="etag etag-level">予約不要</span>}
+    </p>
+    <h1 style="margin:10px 0 12px;color:var(--navy)">{d.title}</h1>
+    <p class="description">{d.summary}</p>
+
+    <div class="event-ended" id="event-ended" hidden>このイベントは終了しました。<a href="/events/">開催予定のイベントを見る →</a></div>
+
+    <dl class="facts">
+      <dt>日程</dt>
+      <dd>
+        <ul class="event-dates" id="event-dates">
+          {dates.map((x) => <li data-date={iso(x)}>{md(x)}</li>)}
+        </ul>
+      </dd>
+      {d.time && (<><dt>時間</dt><dd>{d.time}</dd></>)}
+      <dt>会場</dt><dd>{venue.court ? <a href={`/courts/${venue.court.id}/`}>{venue.name}</a> : venue.name}{venue.address && <><br /><small>{venue.address}</small></>}</dd>
+      <dt>対象</dt><dd>{LEVELS[d.level].ja}</dd>
+      {d.price && (<><dt>参加費</dt><dd>{d.price}</dd></>)}
+      <dt>申込</dt><dd>{d.entry.required ? '事前申込が必要' : '予約不要（当日参加OK）'}{d.entry.deadline && `・締切 ${md(d.entry.deadline)}`}{d.entry.note && <><br /><small>{d.entry.note}</small></>}</dd>
+      <dt>主催</dt><dd>{d.organizer.name}</dd>
+    </dl>
+
+    <div class="event-actions" id="event-actions">
+      {selfEntry && <a class="button" href={selfEntry} data-track="event_entry" data-track-from="イベント詳細">参加を申し込む →</a>}
+      {entryUrl && d.entry.required && <a class="button" href={entryUrl} target="_blank" rel="noopener" data-track="event_entry" data-track-from="イベント詳細">申し込む（主催者のページ）→</a>}
+      {d.url && (!d.entry.required || entryUrl !== d.url) && <a class="button secondary" href={d.url} target="_blank" rel="noopener" data-track="event_detail" data-track-from="イベント詳細">主催者のページで詳しく見る</a>}
+    </div>
+
+    <div class="prose"><Content /></div>
+
+    {venue.court && (
+      <section style="margin-top:32px">
+        <h2 style="font-size:1.1rem;color:var(--navy);margin-bottom:12px">会場のコート</h2>
+        <div class="cards"><CourtCard court={venue.court} /></div>
+      </section>
+    )}
+
+    <p class="meta">情報確認日：{iso(d.updatedAt)}　内容は変更されることがあります。参加前に主催者のページで最新情報をご確認ください。</p>
+    <p class="meta"><a href="/contact/?type=fix">掲載内容の誤りを報告する</a>　／　<a href="/contact/?type=event">イベントの掲載を依頼する</a></p>
+    {d.sources.length > 0 && (
+      <div class="sources">
+        <p>参考</p>
+        <ul>{d.sources.map((s) => <li><a href={s} target="_blank" rel="noopener">{new URL(s).hostname}</a></li>)}</ul>
+      </div>
+    )}
+  </main>
+</Base>
+
+<script>
+  // 見た人の今日で、過ぎた日付を薄くし、全部過ぎていたら「終了しました」
+  const today = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
+  const items = [...document.querySelectorAll<HTMLElement>('#event-dates [data-date]')];
+  items.forEach((li) => li.classList.toggle('past', li.dataset.date! < today));
+  if (items.every((li) => li.dataset.date! < today)) {
+    document.getElementById('event-ended')!.hidden = false;
+    document.getElementById('event-dates')!.classList.add('ended');
+    document.getElementById('event-actions')!.hidden = true;
+  }
+</script>

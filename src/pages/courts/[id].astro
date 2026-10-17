@@ -3,6 +3,8 @@
 import { render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import CourtMap from '../../components/CourtMap.astro';
+import EventCard from '../../components/EventCard.astro';
+import { getUpcomingEvents } from '../../lib/events';
 import { getCourts, PREFECTURES, ENVIRONMENTS, mapUrl, isNew, rentalText, reservationText, type Court } from '../../lib/courts';
 
 export async function getStaticPaths() {
@@ -13,6 +15,7 @@ export async function getStaticPaths() {
 const { court } = Astro.props as { court: Court };
 const d = court.data;
 const { Content } = await render(court);
+const courtEvents = (await getUpcomingEvents()).filter((e) => e.data.court === court.id);
 const env = d.environment.map((e) => ENVIRONMENTS[e].ja).join('・');
 const pref = PREFECTURES[d.prefecture].full;
 const bookLabel = d.booking.label === 'info' ? '公式サイトで詳細を見る →' : '公式サイトで予約する →';
@@ -51,6 +54,13 @@ const desc = `${d.name}（${pref}・${d.area.ja}）のピックルボールコ�
     <a class="map-button" href={mapUrl(court)} target="_blank" rel="noopener" data-track="map" data-track-from="詳細ページ" data-court-id={court.id} data-court-name={d.name}>📍 Google Map</a>
 
     <div class="prose"><Content /></div>
+
+    {courtEvents.length > 0 && (
+      <section style="margin-top:28px">
+        <h2 style="font-size:1.1rem;color:var(--navy);margin-bottom:12px">このコートで開催予定のイベント</h2>
+        <div class="event-list">{courtEvents.map((e) => <EventCard event={e} />)}</div>
+      </section>
+    )}
 
     {d.location && <div style="margin-top:28px"><CourtMap courts={[court]} /></div>}
 

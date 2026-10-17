@@ -63,4 +63,41 @@ const posts = defineCollection({
   }),
 });
 
-export const collections = { courts, posts };
+// イベント（大会・練習会・体験会など）。1イベント＝1ファイル。書き方は src/content/events/_template.md
+// 日付がすべて過ぎたイベントは、サイト上で自動的に「終了」扱いになり一覧から消える
+const events = defineCollection({
+  loader: glob({ pattern: '**/[^_]*.md', base: './src/content/events' }),
+  schema: z.object({
+    title: z.string(),
+    type: z.enum(['tournament', 'practice', 'trial', 'lesson', 'festival']), // 大会 / 練習会・オープンプレー / 体験会 / レッスン / フェス・複合イベント
+    dates: z.array(z.coerce.date()).min(1), // 開催日（複数日・定期開催はすべて並べる）
+    time: z.string().optional(), // 例: "11:00〜15:00"
+    court: z.string().optional(), // 掲載中コートで開催するときはコートのファイル名（会場情報はコートから自動で入る）
+    venue: z.object({ // 掲載していない会場のとき
+      name: z.string(),
+      address: z.string().optional(),
+      location: z.object({ lat: z.number(), lng: z.number() }).optional(),
+    }).optional(),
+    prefecture: z.enum(['tokyo', 'kanagawa', 'saitama', 'chiba']).optional(), // court を書いたときは不要
+    level: z.enum(['beginner', 'all', 'intermediate', 'advanced']).default('all'), // 初心者向け / どなたでも / 中級以上 / 上級
+    price: z.string().optional(), // 例: "無料" "1ペア 10,000円"
+    entry: z.object({
+      required: z.boolean().default(true), // false=予約不要・当日参加OK
+      deadline: z.coerce.date().optional(), // 申込締切
+      url: z.string().url().optional(), // 申込ページ（なければ url を使う）
+      note: z.string().optional(),
+    }).default({ required: true }),
+    summary: z.string(), // 一覧に出る1〜2文の紹介
+    url: z.string().url().optional(), // 主催者の公式ページ（詳細はこちらへ送る）
+    organizer: z.object({
+      name: z.string(),
+      self: z.boolean().default(false), // true = Pickleball Tokyo 主催（一覧の先頭に目立たせ、申込をサイト内で受ける）
+    }),
+    image: z.string().optional(),
+    sources: z.array(z.string().url()).default([]),
+    updatedAt: z.coerce.date(), // 情報を確認した日
+    hidden: z.boolean().default(false),
+  }),
+});
+
+export const collections = { courts, posts, events };
