@@ -37,6 +37,14 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <meta property="og:url" content={canonical} />
     <meta name="twitter:card" content="summary_large_image" />
     {ogImage && <meta property="og:image" content={ogImage} />}
+    <!-- Google アナリティクス（GA4）。Google が配布している標準のタグをそのまま使う -->
+    <script is:inline async src="https://www.googletagmanager.com/gtag/js?id=G-DJ5EQR4TPG"></script>
+    <script is:inline>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-DJ5EQR4TPG');
+    </script>
     <slot name="head" />
   </head>
   <body>
@@ -72,6 +80,10 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
           <a href="/contact/" data-ja="お問い合わせ" data-en="Contact">お問い合わせ</a>
           <a href="/privacy/" data-ja="プライバシーポリシー" data-en="Privacy">プライバシーポリシー</a>
         </nav>
+        <nav class="footer-sns" aria-label="SNS">
+          <a href="https://www.instagram.com/pickleballtokyo/" target="_blank" rel="noopener">Instagram</a>
+          <a href="https://x.com/PickleballTokyo" target="_blank" rel="noopener">X</a>
+        </nav>
       </div>
       <p class="footer-note" data-ja="料金・営業時間は変わることがあります。最新情報は各施設の公式サイトでご確認ください。" data-en="Prices and hours may change. Please check each facility's official site.">料金・営業時間は変わることがあります。最新情報は各施設の公式サイトでご確認ください。</p>
     </footer>
@@ -93,6 +105,10 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
             page: location.pathname,
           });
           try { navigator.sendBeacon('/api/track', data); } catch (err) {}
+          if (window.gtag) {
+            var d = JSON.parse(data);
+            gtag('event', 'court_link_click', { link_kind: d.kind, link_place: d.from, court_id: d.courtId, court_name: d.courtName });
+          }
         }
         document.addEventListener('click', send, true);
         document.addEventListener('auxclick', send, true);
