@@ -144,16 +144,19 @@ function makeReceiptId() {
 async function saveToSheet({ id, receivedAt, type, fields, values, source }) {
   const url = process.env.SHEET_WEBHOOK_URL;
   if (!url) throw new Error('SHEET_WEBHOOK_URL not set');
-  const details = fields
-    .filter((f) => !['name', 'email'].includes(f.name))
-    .map((f) => `${f.label}: ${fmt(values[f.name])}`)
-    .join('\n');
+  // 1項目1列。列名＝項目名。種別ごとに別タブ（台帳側で列が足りなければ自動で追加される）
+  const row = { 受付番号: id, 受付日時: receivedAt, ステータス: '未対応' };
+  for (const f of fields) row[f.label] = fmt(values[f.name]);
+  row['送信元ページ'] = source;
+  row['担当メモ'] = '';
   const r = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       secret: process.env.SHEET_WEBHOOK_SECRET,
-      row: { id, receivedAt, type: type.label, name: values.name, email: values.email, subject: values[type.subjectField] || '', details, source },
+      sheet: type.sheetName || type.label,
+      headers: Object.keys(row),
+      row,
     }),
     redirect: 'follow',
   });

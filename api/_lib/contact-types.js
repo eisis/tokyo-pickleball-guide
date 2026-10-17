@@ -19,6 +19,7 @@ const PREFECTURES = ['東京都', '神奈川県', '千葉県', '埼玉県'];
 const TYPES = [
   {
     id: 'court',
+    sheetName: 'コート掲載', // 受付台帳のタブ名
     label: 'コートを掲載したい',
     description: '施設の運営者・管理者の方へ。掲載は無料です。',
     icon: '🏓',
@@ -43,6 +44,7 @@ const TYPES = [
   },
   {
     id: 'fix',
+    sheetName: '情報修正', // 受付台帳のタブ名
     label: '掲載情報の修正',
     description: '料金・営業時間などの誤りや閉鎖のご連絡。',
     icon: '✏️',
@@ -57,6 +59,7 @@ const TYPES = [
   },
   {
     id: 'other',
+    sheetName: 'その他', // 受付台帳のタブ名
     label: 'その他のお問い合わせ',
     description: '取材・協業・広告・練習会など。',
     icon: '💬',
@@ -72,6 +75,7 @@ const TYPES = [
   // ---- 将来の拡張例（enabled: true にすると表示されます）----
   {
     id: 'tournament',
+    sheetName: '大会エントリー', // 受付台帳のタブ名
     enabled: false,
     label: '大会エントリー',
     description: '大会への参加申し込み。',
@@ -88,6 +92,7 @@ const TYPES = [
   },
   {
     id: 'lesson',
+    sheetName: 'レッスン予約', // 受付台帳のタブ名
     enabled: false,
     label: 'レッスン予約',
     description: 'レッスン・体験会のお申し込み。',
