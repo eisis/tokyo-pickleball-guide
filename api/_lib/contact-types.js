@@ -14,7 +14,20 @@ const COMMON_FIELDS = [
     placeholder: 'もう一度入力してください', confirmOf: 'email' },
 ];
 
-const PREFECTURES = ['東京都', '神奈川県', '千葉県', '埼玉県'];
+// 都道府県：いま掲載しているエリアを先頭にして、見出し付きのグループで表示する
+const PREFECTURE_GROUPS = [
+  { label: '現在の掲載エリア', options: ['東京都', '神奈川県', '千葉県', '埼玉県'] },
+  { label: '関東・近郊', options: ['茨城県', '栃木県', '群馬県', '山梨県', '静岡県'] },
+  { label: 'その他の地域', options: [
+    '北海道', '青森県', '岩手県', '宮城県', '秋田県', '山形県', '福島県',
+    '新潟県', '富山県', '石川県', '福井県', '長野県', '岐阜県', '愛知県', '三重県',
+    '滋賀県', '京都府', '大阪府', '兵庫県', '奈良県', '和歌山県',
+    '鳥取県', '島根県', '岡山県', '広島県', '山口県',
+    '徳島県', '香川県', '愛媛県', '高知県',
+    '福岡県', '佐賀県', '長崎県', '熊本県', '大分県', '宮崎県', '鹿児島県', '沖縄県',
+  ] },
+];
+const PREFECTURES = PREFECTURE_GROUPS.flatMap((g) => g.options);
 
 const TYPES = [
   {
@@ -29,7 +42,8 @@ const TYPES = [
       { name: 'operatorType', label: 'お立場', type: 'select', required: true,
         options: ['施設運営者', 'コート所有者・管理者', '自治体・公共施設のご担当', 'その他'] },
       { name: 'facilityName', label: '施設名', type: 'text', required: true, maxLength: 100, placeholder: '〇〇スポーツセンター' },
-      { name: 'prefecture', label: '都県', type: 'select', required: true, options: PREFECTURES },
+      { name: 'prefecture', label: '都道府県', type: 'select', required: true, options: PREFECTURES, groups: PREFECTURE_GROUPS,
+        help: '現在は東京・神奈川・千葉・埼玉を中心に掲載しています。その他の地域も今後の掲載候補として受け付けています。' },
       { name: 'city', label: '市区町村', type: 'text', required: true, maxLength: 60, placeholder: '港区' },
       { name: 'officialUrl', label: '公式サイトURL', type: 'url', required: false, maxLength: 300, placeholder: 'https://' },
       { name: 'courts', label: 'コート面数', type: 'number', required: false, min: 1, max: 99 },

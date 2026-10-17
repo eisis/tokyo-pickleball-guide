@@ -137,8 +137,11 @@ import Base from '../layouts/Base.astro';
           html = `<label for="${id}">${esc(f.label)}${badge}</label>`;
           const attrs = `id="${id}" name="${f.name}" ${f.maxLength ? `maxlength="${f.maxLength}"` : ''} ${f.placeholder ? `placeholder="${esc(f.placeholder)}"` : ''} ${f.autocomplete ? `autocomplete="${f.autocomplete}"` : ''}`;
           if (f.type === 'select') {
-            html += `<select ${attrs}><option value="">選択してください</option>` +
-              f.options.map((o) => `<option ${val === o ? 'selected' : ''}>${esc(o)}</option>`).join('') + '</select>';
+            const opt = (o) => `<option ${val === o ? 'selected' : ''}>${esc(o)}</option>`;
+            const body = f.groups
+              ? f.groups.map((g) => `<optgroup label="${esc(g.label)}">${g.options.map(opt).join('')}</optgroup>`).join('')
+              : f.options.map(opt).join('');
+            html += `<select ${attrs}><option value="">選択してください</option>${body}</select>`;
           } else if (f.type === 'textarea') {
             html += `<textarea ${attrs}>${esc(val || '')}</textarea>`;
           } else {
