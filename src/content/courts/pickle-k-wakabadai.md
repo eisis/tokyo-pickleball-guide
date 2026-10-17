@@ -14,9 +14,7 @@ description:
   ja: ショッピングセンターの中にある屋内4面のコート。駅から近く、ショップとスクールも併設です。
   en: Four indoor courts inside a shopping center near Wakabadai Station, with a shop and school.
 officialUrl: https://andpickle.jp/PickleK/
-imageUrl: https://prcdn.freetls.fastly.net/release_image/185955/2/185955-2-9fd8841bff769708e1910e248ad5dbc3-1919x1152.png
-image: /images/courts/pickle-k-wakabadai.jpg
-imageSource: https://andpickle.jp/PickleK/
+imageUrl: https://prcdn.freetls.fastly.net/release_image/185955/2/185955-2-f7ab4626cfa205c5909804649f9e34e5-1477x1108.jpg
 booking: { url: "https://reserve.andpickle.jp/reserve", label: book }
 location: { lat: 35.620407, lng: 139.471176 }
 mapQuery: Pickle K フレスポ若葉台

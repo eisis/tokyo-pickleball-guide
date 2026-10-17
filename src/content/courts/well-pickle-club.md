@@ -15,9 +15,7 @@ description:
   ja: 屋外ハードコート4面のピックルボール専用施設。体験会やオープンプレイも開催しています。
   en: A pickleball-only facility with four outdoor hard courts, plus trial sessions and open play.
 officialUrl: https://pickleclub.well-k.jp/
-imageUrl: https://pickleclub.well-k.jp/wp-content/uploads/2025/04/hed02-01.jpg
-image: /images/courts/well-pickle-club.jpg
-imageSource: https://pickleclub.well-k.jp/
+imageUrl: https://pickleclub.well-k.jp/wp-content/uploads/2025/04/hed02-02.jpg
 booking: { url: "https://pickleclub.well-k.jp/reservation/", label: book }
 location: { lat: 35.790924, lng: 139.852478 }
 mapQuery: WELL PICKLE CLUB 葛飾
