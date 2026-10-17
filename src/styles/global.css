@@ -270,9 +270,13 @@ html[lang="en"] .hero h1 { font-family: var(--display); font-weight: 800; letter
 .tag.category { border: 1px solid var(--line); color: var(--ink-soft); }
 .new-label { margin-left: 8px; color: var(--coral); font-size: .75rem; font-weight: 800; letter-spacing: .05em; vertical-align: middle; }
 .description { margin-top: 10px; font-size: .9rem; color: var(--ink-soft); flex-grow: 1; }
-.card-actions { display: flex; gap: 8px; margin-top: 16px; }
-.card-actions .button, .card-actions .map-button { margin: 0; padding: 10px 12px; border-radius: 12px; font-size: .88rem; }
-.card-actions .button:not(.secondary) { flex: 1; }
+.card-actions { display: flex; align-items: stretch; gap: 8px; margin-top: 16px; }
+/* 詳細ページ用の余白・大きさ（.button.secondary など）に負けないよう、カード内のボタンはここで揃える */
+.card-actions .button, .card-actions .button.secondary, .card-actions .map-button {
+  margin: 0; padding: 10px 12px; border-radius: 12px; font-size: .88rem;
+  display: flex; align-items: center; justify-content: center; white-space: nowrap;
+}
+.card-actions .button:not(.secondary) { flex: 1; min-width: 0; }
 
 /* buttons（コート詳細ページでも使う） */
 .button {
