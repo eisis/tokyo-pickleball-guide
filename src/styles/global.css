@@ -549,3 +549,36 @@ html[lang="en"] .hero h1 { font-family: var(--display); font-weight: 800; letter
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition: none !important; }
 }
+
+/* ヘッダーのコート掲載ボタン（運営者向けの入口。スマホでは隠して、トップページの案内枠に任せる） */
+.site-header nav a.nav-cta {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--ball); color: var(--ball-ink); padding: 6px 8px 6px 14px; border-radius: 999px;
+  font-size: .88rem; font-weight: 800; box-shadow: 0 2px 0 #a9c21d;
+}
+.site-header nav a.nav-cta:hover { color: var(--ball-ink); filter: brightness(1.04); }
+.nav-cta-free { background: var(--ball-ink); color: var(--ball); font-size: .68rem; font-weight: 800; padding: 1px 7px; border-radius: 999px; letter-spacing: .04em; }
+@media (max-width: 720px) { .site-header nav a.nav-cta { display: none; } }
+
+/* トップページ：コート運営者向けの案内枠 */
+.owner-band {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 20px 32px;
+  background: linear-gradient(135deg, var(--navy) 0%, var(--deep) 100%); color: #e6f6f3;
+  border-radius: var(--radius); padding: 28px 32px; box-shadow: var(--shadow);
+}
+.owner-band .eyebrow { color: var(--ball); }
+.owner-band h2 { color: #fff; font-size: clamp(1.25rem, 3vw, 1.6rem); font-weight: 900; margin-bottom: 6px; }
+.owner-band-text { flex: 1 1 320px; }
+.owner-band-text p:last-child { font-size: .95rem; opacity: .9; }
+.owner-band-actions { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
+.owner-btn {
+  display: inline-block; background: var(--ball); color: var(--ball-ink); text-decoration: none; font-weight: 800;
+  padding: 13px 26px; border-radius: 999px; box-shadow: 0 4px 0 #a9c21d; white-space: nowrap;
+}
+.owner-btn:hover { filter: brightness(1.04); }
+.owner-link { color: #fff; font-size: .88rem; font-weight: 700; }
+@media (max-width: 560px) {
+  .owner-band { padding: 22px 20px; }
+  .owner-band-actions { width: 100%; }
+  .owner-btn { width: 100%; text-align: center; }
+}

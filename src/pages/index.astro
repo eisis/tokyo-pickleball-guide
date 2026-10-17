@@ -91,6 +91,21 @@ const posts = top ? [top, ...allPosts.filter((p) => p !== top).slice(0, 3)] : []
       </div>
     </section>
 
+    <!-- コート運営者向け：掲載依頼の入口（スマホではヘッダーのボタンが隠れるので、ここが主な入口） -->
+    <section class="home-block">
+      <div class="owner-band">
+        <div class="owner-band-text">
+          <p class="eyebrow">For Court Owners</p>
+          <h2 data-ja="コートを運営している方へ" data-en="Do you run a pickleball court?">コートを運営している方へ</h2>
+          <p data-ja="Pickleball Tokyo への掲載は無料です。新しいコートの掲載や、掲載内容の修正はフォームからお気軽にどうぞ。" data-en="Listing on Pickleball Tokyo is free. Send us your court details or corrections anytime.">Pickleball Tokyo への掲載は無料です。新しいコートの掲載や、掲載内容の修正はフォームからお気軽にどうぞ。</p>
+        </div>
+        <div class="owner-band-actions">
+          <a class="owner-btn" href="/contact/?type=court" data-ja="掲載を依頼する（無料）" data-en="List your court (free)">掲載を依頼する（無料）</a>
+          <a class="owner-link" href="/contact/?type=fix" data-ja="掲載情報の修正はこちら →" data-en="Report a correction →">掲載情報の修正はこちら →</a>
+        </div>
+      </div>
+    </section>
+
     {posts.length > 0 && (
       <section class="home-block" id="posts">
         <div class="block-head">
