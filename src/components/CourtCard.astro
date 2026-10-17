@@ -51,11 +51,11 @@ const searchText = [d.name, d.area.ja, d.area.en, PREFECTURES[d.prefecture].ja, 
     </div>
     <p class="description" data-ja={d.description.ja} data-en={d.description.en}>{d.description.ja}</p>
     <div class="card-actions">
-      <a class="button" href={d.booking.url} target="_blank" rel="noopener" data-ja={label.ja} data-en={label.en}>{label.ja}</a>
+      <a class="button" href={d.booking.url} target="_blank" rel="noopener" data-track="booking" data-track-from="一覧カード" data-ja={label.ja} data-en={label.en}>{label.ja}</a>
       {d.availabilityUrl && (
-        <a class="button secondary" href={d.availabilityUrl} target="_blank" rel="noopener" data-ja="空き状況" data-en="Availability">空き状況</a>
+        <a class="button secondary" href={d.availabilityUrl} target="_blank" rel="noopener" data-track="availability" data-track-from="一覧カード" data-ja="空き状況" data-en="Availability">空き状況</a>
       )}
-      <a class="map-button" href={mapUrl(court)} target="_blank" rel="noopener" data-ja="地図" data-en="Map">地図</a>
+      <a class="map-button" href={mapUrl(court)} target="_blank" rel="noopener" data-track="map" data-track-from="一覧カード" data-ja="地図" data-en="Map">地図</a>
     </div>
   </div>
 </article>

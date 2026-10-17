@@ -34,7 +34,7 @@ const TYPES = [
     id: 'court',
     sheetName: 'コート掲載', // 受付台帳のタブ名
     label: 'コートを掲載したい',
-    description: '施設の運営者・管理者の方へ。掲載は無料です。',
+    description: '施設の運営者・管理者の方へ。基本掲載は無料です。',
     icon: '🏓',
     subjectField: 'facilityName', // 通知メールの件名に使う項目
     autoReplyNote: '掲載にあたり、写真や詳細情報をメールでお伺いする場合があります。',

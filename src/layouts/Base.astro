@@ -46,7 +46,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
         <a href="/#courts" data-ja="コート" data-en="Courts">コート</a>
         <a class="nav-sub" href="/#areas" data-ja="エリア" data-en="Areas">エリア</a>
         <a href="/blog/" data-ja="記事" data-en="Articles">記事</a>
-        <a class="nav-cta" href="/contact/?type=court" data-ja="コート掲載<span class='nav-cta-free'>無料</span>" data-en="List your court<span class='nav-cta-free'>Free</span>">コート掲載<span class="nav-cta-free">無料</span></a>
+        <a class="nav-cta" href="/contact/?type=court" data-ja="コート掲載<span class='nav-cta-free'>基本無料</span>" data-en="List your court<span class='nav-cta-free'>Free</span>">コート掲載<span class="nav-cta-free">基本無料</span></a>
         <div class="lang-switch">
           <button id="jpBtn" class="active" type="button">JP</button>
           <button id="enBtn" type="button">EN</button>
@@ -76,6 +76,28 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
       <p class="footer-note" data-ja="料金・営業時間は変わることがあります。最新情報は各施設の公式サイトでご確認ください。" data-en="Prices and hours may change. Please check each facility's official site.">料金・営業時間は変わることがあります。最新情報は各施設の公式サイトでご確認ください。</p>
     </footer>
 
+    <script is:inline>
+      // 送客計測：予約・空き状況・地図リンクのクリックを /api/track に送る（個人情報は送らない）
+      (function () {
+        function send(e) {
+          if (e.type === 'auxclick' && e.button !== 1) return;
+          var a = e.target.closest && e.target.closest('a[data-track]');
+          if (!a) return;
+          var card = a.closest('[data-court-item]');
+          var data = JSON.stringify({
+            kind: a.dataset.track,
+            from: a.dataset.trackFrom || '',
+            courtId: a.dataset.courtId || (card && card.dataset.id) || '',
+            courtName: a.dataset.courtName || (card && card.dataset.name) || '',
+            url: a.href,
+            page: location.pathname,
+          });
+          try { navigator.sendBeacon('/api/track', data); } catch (err) {}
+        }
+        document.addEventListener('click', send, true);
+        document.addEventListener('auxclick', send, true);
+      })();
+    </script>
     <script is:inline>
       // 日本語/英語の切り替え（data-ja / data-en を持つ要素を書き換える）
       (function () {

@@ -44,9 +44,9 @@ const desc = `${d.name}（${pref}・${d.area.ja}）のピックルボールコ�
       {d.openedAt && (<><dt>オープン</dt><dd>{ymd(d.openedAt)}</dd></>)}
     </dl>
 
-    <a class="button" href={d.booking.url} target="_blank" rel="noopener">{bookLabel}</a>
-    {d.availabilityUrl && <a class="button secondary" href={d.availabilityUrl} target="_blank" rel="noopener">空き状況を見る</a>}
-    <a class="map-button" href={mapUrl(court)} target="_blank" rel="noopener">📍 Google Map</a>
+    <a class="button" href={d.booking.url} target="_blank" rel="noopener" data-track="booking" data-track-from="詳細ページ" data-court-id={court.id} data-court-name={d.name}>{bookLabel}</a>
+    {d.availabilityUrl && <a class="button secondary" href={d.availabilityUrl} target="_blank" rel="noopener" data-track="availability" data-track-from="詳細ページ" data-court-id={court.id} data-court-name={d.name}>空き状況を見る</a>}
+    <a class="map-button" href={mapUrl(court)} target="_blank" rel="noopener" data-track="map" data-track-from="詳細ページ" data-court-id={court.id} data-court-name={d.name}>📍 Google Map</a>
 
     <div class="prose"><Content /></div>
 

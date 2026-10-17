@@ -73,8 +73,8 @@ const points = courts
       <div class="map-popup-meta">@${esc(p.area[l])} · ${p.prefLabel} · ${p.envLabels.map((e) => e[l]).join(' / ')}</div>
       <div class="map-popup-links">
         <a href="${p.detailUrl}">${l === 'ja' ? '詳細' : 'Details'}</a>
-        <a href="${p.bookingUrl}" target="_blank" rel="noopener">${p.bookingLabel[l]}</a>
-        <a href="${p.mapUrl}" target="_blank" rel="noopener">Google Map</a>
+        <a href="${p.bookingUrl}" target="_blank" rel="noopener" data-track="booking" data-track-from="地図" data-court-id="${esc(p.id)}" data-court-name="${esc(p.name)}">${p.bookingLabel[l]}</a>
+        <a href="${p.mapUrl}" target="_blank" rel="noopener" data-track="map" data-track-from="地図" data-court-id="${esc(p.id)}" data-court-name="${esc(p.name)}">Google Map</a>
       </div>
     </div>`;
   };
