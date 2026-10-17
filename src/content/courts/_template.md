@@ -11,7 +11,7 @@ address: 東京都〇〇区〇〇1-2-3
 access: { ja: 〇〇駅から徒歩5分, en: 5 min walk from 〇〇 Station }
 hours: "9:00〜22:00"
 price: 1時間 ¥5,000〜
-rental: { status: free, note: パドル・ボール }   # 道具の貸し出し：free=無料 / paid=有料 / none=なし。確認できなければこの行を消す（「未確認」と表示される）
+rental: { status: free, note: パドル・ボール }   # 道具の貸し出し：free=無料 / paid=有料 / none=なし。確認できなければこの行を消す
 reservation: [online]        # 予約方法：online=ネット / phone=電話 / walkin=当日受付（複数可）。確認できなければこの行を消す
 description:
   ja: カードに出る短い紹介文（2文くらい）

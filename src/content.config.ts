@@ -19,7 +19,7 @@ const courts = defineCollection({
     access: ja_en.optional(), // 最寄り駅など
     hours: z.string().optional(), // 営業時間
     price: z.string().optional(), // 料金の目安
-    // ↓ 書いていない＝「未確認」として表示される（間違いを載せないため、確認できたものだけ書く）
+    // ↓ 確認できたものだけ書く（書いていなければサイトには出ない）
     rental: z.object({
       status: z.enum(['free', 'paid', 'none']), // free=無料で借りられる / paid=有料で借りられる / none=借りられない
       note: z.string().optional(), // 何を借りられるか（例: パドル・ボール）

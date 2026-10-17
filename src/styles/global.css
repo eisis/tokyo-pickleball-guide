@@ -269,7 +269,6 @@ html[lang="en"] .hero h1 { font-family: var(--display); font-weight: 800; letter
 .tag.outdoor { background: #def3e9; color: var(--outdoor); }
 .tag.category { border: 1px solid var(--line); color: var(--ink-soft); }
 .tag.rental { background: #fff1e6; color: #b4531f; }
-.facts dd.unknown { color: var(--ink-soft); font-weight: 400; }
 .new-label { margin-left: 8px; color: var(--coral); font-size: .75rem; font-weight: 800; letter-spacing: .05em; vertical-align: middle; }
 .description { margin-top: 10px; font-size: .9rem; color: var(--ink-soft); flex-grow: 1; }
 .card-actions { display: flex; align-items: stretch; gap: 8px; margin-top: 16px; }

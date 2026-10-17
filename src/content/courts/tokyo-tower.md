@@ -3,6 +3,7 @@ name: TOKYO TOWER PICKLEBALL FRIENDSHIP
 area: { ja: 東京タワー, en: Tokyo Tower }
 prefecture: tokyo
 environment: [outdoor]
+courts: 2
 rental: { status: free, note: パドル・ボール }
 reservation: [online]
 description:

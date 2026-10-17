@@ -29,8 +29,8 @@ const facts = main
   ? [
       ...d.facts,
       ...(labels.has('コート') || labels.has('屋内/屋外') ? [] : [{ label: '屋内/屋外', value: main.data.environment.map((e) => ENVIRONMENTS[e].ja).join('・') }]),
-      ...(labels.has('予約') ? [] : [{ label: '予約', value: reservationText(main) }]),
-      ...(labels.has('レンタル') ? [] : [{ label: 'レンタル', value: rentalText(main) }]),
+      ...(labels.has('予約') || !main.data.reservation ? [] : [{ label: '予約', value: reservationText(main)! }]),
+      ...(labels.has('レンタル') || !main.data.rental ? [] : [{ label: 'レンタル', value: rentalText(main)! }]),
     ]
   : d.facts;
 const related = relatedPosts(post, await getPosts());
