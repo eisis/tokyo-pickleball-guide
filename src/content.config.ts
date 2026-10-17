@@ -19,6 +19,12 @@ const courts = defineCollection({
     access: ja_en.optional(), // 最寄り駅など
     hours: z.string().optional(), // 営業時間
     price: z.string().optional(), // 料金の目安
+    // ↓ 書いていない＝「未確認」として表示される（間違いを載せないため、確認できたものだけ書く）
+    rental: z.object({
+      status: z.enum(['free', 'paid', 'none']), // free=無料で借りられる / paid=有料で借りられる / none=借りられない
+      note: z.string().optional(), // 何を借りられるか（例: パドル・ボール）
+    }).optional(),
+    reservation: z.array(z.enum(['online', 'phone', 'walkin'])).min(1).optional(), // 予約方法：online=ネット / phone=電話 / walkin=当日受付
     description: ja_en, // カードに出る短い紹介文
     image: z.string().optional(), // public/images/courts/ の画像。なければ🏓を表示
     imageSource: z.string().url().optional(), // 画像の取得元（自動取得したとき書き込まれる）

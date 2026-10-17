@@ -7,6 +7,7 @@ import SnsLinks from '../../components/SnsLinks.astro';
 import CourtCard from '../../components/CourtCard.astro';
 import PostCard from '../../components/PostCard.astro';
 import { SITE } from '../../lib/site';
+import { ENVIRONMENTS, rentalText, reservationText } from '../../lib/courts';
 import {
   getPosts, POST_CATEGORIES, categoryUrl, tagUrl, postUrl, ymd, readingMinutes, coverOf, relatedPosts, type Post,
 } from '../../lib/posts';
@@ -21,6 +22,17 @@ const d = post.data;
 const { Content, headings } = await render(post);
 const toc = headings.filter((h) => h.depth === 2);
 const courts = (await getEntries(d.courts.map((id) => ({ collection: 'courts' as const, id })))).filter(Boolean);
+// コートレビューでは「屋内外・予約・レンタル」を必ず出す。記事に書いていない項目は、紹介コートのデータから自動で足す
+const labels = new Set(d.facts.map((f) => f.label));
+const main = d.category === 'review' ? courts[0] : undefined;
+const facts = main
+  ? [
+      ...d.facts,
+      ...(labels.has('コート') || labels.has('屋内/屋外') ? [] : [{ label: '屋内/屋外', value: main.data.environment.map((e) => ENVIRONMENTS[e].ja).join('・') }]),
+      ...(labels.has('予約') ? [] : [{ label: '予約', value: reservationText(main) }]),
+      ...(labels.has('レンタル') ? [] : [{ label: 'レンタル', value: rentalText(main) }]),
+    ]
+  : d.facts;
 const related = relatedPosts(post, await getPosts());
 const cover = await coverOf(post);
 const cat = POST_CATEGORIES[d.category];
@@ -84,7 +96,7 @@ const jsonLd = {
       </figure>
     )}
 
-    {(d.points.length > 0 || d.facts.length > 0) && (
+    {(d.points.length > 0 || facts.length > 0) && (
       <div class="article-summary">
         {d.points.length > 0 && (
           <section class="points" aria-label="この記事のポイント">
@@ -92,10 +104,10 @@ const jsonLd = {
             <ol>{d.points.map((pt) => <li>{pt}</li>)}</ol>
           </section>
         )}
-        {d.facts.length > 0 && (
+        {facts.length > 0 && (
           <section class="facts-box" aria-label="基本情報">
             <p class="points-label">{d.category === 'review' ? 'コート情報' : '基本情報'}</p>
-            <dl>{d.facts.map((f) => <><dt>{f.label}</dt><dd>{f.value}</dd></>)}</dl>
+            <dl>{facts.map((f) => <><dt>{f.label}</dt><dd>{f.value}</dd></>)}</dl>
           </section>
         )}
       </div>

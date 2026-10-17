@@ -2,7 +2,7 @@
 // 絞り込みバー（検索・エリア・屋内外・並び順）。
 // data-court-item を持つカードを出し分け・並べ替えし、地図には 'courts:filter' イベントで知らせる。
 // 他の場所（ヒーローの検索窓・エリアのタイル）からは 'courts:set' イベントで条件を渡せる。
-import { PREFECTURES, ENVIRONMENTS, type Court } from '../lib/courts';
+import { PREFECTURES, ENVIRONMENTS, hasRental, type Court } from '../lib/courts';
 import { PLACES } from '../lib/places';
 
 interface Props {
@@ -10,6 +10,8 @@ interface Props {
 }
 const { courts } = Astro.props;
 const prefectures = (Object.keys(PREFECTURES) as (keyof typeof PREFECTURES)[]).filter((p) => courts.some((c) => c.data.prefecture === p));
+// レンタル情報を確認できたコートが少ないうちは、絞り込みボタンを出さない（押しても1件しか出ないと不親切なため）
+const showRental = courts.filter(hasRental).length >= 3;
 const suggestions = [...new Set([...Object.keys(PLACES), ...courts.map((c) => c.data.area.ja)])];
 const courtAreas = courts
   .filter((c) => c.data.location)
@@ -37,6 +39,11 @@ const courtAreas = courts
         <button type="button" class="chip" data-key="env" data-value={k}><span data-ja={v.ja} data-en={v.en}>{v.ja}</span> <span class="n"></span></button>
       ))}
     </div>
+    {showRental && (
+      <div class="chips" role="group" aria-label="その他の条件">
+        <button type="button" class="chip" data-toggle="rental" aria-pressed="false"><span data-ja="レンタルあり" data-en="Rental">レンタルあり</span> <span class="n"></span></button>
+      </div>
+    )}
     <div class="finder-meta">
       <span class="count"><b id="court-count">{courts.length}</b> courts</span>
       <select id="court-sort" class="sort" aria-label="並び順">
@@ -53,7 +60,7 @@ const courtAreas = courts
 
   type Item = {
     el: HTMLElement; i: number; id: string; pref: string; env: string[];
-    lat: number; lng: number; hay: string; opened: number; name: string; distEl: HTMLElement | null;
+    lat: number; lng: number; hay: string; rental: boolean; opened: number; name: string; distEl: HTMLElement | null;
   };
 
   const root = document.getElementById('court-filters')!;
@@ -64,7 +71,7 @@ const courtAreas = courts
   const empty = document.getElementById('court-empty');
   const lang = () => (document.documentElement.lang === 'en' ? 'en' : 'ja');
 
-  const state = { pref: 'all', env: 'all', q: '', sort: 'default', origin: null as Origin | null, geoErr: false };
+  const state = { pref: 'all', env: 'all', rental: false, q: '', sort: 'default', origin: null as Origin | null, geoErr: false };
 
   const items: Item[] = [...document.querySelectorAll<HTMLElement>('.cards [data-court-item]')].map((el, i) => ({
     el, i,
@@ -73,6 +80,7 @@ const courtAreas = courts
     env: (el.dataset.env ?? '').split(' '),
     lat: Number(el.dataset.lat), lng: Number(el.dataset.lng),
     hay: (el.dataset.search ?? '').toLowerCase(),
+    rental: el.dataset.rental === '1',
     opened: Number(el.dataset.opened ?? 0),
     name: el.dataset.name ?? '',
     distEl: el.querySelector<HTMLElement>('[data-dist]'),
@@ -89,8 +97,9 @@ const courtAreas = courts
 
   function apply() {
     const { near, fallback } = nearMap();
-    const ok = (x: Item, ignore?: 'pref' | 'env') =>
+    const ok = (x: Item, ignore?: 'pref' | 'env' | 'rental') =>
       (!near || near.has(x.id)) &&
+      (ignore === 'rental' || !state.rental || x.rental) &&
       (ignore === 'pref' || state.pref === 'all' || x.pref === state.pref) &&
       (ignore === 'env' || state.env === 'all' || x.env.includes(state.env)) &&
       (!!near || !state.q || x.hay.includes(state.q.toLowerCase()));
@@ -114,7 +123,13 @@ const courtAreas = courts
     [...visible].sort(cmp).forEach((x, rank) => (x.el.style.order = String(rank)));
 
     // ボタンの件数
-    root.querySelectorAll<HTMLButtonElement>('.chip').forEach((b) => {
+    root.querySelectorAll<HTMLButtonElement>('.chip[data-toggle="rental"]').forEach((b) => {
+      b.classList.toggle('active', state.rental);
+      b.setAttribute('aria-pressed', String(state.rental));
+      const n = b.querySelector('.n');
+      if (n) n.textContent = String(items.filter((x) => ok(x, 'rental') && x.rental).length);
+    });
+    root.querySelectorAll<HTMLButtonElement>('.chip[data-key]').forEach((b) => {
       const key = b.dataset.key as 'pref' | 'env';
       const v = b.dataset.value!;
       b.classList.toggle('active', state[key] === v);
@@ -178,6 +193,7 @@ const courtAreas = courts
   }
 
   root.addEventListener('click', (e) => {
+    if ((e.target as HTMLElement).closest('.chip[data-toggle="rental"]')) { state.rental = !state.rental; apply(); return; }
     const b = (e.target as HTMLElement).closest<HTMLButtonElement>('.chip[data-key]');
     if (!b) return;
     state[b.dataset.key as 'pref' | 'env'] = b.dataset.value!;
@@ -186,7 +202,7 @@ const courtAreas = courts
   document.addEventListener('click', (e) => {
     const t = e.target as HTMLElement;
     if (t.closest('[data-clear-near]')) { Object.assign(state, { origin: null, geoErr: false, q: '' }); input.value = ''; apply(); }
-    if (t.closest('[data-reset]')) { Object.assign(state, { pref: 'all', env: 'all', q: '', origin: null, geoErr: false }); input.value = ''; apply(); }
+    if (t.closest('[data-reset]')) { Object.assign(state, { pref: 'all', env: 'all', rental: false, q: '', origin: null, geoErr: false }); input.value = ''; apply(); }
     if (t.closest('#jpBtn, #enBtn')) setTimeout(() => { input.placeholder = input.dataset[lang() === 'en' ? 'phEn' : 'phJa'] ?? ''; apply(); }, 0);
   });
   input.addEventListener('input', () => setQuery(input.value));

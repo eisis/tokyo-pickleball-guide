@@ -26,6 +26,31 @@ export const ENVIRONMENTS = {
   outdoor: { ja: '屋外', en: 'Outdoor' },
 } as const;
 
+// レンタル（道具の貸し出し）。書いていないコートは「未確認」
+export const RENTAL = {
+  free: { ja: 'レンタル無料', en: 'Free rental' },
+  paid: { ja: 'レンタル有料', en: 'Paid rental' },
+  none: { ja: 'レンタルなし', en: 'No rental' },
+} as const;
+
+export const RESERVATION = {
+  online: { ja: 'ネット予約', en: 'Online' },
+  phone: { ja: '電話予約', en: 'Phone' },
+  walkin: { ja: '当日受付', en: 'Walk-in' },
+} as const;
+
+/** 道具を借りられるか（無料・有料どちらでも true） */
+export const hasRental = (court: Court) => !!court.data.rental && court.data.rental.status !== 'none';
+
+/** 詳細ページ・記事で使う表示文（未確認なら「未確認」） */
+export const rentalText = (court: Court) => {
+  const r = court.data.rental;
+  if (!r) return '未確認';
+  return r.note ? `${RENTAL[r.status].ja}（${r.note}）` : RENTAL[r.status].ja;
+};
+export const reservationText = (court: Court) =>
+  court.data.reservation ? court.data.reservation.map((r) => RESERVATION[r].ja).join('・') : '未確認';
+
 /** 公開中のコートを、都道府県順→名前順で返す */
 export async function getCourts(): Promise<Court[]> {
   const order = Object.keys(PREFECTURES);

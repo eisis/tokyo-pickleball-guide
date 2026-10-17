@@ -1,7 +1,7 @@
 ---
 // コート1件分のカード。トップの一覧や記事の関連コートで使い回す。
 // data-* はトップの絞り込み・近い順検索・地図との連動に使う
-import { PREFECTURES, ENVIRONMENTS, CATEGORIES, courtUrl, mapUrl, bookingLabel, isNew, type Court } from '../lib/courts';
+import { PREFECTURES, ENVIRONMENTS, CATEGORIES, courtUrl, mapUrl, bookingLabel, isNew, hasRental, type Court } from '../lib/courts';
 
 interface Props {
   court: Court;
@@ -19,6 +19,7 @@ const searchText = [d.name, d.area.ja, d.area.en, PREFECTURES[d.prefecture].ja, 
   data-id={court.id}
   data-pref={d.prefecture}
   data-env={d.environment.join(' ')}
+  data-rental={hasRental(court) ? '1' : '0'}
   data-lat={d.location?.lat}
   data-lng={d.location?.lng}
   data-search={searchText}
@@ -47,6 +48,7 @@ const searchText = [d.name, d.area.ja, d.area.en, PREFECTURES[d.prefecture].ja, 
       {d.category !== 'dedicated' && (
         <span class="tag category" data-ja={CATEGORIES[d.category].ja} data-en={CATEGORIES[d.category].en}>{CATEGORIES[d.category].ja}</span>
       )}
+      {hasRental(court) && <span class="tag rental" data-ja="レンタルあり" data-en="Rental">レンタルあり</span>}
       {d.courts && <span class="tag category" data-ja={`${d.courts}面`} data-en={`${d.courts} courts`}>{d.courts}面</span>}
     </div>
     <p class="description" data-ja={d.description.ja} data-en={d.description.en}>{d.description.ja}</p>

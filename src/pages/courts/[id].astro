@@ -3,7 +3,7 @@
 import { render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import CourtMap from '../../components/CourtMap.astro';
-import { getCourts, PREFECTURES, ENVIRONMENTS, mapUrl, isNew, type Court } from '../../lib/courts';
+import { getCourts, PREFECTURES, ENVIRONMENTS, mapUrl, isNew, rentalText, reservationText, type Court } from '../../lib/courts';
 
 export async function getStaticPaths() {
   const courts = await getCourts();
@@ -36,6 +36,8 @@ const desc = `${d.name}（${pref}・${d.area.ja}）のピックルボールコ�
     <dl class="facts">
       <dt>エリア</dt><dd>{pref} {d.area.ja}</dd>
       <dt>屋内/屋外</dt><dd>{env}</dd>
+      <dt>予約方法</dt><dd class:list={[{ unknown: !d.reservation }]}>{reservationText(court)}</dd>
+      <dt>レンタル</dt><dd class:list={[{ unknown: !d.rental }]}>{rentalText(court)}</dd>
       {d.courts && (<><dt>面数</dt><dd>{d.courts}面</dd></>)}
       {d.address && (<><dt>住所</dt><dd>{d.address}</dd></>)}
       {d.access && (<><dt>アクセス</dt><dd>{d.access.ja}</dd></>)}
