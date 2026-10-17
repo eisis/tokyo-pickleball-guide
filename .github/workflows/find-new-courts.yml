@@ -1,8 +1,8 @@
 name: Find new courts
 
+# 毎週土曜の自動チェックは Claude の予定タスク「新コート候補の週次チェック」に移行（記事の中身まで読んで判定する）。
+# このワークフローは予備として、手動実行ボタンだけ残している。
 on:
-  schedule:
-    - cron: '0 0 * * 6' # 毎週土曜 9:00（日本時間）
   workflow_dispatch: {} # 手動実行ボタン
 
 permissions:
