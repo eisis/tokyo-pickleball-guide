@@ -20,7 +20,7 @@ const ymd = (date: Date) => date.toISOString().slice(0, 10);
 const desc = `${d.name}（${pref}・${d.area.ja}）のピックルボールコート情報。${d.description.ja}`;
 ---
 
-<Base title={`${d.name}｜${d.area.ja}のピックルボールコート`} description={desc}>
+<Base title={`${d.name}｜${d.area.ja}のピックルボールコート`} description={desc} image={d.image}>
   <main class="container narrow">
     <p class="meta"><a href="/">← コート一覧</a></p>
     <h1 style="margin:12px 0 20px;color:var(--navy)">{d.name}{isNew(court) && <span class="new-label">NEW</span>}</h1>

@@ -10,7 +10,8 @@ interface Props {
   image?: string; // SNSで共有したときの画像（/images/... または https://...）
 }
 const { title, description, image } = Astro.props;
-const ogImage = image ? new URL(image, Astro.site).href : undefined;
+// SNS で共有したときの画像。ページごとの画像がなければサイト共通のカード画像（public/og-default.png）を使う
+const ogImage = new URL(image || '/og-default.png', Astro.site).href;
 const siteName = SITE.name;
 const fullTitle = title === siteName ? title : `${title} | ${siteName}`;
 const canonical = new URL(Astro.url.pathname, Astro.site);
@@ -35,9 +36,12 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={siteName} />
+    <meta property="og:locale" content="ja_JP" />
     <meta property="og:url" content={canonical} />
     <meta name="twitter:card" content="summary_large_image" />
-    {ogImage && <meta property="og:image" content={ogImage} />}
+    <meta property="og:image" content={ogImage} />
+    <meta name="twitter:image" content={ogImage} />
     <!-- Google アナリティクス（GA4）。Google が配布している標準のタグをそのまま使う -->
     <script is:inline async src="https://www.googletagmanager.com/gtag/js?id=G-DJ5EQR4TPG"></script>
     <script is:inline>
