@@ -3,6 +3,7 @@ name: PICKLR TOKYO TOYOSU
 area: { ja: 豊洲, en: Toyosu }
 prefecture: tokyo
 environment: [indoor]
+reservation: [online]
 courts: 7
 address: 東京都江東区塩浜1-2-2
 description:
@@ -12,7 +13,7 @@ image: /images/courts/picklr-toyosu.jpg
 booking: { url: "https://www.picklr.jp/locations/tokyo-toyosu", label: info }
 location: { lat: 35.66128, lng: 139.80001 }
 mapQuery: PICKLR TOKYO TOYOSU
-updatedAt: 2026-10-12
+updatedAt: 2026-10-17
 sources:
   - https://prtimes.jp/main/html/rd/p/000000014.000160669.html
 ---

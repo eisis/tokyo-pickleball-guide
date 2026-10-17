@@ -3,6 +3,8 @@ name: Sansanピックルボールコート池袋
 area: { ja: 東池袋, en: Higashi-Ikebukuro }
 prefecture: tokyo
 environment: [indoor, outdoor]
+rental: { status: paid, note: パドル 500円 }
+reservation: [online]
 courts: 7
 address: 東京都豊島区東池袋4-27-10 サンソウゴ池袋ビル 4〜6階
 access: { ja: 東池袋駅から徒歩3分, en: 3 min walk from Higashi-Ikebukuro Station }
@@ -16,7 +18,7 @@ booking: { url: "https://sansan-pickleball.com/", label: book }
 location: { lat: 35.72527, lng: 139.72017 }
 mapQuery: Sansan Pickleball Court Ikebukuro
 openedAt: 2026-07-10
-updatedAt: 2026-10-12
+updatedAt: 2026-10-17
 sources:
   - https://www.fashionsnap.com/article/2026-07-10/sansan-pickle-coat/
   - https://oggi.jp/7898131

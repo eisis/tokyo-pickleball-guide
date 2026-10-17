@@ -3,6 +3,7 @@ name: ピックルボールワン銀座新橋
 area: { ja: 新橋, en: Shimbashi }
 prefecture: tokyo
 environment: [indoor]
+reservation: [online]
 courts: 2
 address: 東京都千代田区内幸町
 access: { ja: 新橋駅直結, en: Directly connected to Shimbashi Station }
@@ -16,7 +17,7 @@ booking: { url: "https://reserva.be/pboneginza", label: book }
 availabilityUrl: https://reserva.be/pboneginza/availability
 location: { lat: 35.66649, lng: 139.75874 }
 mapQuery: Pickleball One Ginza Shimbashi
-updatedAt: 2026-10-12
+updatedAt: 2026-10-17
 sources:
   - https://oggi.jp/7887651
 ---

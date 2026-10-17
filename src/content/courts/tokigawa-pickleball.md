@@ -3,6 +3,8 @@ name: ときがわピックルボール（滞在型施設）
 area: { ja: ときがわ町, en: Tokigawa }
 prefecture: saitama
 environment: [outdoor]
+rental: { status: free, note: パドル・ボール（コーチ付きプラン） }
+reservation: [line]
 courts: 2
 address: 埼玉県比企郡ときがわ町馬場434
 price: 体験 15分 ¥250〜／コーチ付き 1名 ¥3,000
@@ -13,7 +15,7 @@ image: /images/courts/tokigawa-pickleball.jpg
 booking: { url: "https://lin.ee/XweaHuI", label: book }
 location: { lat: 35.99865, lng: 139.28129 }
 mapQuery: 埼玉県比企郡ときがわ町馬場434
-updatedAt: 2026-10-12
+updatedAt: 2026-10-17
 sources:
   - https://prtimes.jp/main/html/rd/p/000000002.000186231.html
 ---

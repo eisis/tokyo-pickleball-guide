@@ -30,11 +30,13 @@ export const ENVIRONMENTS = {
 export const RENTAL = {
   free: { ja: 'レンタル無料', en: 'Free rental' },
   paid: { ja: 'レンタル有料', en: 'Paid rental' },
+  available: { ja: 'レンタルあり', en: 'Rental' },
   none: { ja: 'レンタルなし', en: 'No rental' },
 } as const;
 
 export const RESERVATION = {
   online: { ja: 'ネット予約', en: 'Online' },
+  line: { ja: 'LINE予約', en: 'LINE' },
   phone: { ja: '電話予約', en: 'Phone' },
   walkin: { ja: '当日受付', en: 'Walk-in' },
 } as const;
