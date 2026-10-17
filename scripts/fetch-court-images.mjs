@@ -1,6 +1,6 @@
 // 画像がまだないコートについて、公式サイトの「シェア用画像（og:image）」を取ってきて保存する。
 // - 対象：src/content/courts/*.md のうち image: の行がないもの
-// - 取得元：officialUrl（あれば）→ なければ booking.url（予約サイト・ニュースサイトは除外）
+// - 取得元：imageUrl（コート写真を直接指定）→ officialUrl（あれば）→ なければ booking.url（予約サイト・ニュースサイトは除外）
 // - 保存先：public/images/courts/<ファイル名>.jpg（横1200pxに縮小）
 // - コートのファイルに image: と imageSource:（取得元）を書き足す
 // ※ 施設の画像なので、掲載時に施設へ一言許可を取る運用にしています。
@@ -45,7 +45,8 @@ for (const file of readdirSync(DIR).filter((f) => f.endsWith('.md') && !f.starts
 
   const official = fm.match(/^officialUrl:\s*"?([^"\s#]+)/m)?.[1];
   const booking = fm.match(/^booking:\s*\{\s*url:\s*"?([^",\s}]+)/m)?.[1];
-  const page = official ?? (booking && !isSkipped(booking) ? booking : null);
+  const direct = fm.match(/^imageUrl:\s*"?([^"\s#]+)/m)?.[1]; // コート写真を直接指定したもの
+  const page = direct ?? official ?? (booking && !isSkipped(booking) ? booking : null);
   const id = file.replace(/\.md$/, '');
   if (!page) {
     console.log(`- ${id}: 公式サイトのURLがないためスキップ（officialUrl: を書くと取得します）`);
@@ -53,7 +54,7 @@ for (const file of readdirSync(DIR).filter((f) => f.endsWith('.md') && !f.starts
   }
 
   try {
-    const imgUrl = await findOgImage(page);
+    const imgUrl = direct ?? await findOgImage(page);
     const res = await fetch(imgUrl, { headers: UA });
     if (!res.ok) throw new Error(`画像取得失敗 ${res.status}`);
     const buf = Buffer.from(await res.arrayBuffer());
@@ -64,7 +65,7 @@ for (const file of readdirSync(DIR).filter((f) => f.endsWith('.md') && !f.starts
     await sharp(buf).resize({ width: 1200, withoutEnlargement: true }).flatten({ background: '#ffffff' })
       .jpeg({ quality: 82, mozjpeg: true }).toFile(`${OUT}/${id}.jpg`);
 
-    const lines = `image: /images/courts/${id}.jpg\nimageSource: ${page}\n`;
+    const lines = `image: /images/courts/${id}.jpg\nimageSource: ${direct ? (official ?? direct) : page}\n`;
     writeFileSync(path, text.replace(/^booking:/m, `${lines}booking:`));
     console.log(`✓ ${id}: ${imgUrl}`);
     added++;

@@ -29,6 +29,7 @@ const courts = defineCollection({
     image: z.string().optional(), // public/images/courts/ の画像。なければ🏓を表示
     imageSource: z.string().url().optional(), // 画像の取得元（自動取得したとき書き込まれる）
     officialUrl: z.string().url().optional(), // 施設の公式サイト（画像の自動取得に使う）
+    imageUrl: z.string().url().optional(), // コートが写っている写真のURL（あればシェア用画像より優先して取得）
     booking: z.object({
       url: z.string().url(),
       label: z.enum(['book', 'info']).default('book'), // book=予約する / info=詳細を見る
