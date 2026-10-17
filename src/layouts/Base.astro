@@ -2,6 +2,7 @@
 // 全ページ共通の枠（ヘッダー・フッター・言語切替）。ページごとに title と description を渡す
 import '../styles/global.css';
 import { SITE } from '../lib/site';
+import SnsLinks from '../components/SnsLinks.astro';
 
 interface Props {
   title: string;
@@ -71,6 +72,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
           <p data-ja="東京近郊のピックルボールコートまとめ。ピックルボールプレイヤーのために定期的に更新しています。" data-en="Pickleball courts in and around Tokyo, updated regularly for players.">
             東京近郊のピックルボールコートまとめ。ピックルボールプレイヤーのために定期的に更新しています。
           </p>
+          <SnsLinks place="footer" />
         </div>
         <nav class="footer-nav" aria-label="フッター">
           <a href="/#courts" data-ja="コート一覧" data-en="Courts">コート一覧</a>
@@ -80,10 +82,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
           <a href="/contact/" data-ja="お問い合わせ" data-en="Contact">お問い合わせ</a>
           <a href="/privacy/" data-ja="プライバシーポリシー" data-en="Privacy">プライバシーポリシー</a>
         </nav>
-        <nav class="footer-sns" aria-label="SNS">
-          <a href="https://www.instagram.com/pickleballtokyo/" target="_blank" rel="noopener">Instagram</a>
-          <a href="https://x.com/PickleballTokyo" target="_blank" rel="noopener">X</a>
-        </nav>
+
       </div>
       <p class="footer-note" data-ja="料金・営業時間は変わることがあります。最新情報は各施設の公式サイトでご確認ください。" data-en="Prices and hours may change. Please check each facility's official site.">料金・営業時間は変わることがあります。最新情報は各施設の公式サイトでご確認ください。</p>
     </footer>
@@ -111,6 +110,11 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
           }
         }
         document.addEventListener('click', send, true);
+        // SNS リンクのクリックは GA4 にだけ送る
+        document.addEventListener('click', function (e) {
+          var a = e.target.closest && e.target.closest('a[data-sns]');
+          if (a && window.gtag) gtag('event', 'sns_click', { sns: a.dataset.sns, sns_place: a.dataset.snsPlace });
+        }, true);
         document.addEventListener('auxclick', send, true);
       })();
     </script>

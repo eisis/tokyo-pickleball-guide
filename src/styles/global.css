@@ -548,9 +548,17 @@ html[lang="en"] .hero h1 { font-family: var(--display); font-weight: 800; letter
 .footer-nav { display: flex; gap: 20px; flex-wrap: wrap; }
 .footer-nav a { color: #fff; text-decoration: none; font-weight: 700; }
 .footer-nav a:hover { color: var(--ball); }
-.footer-sns { display: flex; gap: 10px; flex-wrap: wrap; }
-.footer-sns a { color: #fff; text-decoration: none; font-weight: 700; font-size: .82rem; border: 1px solid rgba(255, 255, 255, .25); border-radius: 999px; padding: 4px 14px; }
-.footer-sns a:hover { border-color: var(--ball); color: var(--ball); }
+/* SNS リンク（SnsLinks.astro）。単色のアイコンで控えめに。ホバーで色が付く */
+.sns { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.sns a { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; transition: color .15s, border-color .15s, background .15s; }
+.sns svg { width: 18px; height: 18px; flex: none; }
+.sns-footer { margin-top: 14px; }
+.sns-footer a { width: 36px; height: 36px; justify-content: center; border-radius: 50%; color: rgba(255, 255, 255, .6); border: 1px solid rgba(255, 255, 255, .18); }
+.sns-footer a:hover { color: var(--ball); border-color: var(--ball); }
+.sns-article a { color: var(--ink-soft); font-size: .85rem; font-weight: 700; border: 1px solid var(--line); border-radius: 999px; padding: 7px 14px; background: #fff; }
+.sns-article a:hover { color: var(--teal-dark); border-color: var(--teal); }
+.follow { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px; padding: 14px 16px; border-radius: var(--radius-sm); background: var(--foam); }
+.follow-label { font-size: .88rem; font-weight: 700; color: var(--navy); }
 .footer-note { max-width: 1200px; margin: 28px auto 0; padding-top: 18px; border-top: 1px solid rgba(255, 255, 255, .12); font-size: .78rem; opacity: .75; }
 
 @media (prefers-reduced-motion: reduce) {
