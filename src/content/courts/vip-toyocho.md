@@ -16,6 +16,8 @@ description:
   en: An indoor 3-court pickleball club near Toyocho Station, with air conditioning and lessons.
 officialUrl: https://viptop.jp/toyocho-pickleball/
 imageUrl: https://viptop.jp/toyocho-pickleball/wp-content/themes/toyocho-pickleball/images/img_court.webp
+image: /images/courts/vip-toyocho.jpg
+imageSource: https://viptop.jp/toyocho-pickleball/
 booking: { url: "https://reserva.be/viptop", label: book }
 location: { lat: 35.673431, lng: 139.819702 }
 mapQuery: VIPインドアピックルボールクラブ東陽町

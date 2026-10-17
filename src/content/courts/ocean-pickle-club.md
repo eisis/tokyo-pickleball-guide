@@ -16,6 +16,8 @@ description:
   en: Two outdoor hard courts opened in June 2026, with permanent nets and 24-hour online booking.
 officialUrl: https://www.oceangp.com/about/sports/
 imageUrl: https://www.oceangp.com/common/image/about/sports/court-front.jpg
+image: /images/courts/ocean-pickle-club.jpg
+imageSource: https://www.oceangp.com/about/sports/
 booking: { url: "https://ocean-pickle-club.stores.jp/reserve/tsurumi", label: book }
 location: { lat: 35.500771, lng: 139.65741 }
 mapQuery: OCEAN PICKLE CLUB 鶴見

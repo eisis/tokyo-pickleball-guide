@@ -16,6 +16,8 @@ description:
   en: Three air-conditioned indoor courts by Motoyawata Station, open 6am to 1am every day.
 officialUrl: https://www.thepicklebang.com/
 imageUrl: https://www.thepicklebang.com/images/facility.webp
+image: /images/courts/pickle-bang-theory.jpg
+imageSource: https://www.thepicklebang.com/
 booking: { url: "https://www.thepicklebang.com/reserve?tab=pickleball", label: book }
 location: { lat: 35.721508, lng: 139.926834 }
 mapQuery: THE PICKLE BANG THEORY 本八幡
