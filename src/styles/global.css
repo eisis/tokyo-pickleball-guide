@@ -578,7 +578,6 @@ html[lang="en"] .hero h1 { font-family: var(--display); font-weight: 800; letter
   font-size: .88rem; font-weight: 800; box-shadow: 0 2px 0 #a9c21d;
 }
 .site-header nav a.nav-cta:hover { color: var(--ball-ink); filter: brightness(1.04); }
-.nav-cta-free { background: var(--ball-ink); color: var(--ball); font-size: .68rem; font-weight: 800; padding: 1px 7px; border-radius: 999px; letter-spacing: .04em; }
 @media (max-width: 720px) { .site-header nav a.nav-cta { display: none; } }
 
 /* トップページ：コート運営者向けの案内枠 */

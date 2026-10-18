@@ -35,7 +35,7 @@ const TYPES = [
     // コートの掲載・更新は専用ページ（/owners/）で受け付ける。ここは入口のカードだけ
     id: 'court',
     label: 'コートを掲載・更新したい',
-    description: '施設の運営者の方へ。専用フォームから掲載内容を直接お送りいただけます（基本掲載無料）。',
+    description: '施設の運営者の方へ。専用フォームから掲載内容を直接お送りいただけます。',
     icon: '🏓',
     href: '/owners/',
   },
@@ -58,7 +58,7 @@ const TYPES = [
     id: 'event',
     sheetName: 'イベント掲載', // 受付台帳のタブ名
     label: 'イベントを掲載したい',
-    description: '大会・練習会・体験会の主催者の方へ。掲載は無料です。',
+    description: '大会・練習会・体験会の主催者の方へ。',
     icon: '📅',
     subjectField: 'eventName',
     autoReplyNote: '内容を確認のうえ、イベントページに掲載します。確認のためご連絡する場合があります。',
