@@ -62,7 +62,7 @@ const jsonLd = {
   ...(price === 0 ? { isAccessibleForFree: true } : {}),
   url: pageUrl,
 };
-------
+---
 
 <Base title={`${d.title}｜ピックルボールの${type.ja}`} description={desc} image={d.image ?? venue.court?.data.image}>
   <script slot="head" type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
