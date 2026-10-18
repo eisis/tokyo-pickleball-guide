@@ -56,7 +56,7 @@
 .contact-confirm div:first-child { border-top: 0; }
 .contact-confirm dt { background: var(--sand); padding: 10px 12px; font-weight: 700; font-size: .88rem; }
 .contact-confirm dd { padding: 10px 12px; white-space: pre-wrap; word-break: break-word; }
-.contact-confirm .empty { color: var(--ink-soft); opacity: .7; }
+.contact-confirm .contact-empty { color: var(--ink-soft); opacity: .7; }
 #ts { display: flex; justify-content: center; margin-top: 18px; }
 
 .contact-done { text-align: center; }

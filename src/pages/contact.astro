@@ -204,7 +204,7 @@ import '../styles/form.css';
       if (Object.keys(errs).length) return;
       $('#confirm').innerHTML = allFields().filter((f) => !f.confirmOf).map((f) => {
         const x = Array.isArray(v[f.name]) ? v[f.name].join('、') : v[f.name];
-        return `<div><dt>${esc(f.label)}</dt><dd>${x ? esc(x) : '<span class="empty">（未入力）</span>'}</dd></div>`;
+        return `<div><dt>${esc(f.label)}</dt><dd>${x ? esc(x) : '<span class="contact-empty">（未入力）</span>'}</dd></div>`;
       }).join('');
       $('#sendError').hidden = true;
       showStep(3);

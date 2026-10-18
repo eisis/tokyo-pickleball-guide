@@ -474,7 +474,7 @@ const attrs = (f) => ({
       const rows = FIELDS.filter((f) => f.type !== 'photos' && !f.confirmOf && isShown(f, v)).map((f) => {
         let x = v[f.name];
         if (f.options) x = (Array.isArray(x) ? x : [x]).filter(Boolean).map((o) => optLabel(f.name, o)).join('、');
-        return `<div><dt>${esc(f.label)}${f.public ? '' : '<small>非公開</small>'}</dt><dd>${x ? esc(x) : '<span class="empty">（未入力）</span>'}</dd></div>`;
+        return `<div><dt>${esc(f.label)}${f.public ? '' : '<small>非公開</small>'}</dt><dd>${x ? esc(x) : '<span class="contact-empty">（未入力）</span>'}</dd></div>`;
       });
       $('#confirm').innerHTML = `
         <p class="owners-confirm-mode">${mode() === 'new' ? '新しく掲載する' : `「${esc(court?.name)}」の掲載内容を更新する`}</p>
