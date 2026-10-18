@@ -14,9 +14,7 @@
 // ============================================================
 
 import { COMMON_FIELDS, TYPES, getType } from './_lib/contact-types.js';
-
-const SITE_NAME = 'Pickleball Tokyo';
-const SITE_URL = 'https://www.pickleball-tokyo.com';
+import { SITE_NAME, verifyTurnstile, clientIp, makeReceiptId, nowJst, sheetAppend, sendMail, mailLayout, mailReady, fmt, esc } from './_lib/common.js';
 const MIN_FILL_MS = 3000; // 3秒未満で送信されたらボットとみなす
 
 export default async function handler(req, res) {
@@ -33,8 +31,7 @@ export default async function handler(req, res) {
     }
 
     // 2) Turnstile 検証
-    const ip = (req.headers['x-forwarded-for'] || '').split(',')[0].trim();
-    if (!(await verifyTurnstile(body.turnstileToken, ip))) {
+    if (!(await verifyTurnstile(body.turnstileToken, clientIp(req)))) {
       return res.status(400).json({ ok: false, error: '認証に失敗しました。ページを再読み込みしてお試しください。' });
     }
 
@@ -52,7 +49,7 @@ export default async function handler(req, res) {
 
     // 4) 受付番号
     const id = makeReceiptId();
-    const receivedAt = new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' });
+    const receivedAt = nowJst();
     // 確認用の項目は記録・メールに含めない
     const record = { id, receivedAt, type, fields: fields.filter((f) => !f.confirmOf), values, source: String(body.source || '').slice(0, 300) };
 
@@ -80,10 +77,11 @@ function sendConfig(res) {
   res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=600');
   res.status(200).json({
     // メール送信の設定が揃うまでは「準備中」を表示する
-    ready: Boolean(process.env.RESEND_API_KEY && process.env.CONTACT_TO && process.env.CONTACT_FROM),
+    ready: mailReady(),
     turnstileSiteKey: process.env.TURNSTILE_SITE_KEY || '',
     common: COMMON_FIELDS,
-    types: TYPES.filter((t) => t.enabled !== false).map(({ id, label, description, icon, fields }) => ({ id, label, description, icon, fields })),
+    // href のある種別は専用ページへ移動する（例：コート掲載 → /owners/）
+    types: TYPES.filter((t) => t.enabled !== false).map(({ id, label, description, icon, fields, href }) => ({ id, label, description, icon, fields: fields || [], href })),
   });
 }
 
@@ -119,60 +117,19 @@ function validate(fields, raw) {
   return { values, errors };
 }
 
-async function verifyTurnstile(token, ip) {
-  const secret = process.env.TURNSTILE_SECRET_KEY;
-  if (!secret) return true; // 未設定時（ローカル確認用）はスキップ
-  if (!token) return false;
-  const r = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: new URLSearchParams({ secret, response: token, remoteip: ip || '' }),
-  });
-  const j = await r.json();
-  return j.success === true;
-}
 
-function makeReceiptId() {
-  const d = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10).replace(/-/g, '');
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  let s = '';
-  for (let i = 0; i < 4; i++) s += chars[Math.floor(Math.random() * chars.length)];
-  return `PT-${d}-${s}`;
-}
 
 // ---------------- 台帳（Google スプレッドシート） ----------------
 async function saveToSheet({ id, receivedAt, type, fields, values, source }) {
-  const url = process.env.SHEET_WEBHOOK_URL;
-  if (!url) throw new Error('SHEET_WEBHOOK_URL not set');
   // 1項目1列。列名＝項目名。種別ごとに別タブ（台帳側で列が足りなければ自動で追加される）
   const row = { 受付番号: id, 受付日時: receivedAt, ステータス: '未対応' };
   for (const f of fields) row[f.label] = fmt(values[f.name]);
   row['送信元ページ'] = source;
   row['担当メモ'] = '';
-  const r = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      secret: process.env.SHEET_WEBHOOK_SECRET,
-      sheet: type.sheetName || type.label,
-      headers: Object.keys(row),
-      row,
-    }),
-    redirect: 'follow',
-  });
-  const text = await r.text();
-  if (!r.ok || !text.includes('"ok":true')) throw new Error('sheet: ' + text.slice(0, 200));
+  await sheetAppend(type.sheetName || type.label, row);
 }
 
 // ---------------- メール（Resend） ----------------
-async function sendMail(payload) {
-  const r = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${process.env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ from: process.env.CONTACT_FROM, ...payload }),
-  });
-  if (!r.ok) throw new Error('resend: ' + (await r.text()).slice(0, 200));
-}
 
 function sendNotification({ id, receivedAt, type, fields, values, source }) {
   const subjectTail = values[type.subjectField] ? ` / ${values[type.subjectField]}` : '';
@@ -209,12 +166,4 @@ function table(fields, values) {
   return `<table style="border-collapse:collapse;width:100%;font-size:14px;border:1px solid #e6dfcf">${rows}</table>`;
 }
 
-function mailLayout(inner) {
-  return `<div style="font-family:-apple-system,'Hiragino Sans','Noto Sans JP',sans-serif;color:#1f3540;max-width:600px;margin:0 auto">
-    <div style="background:#0e8a8f;color:#fff;padding:14px 20px;border-radius:10px 10px 0 0;font-weight:700">${SITE_NAME}</div>
-    <div style="border:1px solid #e6dfcf;border-top:0;padding:20px;border-radius:0 0 10px 10px;line-height:1.7">${inner}</div>
-    <p style="text-align:center;color:#8a9aa1;font-size:12px"><a href="${SITE_URL}" style="color:#0e8a8f">${SITE_URL.replace('https://', '')}</a></p></div>`;
-}
 
-const fmt = (v) => (Array.isArray(v) ? v.join('、') : v == null ? '' : String(v));
-const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));

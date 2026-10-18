@@ -1,0 +1,660 @@
+---
+// コート運営者向けページ（/owners/）：コートの新規掲載・掲載内容の更新を、運営者が自分で申請できる
+// ・項目は api/_lib/court-form.js で管理（画面・受付APIの両方がこの定義を使う）
+// ・申請は GitHub の PR になり、運営者（サイト側）が確認して Merge すると公開される（docs/court-submission/README.md）
+// ・入口：/owners/（新規）、/owners/?court=<コートのファイル名>（更新。詳細ページのボタンから）
+import Base from '../layouts/Base.astro';
+import '../styles/form.css';
+import { SECTIONS, GUIDELINES, PHOTO_LIMIT, PREFECTURE_OPTIONS } from '../../api/_lib/court-form.js';
+import { fromCourtData } from '../../api/_lib/court-markdown.js';
+import { getCourts, PREFECTURES } from '../lib/courts';
+
+const courts = await getCourts();
+const courtList = courts.map((c) => ({
+  id: c.id,
+  name: c.data.name,
+  area: c.data.area.ja,
+  pref: c.data.prefecture,
+  image: c.data.image || '',
+  values: fromCourtData(c.data, c.body),
+}));
+const groups = Object.entries(PREFECTURES).map(([k, p]) => ({ label: p.full, items: courtList.filter((c) => c.pref === k) })).filter((g) => g.items.length);
+
+// 画面のスクリプトに渡す項目の定義（表示に必要なものだけ）
+const fieldMeta = SECTIONS.flatMap((s) => s.fields).map((f) => ({
+  name: f.name, type: f.type, label: f.label, required: !!f.required, maxLength: f.maxLength, min: f.min, max: f.max,
+  only: f.only, showIf: f.showIf, confirmOf: f.confirmOf, requiredIfPhotos: f.requiredIfPhotos, public: f.public !== false,
+  options: f.options ? f.options.map((o) => ({ v: o.v, label: o.label })) : undefined,
+}));
+const prefLabel = Object.fromEntries(PREFECTURE_OPTIONS.map((o) => [o.v, o.label]));
+
+const badge = (f) => (f.required ? '<span class="req">必須</span>' : f.requiredIfPhotos ? '<span class="opt">写真があれば必須</span>' : '<span class="opt">任意</span>');
+const attrs = (f) => ({
+  'data-only': f.only,
+  'data-showif': f.showIf ? JSON.stringify(f.showIf) : undefined,
+});
+---
+
+<Base title="コート運営者の方へ｜掲載・更新のお申し込み" description="Pickleball Tokyo へのピックルボールコートの掲載・掲載内容の更新は、施設の運営者の方がフォームから直接お申し込みいただけます。基本掲載は無料。空き状況の表示や予約連携のご相談も受け付けています。">
+  <main class="container owners contact">
+    <!-- ① なぜ載せるのか -->
+    <header class="owners-hero">
+      <p class="contact-eyebrow">For Court Owners</p>
+      <h1>コートの掲載・更新は、<br class="sp" />運営者の方が直接できます</h1>
+      <p class="contact-lead">東京・神奈川・千葉・埼玉で「どこで・いつ・誰とピックルボールができるか」を探している人に、あなたのコートを届けます。いま {courts.length} 施設を掲載中です。</p>
+      <ul class="owners-points">
+        <li><b>基本掲載は無料</b><span>掲載料も、予約の手数料もかかりません。「予約する」ボタンから御社の予約ページへそのまま案内します。</span></li>
+        <li><b>5分で申し込み</b><span>スマホの写真もそのまま送れます。申し込む前に、一覧に出るカードの見え方を確かめられます。</span></li>
+        <li><b>いつでも自分で更新</b><span>料金や営業時間が変わったら、同じフォームから更新を申し込めます。運営者の情報には「運営者掲載」マークが付きます。</span></li>
+      </ul>
+      <div class="owners-cta">
+        <a class="contact-btn" href="#apply" data-mode-link="new">新しく掲載する</a>
+        <a class="contact-btn ghost" href="#apply" data-mode-link="update">掲載中のコートを更新する</a>
+      </div>
+    </header>
+
+    <!-- ② 掲載までの流れ -->
+    <section class="owners-flow" aria-label="掲載までの流れ">
+      <ol>
+        <li><span>1</span><b>フォームに入力</b><small>施設の情報・写真・予約ページ</small></li>
+        <li><span>2</span><b>内容の確認</b><small>運営チームが公式情報と照らして確認（通常3営業日以内）</small></li>
+        <li><span>3</span><b>公開・お知らせ</b><small>公開したらページのURLをメールでお送りします</small></li>
+      </ol>
+    </section>
+
+    <!-- ③ 申し込みフォーム -->
+    <section id="apply" class="owners-apply">
+      <ol class="contact-steps" id="steps" aria-label="入力の流れ">
+        <li data-step="2" class="on"><span>1</span><b>入力</b></li>
+        <li data-step="3"><span>2</span><b>確認</b></li>
+        <li data-step="4"><span>3</span><b>完了</b></li>
+      </ol>
+
+      <div class="contact-alert" id="notReady" hidden>
+        申し込みフォームは現在準備中です。お急ぎの場合は <a href="mailto:info@pickleball-tokyo.com">info@pickleball-tokyo.com</a> までご連絡ください。
+      </div>
+
+      <!-- 入力 -->
+      <div class="owners-layout" id="step2">
+        <form id="form" class="contact-panel" novalidate>
+          <fieldset class="owners-mode">
+            <legend class="lbl">お申し込みの内容</legend>
+            <div class="owners-seg" role="radiogroup">
+              <label><input type="radio" name="mode" value="new" checked /><span>新しく掲載する</span></label>
+              <label><input type="radio" name="mode" value="update" /><span>掲載中のコートを更新する</span></label>
+            </div>
+          </fieldset>
+
+          <div class="contact-field" id="f-courtId" data-only="update" hidden>
+            <label for="in-courtId">更新するコート<span class="req">必須</span></label>
+            <select id="in-courtId" name="courtId">
+              <option value="">選択してください</option>
+              {groups.map((g) => (
+                <optgroup label={g.label}>{g.items.map((c) => <option value={c.id}>{c.name}（{c.area}）</option>)}</optgroup>
+              ))}
+            </select>
+            <div class="help">選ぶと、いま掲載している内容が入ります。変えたいところだけ書き換えてください。</div>
+            <div class="error" hidden></div>
+          </div>
+
+          <div class="owners-dup" id="dup" hidden></div>
+
+          {SECTIONS.map((s, si) => (
+            <section class="owners-sec" id={`sec-${s.id}`}>
+              <h2><span>{si + 1}</span>{s.title}</h2>
+              {s.lead && <p class="owners-sec-lead">{s.lead}</p>}
+              {s.fields.map((f) => (
+                <div class={`contact-field${f.wide ? ' wide' : ''}`} id={`f-${f.name}`} {...attrs(f)}>
+                  {f.type === 'photos' ? (
+                    <>
+                      <span class="lbl">{f.label}<Fragment set:html={badge(f)} /></span>
+                      <div class="owners-photos" id="photos"></div>
+                      <label class="owners-photo-add" id="photoAdd">
+                        <input type="file" id="photoInput" accept="image/*" multiple />
+                        <span>＋ 写真を選ぶ</span>
+                      </label>
+                      <p class="owners-current" id="currentPhoto" hidden></p>
+                    </>
+                  ) : f.type === 'radio' || f.type === 'checkbox' ? (
+                    <>
+                      <span class="lbl">{f.label}<Fragment set:html={badge(f)} /></span>
+                      <div class={f.options.some((o) => o.note) ? 'owners-options' : 'contact-choices'} role="group" aria-label={f.label}>
+                        {f.options.map((o) => (
+                          <label>
+                            <input type={f.type} name={f.name} value={o.v} />
+                            {o.note ? <span><b>{o.label}</b><small>{o.note}</small></span> : o.label}
+                          </label>
+                        ))}
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <label for={`in-${f.name}`}>{f.label}<Fragment set:html={badge(f)} /></label>
+                      {f.type === 'select' ? (
+                        <select id={`in-${f.name}`} name={f.name}>
+                          <option value="">選択してください</option>
+                          {f.options.map((o) => <option value={o.v}>{o.label}</option>)}
+                        </select>
+                      ) : f.type === 'textarea' ? (
+                        <textarea id={`in-${f.name}`} name={f.name} rows={f.rows || 4} maxlength={f.maxLength} placeholder={f.placeholder}></textarea>
+                      ) : (
+                        <input
+                          type={f.type}
+                          id={`in-${f.name}`}
+                          name={f.name}
+                          maxlength={f.maxLength}
+                          placeholder={f.placeholder}
+                          autocomplete={f.autocomplete}
+                          min={f.min}
+                          max={f.max}
+                          inputmode={f.type === 'number' ? 'numeric' : undefined}
+                        />
+                      )}
+                      {f.maxLength && f.type === 'textarea' && <div class="owners-count" data-count={f.name}>0 / {f.maxLength}</div>}
+                    </>
+                  )}
+                  {f.help && <div class="help">{f.help}</div>}
+                  <div class="error" hidden></div>
+                </div>
+              ))}
+            </section>
+          ))}
+
+          <div class="owners-guide">
+            <p class="lbl">掲載基準</p>
+            <ul>{GUIDELINES.map((g) => <li>{g}</li>)}</ul>
+          </div>
+          <div class="contact-hp" aria-hidden="true"><label>Website<input type="text" name="website" tabindex="-1" autocomplete="off" /></label></div>
+          <div class="contact-field" id="f-agree">
+            <label class="contact-agree"><input type="checkbox" id="agree" /> <span>掲載基準と<a href="/privacy/" target="_blank" rel="noopener">プライバシーポリシー</a>に同意します</span></label>
+            <div class="error" hidden></div>
+          </div>
+          <div class="contact-actions"><button class="contact-btn" type="submit">入力内容を確認する</button></div>
+          <p class="owners-saved meta" id="saved" hidden>入力内容はこの端末に一時保存しています（写真を除く）。</p>
+        </form>
+
+        <!-- カードのプレビュー -->
+        <aside class="owners-preview" aria-label="一覧に出るカードのプレビュー">
+          <p class="owners-preview-title">一覧での見え方</p>
+          <article class="card" id="pv">
+            <div class="card-media">
+              <div class="facility-image image-placeholder" id="pvImg" data-src="">🏓</div>
+              <span class="card-badges"><span class="badge-new" id="pvNew" hidden>NEW</span><span class="badge-owner" id="pvOwner" hidden>運営者掲載</span></span>
+            </div>
+            <div class="card-body">
+              <p class="card-area"><span id="pvArea">エリア</span><span class="card-pref" id="pvPref">都道府県</span></p>
+              <h3 id="pvName">施設名</h3>
+              <div class="location" id="pvTags"></div>
+              <p class="description" id="pvDesc">ひとこと紹介がここに入ります。</p>
+              <div class="card-actions">
+                <span class="button" id="pvBook">予約する →</span>
+                <span class="button secondary" id="pvAvail" hidden>空き状況</span>
+                <span class="map-button">地図</span>
+              </div>
+            </div>
+          </article>
+          <p class="meta owners-preview-note">「運営者掲載」は、運営者の方からのお申し込みで、確認がとれたときに付きます。</p>
+        </aside>
+      </div>
+
+      <!-- 確認 -->
+      <section class="contact-panel owners-narrow" id="step3" hidden>
+        <h2>入力内容のご確認</h2>
+        <div class="contact-alert" id="sendError" hidden></div>
+        <div id="confirm"></div>
+        <div id="ts"></div>
+        <div class="contact-actions">
+          <button class="contact-btn ghost" type="button" id="back">修正する</button>
+          <button class="contact-btn" type="button" id="send">この内容で申し込む</button>
+        </div>
+      </section>
+
+      <!-- 完了 -->
+      <section class="contact-panel contact-done owners-narrow" id="step4" hidden>
+        <div class="contact-ball" aria-hidden="true">🏓</div>
+        <h2 id="doneTitle">お申し込みを受け付けました</h2>
+        <p id="doneText"></p>
+        <div class="contact-receipt" id="receipt"></div>
+        <p class="meta">ご入力のメールアドレス宛に確認メールをお送りしました。<br />届かない場合は迷惑メールフォルダもご確認ください。</p>
+        <div class="contact-actions">
+          <a class="contact-btn" href="/contact/?type=event">イベントも掲載する</a>
+          <a class="contact-btn ghost" href="/">トップへ戻る</a>
+        </div>
+      </section>
+    </section>
+
+    <!-- ④ よくある質問 -->
+    <section class="owners-faq">
+      <h2>よくあるご質問</h2>
+      <details><summary>本当に無料ですか？</summary><p>コートの基本掲載・更新は無料です。「予約する」ボタンからは御社の予約ページへそのまま移動するので、予約の手数料もかかりません。今後、上位表示や特集などの有料メニューを用意する場合も、基本掲載は無料のままです。</p></details>
+      <details><summary>掲載までどのくらいかかりますか？</summary><p>内容を確認して、通常3営業日以内に公開します。公式サイトの内容と違うところがあるときなどは、確認のためにご連絡します。</p></details>
+      <details><summary>空き状況の表示や予約連携はできますか？</summary><p>空き状況を一般公開しているページがあれば、すぐに「空き状況を見る」ボタンを付けられます。サイト上での空き状況の表示や、予約システムとの連携は、お使いの予約システムに合わせて個別にご相談しています。フォームの「空き状況・予約連携のご相談」で選んでいただければ、担当からご連絡します。</p></details>
+      <details><summary>運営者ではないのですが、コートを紹介できますか？</summary><p>はい、お立場で「利用者」を選んでお申し込みください。公式サイトで内容を確認してから掲載します。掲載内容の誤りのご連絡は<a href="/contact/?type=fix">こちら</a>から受け付けています。</p></details>
+      <details><summary>掲載をやめたいときは？</summary><p><a href="/contact/?type=fix">掲載情報の修正</a>から「閉鎖・休止」を選んでご連絡ください。確認のうえ非公開にします。</p></details>
+    </section>
+  </main>
+
+  <script is:inline id="owners-data" type="application/json" set:html={JSON.stringify({ fields: fieldMeta, courts: courtList, prefLabel, photo: PHOTO_LIMIT }).replace(/</g, '\\u003c')}></script>
+  <script is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
+  <script is:inline>
+  (() => {
+    const $ = (s, r = document) => r.querySelector(s);
+    const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+    const DATA = JSON.parse($('#owners-data').textContent);
+    const FIELDS = DATA.fields;
+    const F = Object.fromEntries(FIELDS.map((f) => [f.name, f]));
+    const form = $('#form');
+    const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    const state = { config: null, photos: [], startedAt: Date.now(), tsWidget: null, tsToken: '', loadedCourt: '' };
+    const DRAFT = 'pt-owner-draft-v1';
+
+    // ---------- 入力値の読み書き ----------
+    const mode = () => form.elements.mode.value;
+    function getValues() {
+      const v = {};
+      FIELDS.forEach((f) => {
+        if (f.type === 'photos') return;
+        if (f.type === 'checkbox') v[f.name] = $$(`[name="${f.name}"]:checked`, form).map((i) => i.value);
+        else if (f.type === 'radio') v[f.name] = ($(`[name="${f.name}"]:checked`, form) || {}).value || '';
+        else v[f.name] = (form.elements[f.name].value || '').trim();
+      });
+      return v;
+    }
+    function setValues(v) {
+      FIELDS.forEach((f) => {
+        if (f.type === 'photos' || !(f.name in v)) return;
+        const x = v[f.name];
+        if (f.type === 'checkbox') $$(`[name="${f.name}"]`, form).forEach((i) => (i.checked = (x || []).includes(i.value)));
+        else if (f.type === 'radio') $$(`[name="${f.name}"]`, form).forEach((i) => (i.checked = i.value === x));
+        else form.elements[f.name].value = x ?? '';
+      });
+      refresh();
+    }
+
+    // ---------- 表示の切り替え（新規/更新・条件付きの項目） ----------
+    function isShown(f, v) {
+      if (f.only && f.only !== mode()) return false;
+      if (!f.showIf) return true;
+      return Object.entries(f.showIf).every(([k, want]) => {
+        const x = v[k];
+        return want === '*' ? (Array.isArray(x) ? x.length > 0 : !!x) : want.includes(x);
+      });
+    }
+    function refresh() {
+      const v = getValues();
+      FIELDS.forEach((f) => { const w = $('#f-' + f.name); if (w) w.hidden = !isShown(f, v); });
+      $('#f-courtId').hidden = mode() !== 'update';
+      if (mode() === 'new') $('#currentPhoto').hidden = true;
+      $$('[data-count]').forEach((el) => { const n = el.dataset.count; el.textContent = `${(v[n] || '').length} / ${F[n].maxLength}`; el.classList.toggle('over', (v[n] || '').length > F[n].maxLength); });
+      checkDuplicate(v);
+      renderPreview(v);
+      saveDraft(v);
+    }
+
+    // ---------- 新規なのに掲載済みのとき ----------
+    const norm = (s) => String(s || '').normalize('NFKC').toLowerCase().replace(/[\s・\-_.,'"()（）【】「」]/g, '');
+    function checkDuplicate(v) {
+      const box = $('#dup');
+      const n = norm(v.name);
+      const hit = mode() === 'new' && n.length >= 3 && DATA.courts.find((c) => { const m = norm(c.name); return m.includes(n) || n.includes(m); });
+      box.hidden = !hit;
+      // 入力のたびに作り直すと、押そうとしたボタンが消えてしまうので、対象が変わったときだけ書き換える
+      if (hit && box.dataset.id !== hit.id) {
+        box.dataset.id = hit.id;
+        box.innerHTML = `「${esc(hit.name)}」はすでに掲載しています。内容を変えたい場合は <button type="button" class="linkish">掲載内容の更新に切り替える</button>`;
+      }
+      if (!hit) box.dataset.id = '';
+    }
+    $('#dup').addEventListener('click', (e) => { const id = e.currentTarget.dataset.id; if (e.target.closest('button') && id) switchMode('update', id); });
+
+    function switchMode(m, courtId) {
+      form.elements.mode.value = m;
+      if (m === 'update' && courtId) { form.elements.courtId.value = courtId; loadCourt(courtId); }
+      if (m === 'new' && state.loadedCourt) { form.reset(); form.elements.mode.value = 'new'; state.loadedCourt = ''; state.photos = []; renderPhotos(); }
+      refresh();
+    }
+    function loadCourt(id) {
+      const c = DATA.courts.find((x) => x.id === id);
+      if (!c) return;
+      setValues(c.values);
+      state.loadedCourt = id;
+      const cur = $('#currentPhoto');
+      cur.hidden = !c.image;
+      if (c.image) cur.innerHTML = `いまの写真：<img src="${esc(c.image)}" alt="" /> 新しい写真を選ぶと差し替わります。`;
+      renderPreview(getValues());
+    }
+    $$('[name="mode"]', form).forEach((r) => r.addEventListener('change', () => switchMode(r.value, form.elements.courtId.value)));
+    form.elements.courtId.addEventListener('change', (e) => e.target.value && loadCourt(e.target.value));
+    $$('[data-mode-link]').forEach((a) => a.addEventListener('click', () => switchMode(a.dataset.modeLink)));
+    const clearError = (e) => {
+      const w = e.target.closest && e.target.closest('.contact-field.invalid');
+      if (w) { w.classList.remove('invalid'); const er = $('.error', w); if (er) er.hidden = true; }
+    };
+    form.addEventListener('input', (e) => { clearError(e); refresh(); });
+    form.addEventListener('change', (e) => { clearError(e); refresh(); });
+
+    // ---------- カードのプレビュー ----------
+    const optLabel = (name, v) => (F[name].options.find((o) => o.v === v) || {}).label || '';
+    function renderPreview(v) {
+      $('#pvName').textContent = v.name || '施設名';
+      $('#pvArea').textContent = v.areaJa || 'エリア';
+      $('#pvPref').textContent = v.prefecture ? (DATA.prefLabel[v.prefecture] || '').replace(/[都県]$/, '') : '都道府県';
+      $('#pvDesc').textContent = v.descriptionJa || 'ひとこと紹介がここに入ります。';
+      const tags = (v.environment || []).map((e) => `<span class="tag ${e}">${e === 'indoor' ? '屋内' : '屋外'}</span>`);
+      if (v.category && v.category !== 'dedicated') tags.push(`<span class="tag category">${{ fitness: 'ジム・スクール', public: '公共施設', circle: 'サークル' }[v.category]}</span>`);
+      if (v.rentalStatus && v.rentalStatus !== 'none') tags.push('<span class="tag rental">レンタルあり</span>');
+      if (v.courts) tags.push(`<span class="tag category">${esc(v.courts)}面</span>`);
+      $('#pvTags').innerHTML = tags.join('');
+      $('#pvBook').textContent = (v.reservation || []).includes('online') ? '予約する →' : '詳細を見る →';
+      $('#pvAvail').hidden = !v.availabilityUrl;
+      $('#pvNew').hidden = !(v.openedAt && Date.now() - new Date(v.openedAt).getTime() < 180 * 864e5);
+      $('#pvOwner').hidden = !['owner', 'staff', 'public'].includes(v.role);
+      const court = mode() === 'update' && DATA.courts.find((c) => c.id === state.loadedCourt);
+      const src = state.photos[0]?.url || (court && court.image) || '';
+      const box = $('#pvImg');
+      if (box.dataset.src === src) return;
+      box.outerHTML = src ? `<img class="facility-image" id="pvImg" data-src="${esc(src)}" src="${esc(src)}" alt="" />` : '<div class="facility-image image-placeholder" id="pvImg" data-src="">🏓</div>';
+    }
+
+    // ---------- 写真（端末で縮めてから送る） ----------
+    async function shrink(file) {
+      const url = URL.createObjectURL(file);
+      try {
+        const img = await new Promise((ok, ng) => { const i = new Image(); i.onload = () => ok(i); i.onerror = ng; i.src = url; });
+        // 長辺を縮め、画質を少しずつ下げて、上限に収まる一番きれいなものを使う
+        for (const edge of [DATA.photo.maxEdge, 1280, 1024]) {
+          const scale = Math.min(1, edge / Math.max(img.naturalWidth, img.naturalHeight));
+          const c = document.createElement('canvas');
+          c.width = Math.round(img.naturalWidth * scale); c.height = Math.round(img.naturalHeight * scale);
+          c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+          for (const q of [0.82, 0.72, 0.62]) {
+            const dataUrl = c.toDataURL('image/jpeg', q);
+            const b64 = dataUrl.split(',')[1];
+            if (b64.length * 0.75 <= DATA.photo.maxBytes * 0.9) return { url: dataUrl, b64 };
+          }
+        }
+        throw new Error('too big');
+      } finally { URL.revokeObjectURL(url); }
+    }
+    $('#photoInput').addEventListener('change', async (e) => {
+      const files = [...e.target.files].slice(0, DATA.photo.max - state.photos.length);
+      e.target.value = '';
+      const err = $('#f-photos .error');
+      err.hidden = true;
+      for (const f of files) {
+        try { state.photos.push(await shrink(f)); }
+        catch { err.textContent = '読み込めない写真がありました。別の写真でお試しください。'; err.hidden = false; }
+      }
+      renderPhotos(); refresh();
+    });
+    function renderPhotos() {
+      $('#photos').innerHTML = state.photos.map((p, i) => `
+        <figure class="owners-thumb${i === 0 ? ' main' : ''}">
+          <img src="${p.url}" alt="" />
+          <figcaption>${i === 0 ? 'メイン' : `<button type="button" data-main="${i}">メインにする</button>`}<button type="button" data-del="${i}" aria-label="この写真を外す">外す</button></figcaption>
+        </figure>`).join('');
+      $('#photoAdd').hidden = state.photos.length >= DATA.photo.max;
+      $$('[data-del]').forEach((b) => (b.onclick = () => { state.photos.splice(+b.dataset.del, 1); renderPhotos(); refresh(); }));
+      $$('[data-main]').forEach((b) => (b.onclick = () => { const [p] = state.photos.splice(+b.dataset.main, 1); state.photos.unshift(p); renderPhotos(); refresh(); }));
+    }
+
+    // ---------- 下書きの一時保存（写真は除く） ----------
+    let saveTimer;
+    function saveDraft(v) {
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(() => {
+        try {
+          const keep = { ...v }; delete keep.emailConfirm;
+          localStorage.setItem(DRAFT, JSON.stringify({ mode: mode(), courtId: form.elements.courtId.value, values: keep, at: Date.now() }));
+          $('#saved').hidden = false;
+        } catch {}
+      }, 600);
+    }
+    function loadDraft() {
+      try {
+        const d = JSON.parse(localStorage.getItem(DRAFT) || 'null');
+        if (!d || Date.now() - d.at > 14 * 864e5) return null;
+        return d;
+      } catch { return null; }
+    }
+    const clearDraft = () => { try { localStorage.removeItem(DRAFT); } catch {} };
+
+    // ---------- 入力チェック ----------
+    function check(v) {
+      const errs = {};
+      FIELDS.forEach((f) => {
+        if (f.type === 'photos' || !isShown(f, v)) return;
+        const x = v[f.name];
+        const empty = Array.isArray(x) ? !x.length : !x;
+        if (empty) {
+          if (f.required) errs[f.name] = f.type === 'checkbox' ? '1つ以上選択してください。' : f.type === 'radio' || f.type === 'select' ? '選択してください。' : '必須項目です。';
+          if (f.requiredIfPhotos && state.photos.length) errs[f.name] = '写真を送る場合はチェックしてください。';
+          return;
+        }
+        if (f.maxLength && String(x).length > f.maxLength) errs[f.name] = `${f.maxLength}文字以内で入力してください。`;
+        if (f.type === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(x)) errs[f.name] = 'メールアドレスの形式が正しくありません。';
+        if (f.type === 'url' && !/^https?:\/\/[^\s"<>]+$/.test(x)) errs[f.name] = 'http(s):// から始まるURLを入力してください。';
+        if (f.type === 'tel' && !/^[0-9+\-() ]{8,20}$/.test(x)) errs[f.name] = '電話番号の形式が正しくありません。';
+        if (f.type === 'number' && (!Number.isInteger(+x) || +x < f.min || +x > f.max)) errs[f.name] = `${f.min}〜${f.max}の数字で入力してください。`;
+        if (f.confirmOf && x !== v[f.confirmOf]) errs[f.name] = 'メールアドレスが一致しません。';
+      });
+      if (mode() === 'update' && !form.elements.courtId.value) errs.courtId = '更新するコートを選んでください。';
+      if (!$('#agree').checked) errs.agree = '掲載基準とプライバシーポリシーへの同意が必要です。';
+      return errs;
+    }
+    function showErrors(errs) {
+      $$('.contact-field', form).forEach((w) => {
+        const name = w.id.slice(2);
+        const e = $('.error', w);
+        const msg = errs[name];
+        w.classList.toggle('invalid', !!msg);
+        if (e && (msg || name !== 'photos')) { e.hidden = !msg; e.textContent = msg || ''; }
+      });
+      const first = Object.keys(errs)[0];
+      if (first) $('#f-' + first)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    // ---------- 画面の切り替え ----------
+    function showStep(n, noPush) {
+      $('#step2').hidden = n !== 2; $('#step3').hidden = n !== 3; $('#step4').hidden = n !== 4;
+      $$('#steps li').forEach((li) => li.classList.toggle('on', +li.dataset.step <= n));
+      if (!noPush) history.pushState({ step: n }, '');
+      if (n === 3) renderTurnstile();
+      $('#apply').scrollIntoView({ behavior: 'smooth' });
+    }
+    window.addEventListener('popstate', (e) => showStep((e.state && e.state.step) || 2, true));
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const v = getValues();
+      const errs = check(v);
+      showErrors(errs);
+      if (Object.keys(errs).length) return;
+      const court = DATA.courts.find((c) => c.id === form.elements.courtId.value);
+      const rows = FIELDS.filter((f) => f.type !== 'photos' && !f.confirmOf && isShown(f, v)).map((f) => {
+        let x = v[f.name];
+        if (f.options) x = (Array.isArray(x) ? x : [x]).filter(Boolean).map((o) => optLabel(f.name, o)).join('、');
+        return `<div><dt>${esc(f.label)}${f.public ? '' : '<small>非公開</small>'}</dt><dd>${x ? esc(x) : '<span class="empty">（未入力）</span>'}</dd></div>`;
+      });
+      $('#confirm').innerHTML = `
+        <p class="owners-confirm-mode">${mode() === 'new' ? '新しく掲載する' : `「${esc(court?.name)}」の掲載内容を更新する`}</p>
+        ${state.photos.length ? `<div class="owners-photos small">${state.photos.map((p, i) => `<figure class="owners-thumb${i ? '' : ' main'}"><img src="${p.url}" alt="" /></figure>`).join('')}</div>` : ''}
+        <dl class="contact-confirm">${rows.join('')}</dl>
+        <div class="owners-confirm-card"><p class="owners-preview-title">一覧での見え方</p></div>`;
+      const card = $('#pv').cloneNode(true);
+      card.removeAttribute('id');
+      $$('[id]', card).forEach((el) => el.removeAttribute('id'));
+      $('.owners-confirm-card', $('#confirm')).appendChild(card);
+      $('#sendError').hidden = true;
+      showStep(3);
+    });
+    $('#back').onclick = () => history.back();
+
+    function renderTurnstile() {
+      const key = state.config && state.config.turnstileSiteKey;
+      if (!key) return;
+      const go = () => {
+        if (!window.turnstile) return setTimeout(go, 200);
+        if (state.tsWidget !== null) { turnstile.reset(state.tsWidget); state.tsToken = ''; return; }
+        state.tsWidget = turnstile.render('#ts', { sitekey: key, language: 'ja', callback: (t) => (state.tsToken = t), 'expired-callback': () => (state.tsToken = '') });
+      };
+      go();
+    }
+
+    $('#send').onclick = async () => {
+      const btn = $('#send');
+      if (state.config.turnstileSiteKey && !state.tsToken) return showSendError('自動確認（ロボットでないことの確認）が終わるまで少しお待ちください。');
+      btn.disabled = true; btn.textContent = '送信中…';
+      try {
+        const r = await fetch('/api/court-submit', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            mode: mode(), courtId: form.elements.courtId.value, data: getValues(), photos: state.photos.map((p) => p.b64),
+            agree: $('#agree').checked, website: form.elements.website.value, startedAt: state.startedAt,
+            turnstileToken: state.tsToken, source: document.referrer,
+          }),
+        });
+        const j = await r.json().catch(() => ({ ok: false, error: r.status === 413 ? '写真の容量が大きすぎます。枚数を減らしてお試しください。' : '送信に失敗しました。' }));
+        if (!j.ok) {
+          if (j.fieldErrors) { showStep(2); showErrors(j.fieldErrors); }
+          else showSendError(j.error);
+          if (state.tsWidget !== null) { turnstile.reset(state.tsWidget); state.tsToken = ''; }
+          return;
+        }
+        clearDraft();
+        $('#receipt').textContent = j.id;
+        $('#doneTitle').textContent = j.mode === 'update' ? '更新のお申し込みを受け付けました' : '掲載のお申し込みを受け付けました';
+        $('#doneText').textContent = j.outOfArea
+          ? '現在は東京・神奈川・千葉・埼玉のコートを掲載しています。掲載エリアを広げる際に、あらためてご連絡します。'
+          : '内容を確認のうえ、通常3営業日以内に公開します。公開したら、ページのURLをメールでお知らせします。';
+        history.replaceState(null, '', location.pathname);
+        showStep(4, true);
+      } catch { showSendError('通信に失敗しました。電波の良い場所で再度お試しください。'); }
+      finally { btn.disabled = false; btn.textContent = 'この内容で申し込む'; }
+    };
+    function showSendError(m) { const a = $('#sendError'); a.textContent = m; a.hidden = false; }
+
+    // ---------- 初期化 ----------
+    const q = new URLSearchParams(location.search);
+    const preCourt = q.get('court');
+    const draft = loadDraft();
+    if (preCourt && DATA.courts.some((c) => c.id === preCourt)) {
+      switchMode('update', preCourt);
+      if (draft && draft.mode === 'update' && draft.courtId === preCourt) setValues(draft.values);
+    } else if (draft) {
+      form.elements.mode.value = draft.mode;
+      if (draft.mode === 'update' && draft.courtId) { form.elements.courtId.value = draft.courtId; loadCourt(draft.courtId); }
+      setValues(draft.values);
+    } else if (q.get('mode') === 'update') switchMode('update');
+    refresh();
+    if (preCourt || q.get('mode')) setTimeout(() => $('#apply').scrollIntoView(), 50);
+
+    fetch('/api/court-submit').then((r) => r.json()).then((cfg) => {
+      state.config = cfg;
+      if (!cfg.ready) { $('#notReady').hidden = false; $('#step2').hidden = true; $('#steps').hidden = true; }
+    }).catch(() => { state.config = { ready: true, turnstileSiteKey: '' }; });
+  })();
+  </script>
+</Base>
+
+<style is:global>
+  .owners { max-width: 1080px; }
+  .owners br.sp { display: none; }
+  .owners-hero { text-align: center; padding: 8px 0 28px; }
+  .owners-hero h1 { color: var(--navy); font-size: clamp(1.6rem, 4.2vw, 2.4rem); line-height: 1.35; margin: 6px 0 12px; }
+  .owners-hero .contact-lead { max-width: 640px; margin: 0 auto; }
+  .owners-points { list-style: none; display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); margin: 28px 0 24px; text-align: left; }
+  .owners-points li { background: #fff; border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 18px; box-shadow: var(--shadow); }
+  .owners-points b { display: block; color: var(--navy); font-size: 1.05rem; margin-bottom: 4px; }
+  .owners-points span { color: var(--ink-soft); font-size: .9rem; }
+  .owners-cta { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+  .owners-flow ol { list-style: none; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 8px 0 40px; counter-reset: none; }
+  .owners-flow li { background: var(--foam); border-radius: var(--radius-sm); padding: 14px 16px; position: relative; }
+  .owners-flow li span { display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--teal-dark); color: #fff; font-weight: 800; font-size: .85rem; margin-right: 8px; }
+  .owners-flow b { color: var(--navy); }
+  .owners-flow small { display: block; color: var(--ink-soft); margin-top: 6px; font-size: .84rem; }
+
+  .owners-apply { scroll-margin-top: calc(var(--header-h) + 12px); }
+  .owners-layout { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 24px; align-items: start; }
+  .owners-layout[hidden] { display: none; }
+  .owners-narrow { max-width: 760px; margin: 0 auto; }
+  .owners-preview { position: sticky; top: calc(var(--header-h) + 16px); }
+  .owners-preview-title { font-weight: 800; color: var(--navy); margin-bottom: 10px; font-size: .9rem; }
+  .owners-preview .card:hover { transform: none; }
+  .owners-preview .card-actions .button, .owners-preview .map-button { pointer-events: none; }
+  .owners-preview-note { margin-top: 10px; font-size: .78rem; }
+
+  .owners-mode { border: 0; margin: 0 0 20px; padding: 0; }
+  .owners-mode legend { font-weight: 700; margin-bottom: 8px; }
+  .owners-seg { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .owners-seg label { cursor: pointer; }
+  .owners-seg input { position: absolute; opacity: 0; pointer-events: none; }
+  .owners-seg span { display: block; text-align: center; padding: 12px; border: 1.5px solid var(--line); border-radius: var(--radius-sm); font-weight: 700; color: var(--ink-soft); background: #fff; }
+  .owners-seg input:checked + span { border-color: var(--teal); background: var(--foam); color: var(--navy); }
+  .owners-seg input:focus-visible + span { outline: 3px solid var(--teal-light); }
+
+  .owners-dup { background: #fff7e0; border-radius: var(--radius-sm); padding: 12px 14px; margin-bottom: 18px; font-size: .92rem; }
+  .owners .linkish { border: 0; background: none; padding: 0; color: var(--teal-dark); font: inherit; font-weight: 700; text-decoration: underline; cursor: pointer; }
+
+  .owners-sec { border-top: 1px solid var(--line); padding-top: 22px; margin-top: 8px; }
+  .owners-sec h2 { display: flex; align-items: center; gap: 10px; font-size: 1.1rem; margin-bottom: 6px; }
+  .owners-sec h2 span { display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: var(--navy); color: #fff; font-size: .85rem; }
+  .owners-sec-lead { color: var(--ink-soft); font-size: .88rem; margin-bottom: 18px; }
+  .owners .contact-field[hidden] { display: none; }
+  .owners textarea { min-height: 0; }
+  .owners-count { text-align: right; font-size: .78rem; color: var(--ink-soft); margin-top: 2px; }
+  .owners-count.over { color: #c83b2a; font-weight: 700; }
+  .owners input[type=date] { width: 100%; font: inherit; font-size: 16px; padding: 11px 14px; border: 1.5px solid var(--line); border-radius: var(--radius-sm); background: #fff; color: var(--ink); }
+
+  .owners-options { display: grid; gap: 8px; }
+  .owners-options label { display: flex; gap: 10px; align-items: flex-start; border: 1.5px solid var(--line); border-radius: var(--radius-sm); padding: 12px 14px; cursor: pointer; background: #fff; }
+  .owners-options label:has(input:checked) { border-color: var(--teal); background: var(--foam); }
+  .owners-options input { margin-top: 5px; accent-color: var(--teal-dark); }
+  .owners-options b { display: block; color: var(--navy); font-size: .95rem; }
+  .owners-options small { display: block; color: var(--ink-soft); font-size: .82rem; margin-top: 2px; }
+
+  .owners-photos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 10px; }
+  .owners-photos:empty { display: none; }
+  .owners-photos.small { max-width: 420px; margin: 0 0 16px; }
+  .owners-thumb { margin: 0; border-radius: var(--radius-sm); overflow: hidden; border: 1.5px solid var(--line); background: #fff; }
+  .owners-thumb.main { border-color: var(--teal); }
+  .owners-thumb img { display: block; width: 100%; aspect-ratio: 16 / 10; object-fit: cover; }
+  .owners-thumb figcaption { display: flex; justify-content: space-between; gap: 4px; padding: 6px 8px; font-size: .78rem; font-weight: 700; color: var(--teal-dark); }
+  .owners-thumb button { border: 0; background: none; padding: 0; font: inherit; color: var(--ink-soft); text-decoration: underline; cursor: pointer; }
+  .owners-photo-add { display: flex; align-items: center; justify-content: center; border: 2px dashed var(--teal); border-radius: var(--radius-sm); padding: 18px; cursor: pointer; font-weight: 700; color: var(--teal-dark); background: var(--foam); }
+  .owners-photo-add[hidden] { display: none; }
+  .owners-photo-add input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+  .owners-photo-add:focus-within { outline: 3px solid var(--teal-light); }
+  .owners-current { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: .85rem; color: var(--ink-soft); margin-top: 10px; }
+  .owners-current img { width: 72px; height: 45px; object-fit: cover; border-radius: 6px; }
+
+  .owners-guide { background: var(--sand); border-radius: var(--radius-sm); padding: 14px 16px; margin: 24px 0 16px; font-size: .88rem; }
+  .owners-guide .lbl { font-weight: 700; margin-bottom: 6px; }
+  .owners-guide ul { padding-left: 1.2em; color: var(--ink-soft); }
+  .owners-saved { text-align: center; margin-top: 10px; font-size: .78rem; }
+
+  .owners-confirm-mode { font-weight: 800; color: var(--navy); margin-bottom: 14px; }
+  .owners-confirm-card { max-width: 340px; margin: 24px auto 0; }
+  .owners-confirm-card .card:hover { transform: none; }
+  .contact-confirm dt small { display: inline-block; margin-left: 6px; font-size: .7rem; font-weight: 600; color: var(--ink-soft); background: var(--sand-deep); border-radius: 4px; padding: 0 6px; }
+
+  .owners-faq { max-width: 760px; margin: 48px auto 0; }
+  .owners-faq h2 { color: var(--navy); font-size: 1.2rem; margin-bottom: 12px; }
+  .owners-faq details { background: #fff; border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 14px 18px; margin-bottom: 10px; }
+  .owners-faq summary { font-weight: 700; cursor: pointer; color: var(--navy); }
+  .owners-faq details p { margin-top: 8px; color: var(--ink-soft); font-size: .92rem; }
+
+  @media (max-width: 900px) {
+    .owners-layout { grid-template-columns: 1fr; }
+    .owners-preview { display: none; } /* スマホでは確認画面でカードを見せる */
+  }
+  @media (max-width: 640px) {
+    .owners br.sp { display: inline; }
+    .owners-points { gap: 10px; margin: 22px 0 20px; }
+    .owners-points li { padding: 14px 16px; }
+    .owners-flow ol { grid-template-columns: 1fr; }
+    .owners-seg { grid-template-columns: 1fr; }
+    .owners-photos { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>

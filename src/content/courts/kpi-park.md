@@ -1,6 +1,6 @@
 ---
 name: KPI PARK
-area: { ja: 横浜・戸塚, en: Totsuka, Yokohama }
+area: { ja: 横浜・戸塚, en: "Totsuka, Yokohama" }
 prefecture: kanagawa
 environment: [outdoor]
 courts: 10

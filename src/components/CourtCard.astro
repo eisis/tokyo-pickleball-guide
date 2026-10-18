@@ -34,6 +34,7 @@ const searchText = [d.name, d.area.ja, d.area.en, PREFECTURES[d.prefecture].ja, 
     )}
     <span class="card-badges">
       {isNew(court) && <span class="badge-new">NEW</span>}
+      {d.ownerVerified && <span class="badge-owner" title="施設の運営者が掲載している情報です" data-ja="運営者掲載" data-en="Official">運営者掲載</span>}
       <span class="dist" data-dist hidden></span>
     </span>
   </a>

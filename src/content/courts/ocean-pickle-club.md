@@ -1,6 +1,6 @@
 ---
 name: OCEAN PICKLE CLUB 鶴見
-area: { ja: 横浜・鶴見, en: Tsurumi, Yokohama }
+area: { ja: 横浜・鶴見, en: "Tsurumi, Yokohama" }
 prefecture: kanagawa
 environment: [outdoor]
 category: dedicated
@@ -9,7 +9,7 @@ address: 神奈川県横浜市鶴見区東寺尾3-16-9
 access: { ja: 鶴見駅・生麦駅から市営バス41系統「みやだいばし」下車, en: City bus No.41 from Tsurumi or Namamugi Sta. to Miyadaibashi }
 hours: "9:00〜21:00"
 price: 1時間 ¥4,000〜
-rental: { status: paid, note: パドル4個・ボール4個セット2,000円 }
+rental: { status: paid, note: "パドル4個・ボール4個セット2,000円" }
 reservation: [online]
 description:
   ja: 2026年6月にできた屋外ハードコート2面。ネット常設で、24時間ネット予約できます。

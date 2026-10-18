@@ -1,12 +1,12 @@
 ---
 name: WELL PICKLE CLUB
-area: { ja: 葛飾・水元, en: Mizumoto, Katsushika }
+area: { ja: 葛飾・水元, en: "Mizumoto, Katsushika" }
 prefecture: tokyo
 environment: [outdoor]
 category: dedicated
 courts: 4
 address: 東京都葛飾区西水元6-5-1
-access: { ja: 亀有駅から東武バス「西水元6丁目」下車徒歩1分, en: Bus from Kameari Sta. to Nishi-Mizumoto 6-chome, 1 min walk }
+access: { ja: 亀有駅から東武バス「西水元6丁目」下車徒歩1分, en: "Bus from Kameari Sta. to Nishi-Mizumoto 6-chome, 1 min walk" }
 hours: "平日10:00〜17:00／土日祝9:00〜17:00（10月〜冬は16:00まで）"
 price: 1時間 ¥4,000〜
 rental: { status: paid, note: パドル2本・ボール2個で500円 }

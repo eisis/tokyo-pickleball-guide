@@ -6,7 +6,7 @@ environment: [indoor]
 category: dedicated
 courts: 3
 address: 東京都江東区南砂2-6-11 ファミル東陽町 3階（フロント5階）
-access: { ja: 東西線 東陽町駅4番出口から徒歩5分, en: 5 min walk from Toyocho Station (Exit 4, Tozai Line) }
+access: { ja: 東西線 東陽町駅4番出口から徒歩5分, en: "5 min walk from Toyocho Station (Exit 4, Tozai Line)" }
 hours: "月 13:00〜16:00／水・金 10:00〜14:30"
 price: 50分 ¥4,400〜
 rental: { status: paid, note: パドル1本220円（ボール・シューズは無料） }

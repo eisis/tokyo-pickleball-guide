@@ -3,6 +3,7 @@
 // ・画面（src/pages/contact.astro）もサーバー（api/contact.js）もこの定義を使います
 // ・新しい種別を追加 → TYPES に1ブロック足すだけ
 // ・一時的に隠したい種別 → enabled: false
+// ・専用ページで受け付ける種別 → href: '/パス/'（カードを押すとそのページへ移動する）
 // ============================================================
 
 // 全種別共通の項目
@@ -31,30 +32,12 @@ const PREFECTURES = PREFECTURE_GROUPS.flatMap((g) => g.options);
 
 const TYPES = [
   {
+    // コートの掲載・更新は専用ページ（/owners/）で受け付ける。ここは入口のカードだけ
     id: 'court',
-    sheetName: 'コート掲載', // 受付台帳のタブ名
-    label: 'コートを掲載したい',
-    description: '施設の運営者・管理者の方へ。基本掲載は無料です。',
+    label: 'コートを掲載・更新したい',
+    description: '施設の運営者の方へ。専用フォームから掲載内容を直接お送りいただけます（基本掲載無料）。',
     icon: '🏓',
-    subjectField: 'facilityName', // 通知メールの件名に使う項目
-    autoReplyNote: '掲載にあたり、写真や詳細情報をメールでお伺いする場合があります。',
-    fields: [
-      { name: 'operatorType', label: 'お立場', type: 'select', required: true,
-        options: ['施設運営者', 'コート所有者・管理者', '自治体・公共施設のご担当', 'その他'] },
-      { name: 'facilityName', label: '施設名', type: 'text', required: true, maxLength: 100, placeholder: '〇〇スポーツセンター' },
-      { name: 'prefecture', label: '都道府県', type: 'select', required: true, options: PREFECTURES, groups: PREFECTURE_GROUPS,
-        help: '現在は東京・神奈川・千葉・埼玉を中心に掲載しています。その他の地域も今後の掲載候補として受け付けています。' },
-      { name: 'city', label: '市区町村', type: 'text', required: true, maxLength: 60, placeholder: '港区' },
-      { name: 'officialUrl', label: '公式サイトURL', type: 'url', required: false, maxLength: 300, placeholder: 'https://' },
-      { name: 'courts', label: 'コート面数', type: 'number', required: false, min: 1, max: 99 },
-      { name: 'environment', label: '屋内 / 屋外', type: 'radio', required: false, options: ['屋内', '屋外', '両方'] },
-      { name: 'booking', label: '予約方法', type: 'text', required: false, maxLength: 200, placeholder: '公式サイト / 電話 / 予約アプリ など' },
-      { name: 'availabilityCoop', label: '空き状況の掲載へのご協力', type: 'radio', required: false,
-        options: ['協力できる', '検討したい', '難しい'],
-        help: '将来、各コートの空き状況をサイトに載せる予定です。' },
-      { name: 'photos', label: '写真のご提供', type: 'radio', required: false, options: ['提供できる', '未定'] },
-      { name: 'message', label: 'その他・ご要望', type: 'textarea', required: false, maxLength: 2000 },
-    ],
+    href: '/owners/',
   },
   {
     id: 'fix',
@@ -143,7 +126,7 @@ const TYPES = [
 ];
 
 function getType(id) {
-  return TYPES.find((t) => t.id === id && t.enabled !== false) || null;
+  return TYPES.find((t) => t.id === id && t.enabled !== false && !t.href) || null;
 }
 
 export { COMMON_FIELDS, TYPES, getType };

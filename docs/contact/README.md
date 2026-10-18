@@ -105,8 +105,8 @@ Vercel → プロジェクト → **Settings → Environment Variables** で以�
 
 | 置く場所 | リンク先 |
 |---|---|
-| コート掲載募集の記事・トップのバナー | `/contact/?type=court` |
-| 各コートページ下部「情報の誤りを報告」 | `/contact/?type=fix` |
+| コートの掲載・更新（運営者向けページへ転送） | `/owners/`（`/contact/?type=court` も転送される。仕組みは docs/court-submission/README.md） |
+| 各コートページ下部「情報の誤りを報告」（利用者向け） | `/contact/?type=fix` |
 | フッター「お問い合わせ」 | `/contact/` |
 
 ## 運用ルール（おすすめ）

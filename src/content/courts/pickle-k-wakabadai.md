@@ -1,6 +1,6 @@
 ---
 name: Pickle K 若葉台
-area: { ja: 稲城・若葉台, en: Wakabadai, Inagi }
+area: { ja: 稲城・若葉台, en: "Wakabadai, Inagi" }
 prefecture: tokyo
 environment: [indoor]
 category: dedicated

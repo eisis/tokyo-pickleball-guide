@@ -27,6 +27,7 @@ const desc = `${d.name}（${pref}・${d.area.ja}）のピックルボールコ�
   <main class="container narrow">
     <p class="meta"><a href="/">← コート一覧</a></p>
     <h1 style="margin:12px 0 20px;color:var(--navy)">{d.name}{isNew(court) && <span class="new-label">NEW</span>}</h1>
+    {d.ownerVerified && <p class="owner-verified">✓ 施設の運営者が掲載している情報です</p>}
 
     {d.image ? (
       <img class="detail-hero" src={d.image} alt={d.name} />
@@ -65,7 +66,15 @@ const desc = `${d.name}（${pref}・${d.area.ja}）のピックルボールコ�
     {d.location && <div style="margin-top:28px"><CourtMap courts={[court]} /></div>}
 
     <p class="meta">情報確認日：{ymd(d.updatedAt)}　料金・営業時間は変わることがあるため、最新情報は公式サイトでご確認ください。</p>
-    <p class="meta"><a href="/contact/?type=fix">掲載情報の誤りを報告する</a>　／　<a href="/contact/?type=court">このコートの運営者の方へ（掲載内容のご相談）</a></p>
+
+    <aside class="owner-note">
+      <div>
+        <p class="owner-note-title">このコートの運営者の方へ</p>
+        <p>料金・営業時間・写真などの掲載内容は、運営者の方がフォームから直接更新できます。空き状況の表示や予約連携のご相談もあわせて受け付けています。</p>
+      </div>
+      <a class="owner-note-btn" href={`/owners/?court=${court.id}`} data-track="owner_update" data-track-from="詳細ページ" data-court-id={court.id} data-court-name={d.name}>掲載内容を更新する</a>
+    </aside>
+    <p class="meta"><a href="/contact/?type=fix">掲載情報の誤りを報告する（利用者の方）</a></p>
     {d.sources.length > 0 && (
       <div class="sources">
         <p>参考</p>

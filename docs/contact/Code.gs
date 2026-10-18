@@ -6,6 +6,7 @@
 // ・種別ごとにタブを分けて、1項目1列で記録します（タブがなければ自動作成）
 // ・フォームに項目が増えたら、右端に列が自動で追加されます
 // ・列の並び替えや幅の変更は自由にしてOK（列名で照合するのでずれません）
+// ・action: 'update' のときは、受付番号の行の列を書き換えます（掲載申請の承認・見送りで使用）
 // ============================================================
 
 const SECRET = 'ここに合言葉を入れる';
@@ -20,6 +21,7 @@ function doPost(e) {
     const lock = LockService.getScriptLock();
     lock.waitLock(10000);
     try {
+      if (body.action === 'update') return json(updateRow(body.sheet, body.id, body.cells || {}));
       const sheet = getSheet(body.sheet, body.headers);
       const headers = ensureHeaders(sheet, body.headers);
       const row = headers.map((h) => clean(body.row[h]));
@@ -31,6 +33,21 @@ function doPost(e) {
   } catch (err) {
     return json({ ok: false, error: String(err) });
   }
+}
+
+// 受付番号の行を探して、指定の列を書き換える（列がなければ右端に追加）
+// 例：掲載申請が承認されたら「ステータス」を「完了」に、「公開日時」を記入
+function updateRow(name, id, cells) {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(name);
+  if (!sheet) return { ok: false, error: 'sheet not found' };
+  const headers = ensureHeaders(sheet, Object.keys(cells));
+  const idCol = headers.indexOf('受付番号') + 1;
+  if (idCol < 1 || sheet.getLastRow() < 2) return { ok: false, error: 'id column not found' };
+  const ids = sheet.getRange(2, idCol, sheet.getLastRow() - 1, 1).getValues().map((r) => String(r[0]));
+  const at = ids.indexOf(String(id));
+  if (at === -1) return { ok: false, error: 'id not found' };
+  Object.keys(cells).forEach((h) => sheet.getRange(at + 2, headers.indexOf(h) + 1).setValue(clean(cells[h])));
+  return { ok: true };
 }
 
 // タブを取得（なければ作る）

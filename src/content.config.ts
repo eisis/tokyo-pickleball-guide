@@ -42,6 +42,7 @@ const courts = defineCollection({
     updatedAt: z.coerce.date(), // 情報を最後に確認した日
     sources: z.array(z.string().url()).default([]), // 情報源
     hidden: z.boolean().default(false), // trueにするとサイトに出さない
+    ownerVerified: z.boolean().default(false), // 施設の運営者本人が掲載・更新した情報（「運営者掲載」マークが付く）
   }),
 });
 
