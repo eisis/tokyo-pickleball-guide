@@ -6,7 +6,7 @@ import Base from '../../layouts/Base.astro';
 import CourtCard from '../../components/CourtCard.astro';
 import { SITE } from '../../lib/site';
 import { PREFECTURES } from '../../lib/courts';
-import { getAllEvents, EVENT_TYPES, LEVELS, venueOf, iso, md, upcomingDates, type Event } from '../../lib/events';
+import { getAllEvents, EVENT_TYPES, LEVELS, venueOf, organizerOf, organizerUrl, iso, md, upcomingDates, type Event } from '../../lib/events';
 
 export async function getStaticPaths() {
   return (await getAllEvents()).map((event) => ({ params: { id: event.id }, props: { event } }));
@@ -16,6 +16,7 @@ const { event } = Astro.props as { event: Event };
 const d = event.data;
 const { Content } = await render(event);
 const venue = await venueOf(event);
+const org = await organizerOf(event);
 const type = EVENT_TYPES[d.type];
 const pref = venue.prefecture ? PREFECTURES[venue.prefecture].full : '';
 const dates = [...d.dates].sort((a, b) => a.getTime() - b.getTime());
@@ -71,6 +72,7 @@ const jsonLd = {
     <p class="event-tags" style="margin-top:16px">
       <span class={`etag etag-${d.type}`}>{type.ja}</span>
       {d.organizer.self && <span class="etag etag-self">Pickleball Tokyo 主催</span>}
+      {d.organizerPosted && !d.organizer.self && <span class="etag etag-posted">主催者掲載</span>}
       {d.level && <span class="etag etag-level">{LEVELS[d.level].ja}</span>}
       {!d.entry.required && <span class="etag etag-level">予約不要</span>}
     </p>
@@ -92,10 +94,10 @@ const jsonLd = {
       {d.level && (<><dt>対象</dt><dd>{LEVELS[d.level].ja}</dd></>)}
       {d.price && (<><dt>参加費</dt><dd>{d.price}</dd></>)}
       <dt>申込</dt><dd>{d.entry.required ? '事前申込が必要' : '予約不要（当日参加OK）'}{d.entry.deadline && `・締切 ${md(d.entry.deadline)}`}{d.entry.note && <><br /><small>{d.entry.note}</small></>}</dd>
-      <dt>主催</dt><dd>{d.organizer.name}</dd>
+      <dt>主催</dt><dd>{org ? <a href={organizerUrl(org.id)}>{org.data.name}</a> : d.organizer.name}</dd>
     </dl>
 
-    <div class="event-actions" id="event-actions">
+    <div class="event-actions" id="event-actions" data-event-id={event.id} data-event-name={d.title}>
       {selfEntry && <a class="button" href={selfEntry} data-track="event_entry" data-track-from="イベント詳細">参加を申し込む →</a>}
       {entryUrl && d.entry.required && <a class="button" href={entryUrl} target="_blank" rel="noopener" data-track="event_entry" data-track-from="イベント詳細">申し込む（主催者のページ）→</a>}
       {d.url && (!d.entry.required || entryUrl !== d.url) && <a class="button secondary" href={d.url} target="_blank" rel="noopener" data-track="event_detail" data-track-from="イベント詳細">主催者のページで詳しく見る</a>}
@@ -111,7 +113,7 @@ const jsonLd = {
     )}
 
     <p class="meta">情報確認日：{iso(d.updatedAt)}　内容は変更されることがあります。参加前に主催者のページで最新情報をご確認ください。</p>
-    <p class="meta"><a href="/contact/?type=fix">掲載内容の誤りを報告する</a>　／　<a href="/contact/?type=event">イベントの掲載を依頼する</a></p>
+    <p class="meta"><a href="/contact/?type=fix">掲載内容の誤りを報告する</a>　／　<a href="/events/submit/">イベントを掲載する（無料）</a></p>
     {d.sources.length > 0 && (
       <div class="sources">
         <p>参考</p>

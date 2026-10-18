@@ -1,0 +1,44 @@
+---
+// 主催者ページ：主催者（src/content/organizers/）ごとに自動で作られる（例: /organizers/pickleball-tokyo/）
+// その主催者のイベントをまとめて見せる。終わったイベントは見た人の今日でスクリプトが隠す
+import Base from '../../layouts/Base.astro';
+import EventCard from '../../components/EventCard.astro';
+import { getOrganizers, getAllEvents, type Organizer } from '../../lib/events';
+
+export async function getStaticPaths() {
+  return (await getOrganizers()).map((o) => ({ params: { id: o.id }, props: { org: o } }));
+}
+const { org } = Astro.props as { org: Organizer };
+const o = org.data;
+const events = (await getAllEvents()).filter((e) => e.data.organizer.id === org.id);
+const host = o.url ? new URL(o.url).hostname.replace(/^www\./, '') : '';
+---
+
+<Base title={`${o.name}のピックルボールイベント`} description={o.description ?? `${o.name}が主催する、東京近郊のピックルボールの練習会・体験会・大会の一覧です。`}>
+  <main class="container narrow">
+    <nav class="crumbs" aria-label="パンくず"><a href="/">トップ</a><span aria-hidden="true">›</span><a href="/events/">イベント</a><span aria-hidden="true">›</span><span>主催者</span></nav>
+    <div class="org-head" style="margin-top:16px">
+      <h1 style="color:var(--navy)">{o.name}</h1>
+      {o.self && <span class="etag etag-self">Pickleball Tokyo 主催</span>}
+    </div>
+    {o.description && <p class="description" style="margin-top:8px">{o.description}</p>}
+    {o.url && <p class="org-link meta"><a href={o.url} target="_blank" rel="noopener">{host} →</a></p>}
+
+    <h2 style="font-size:1.1rem;color:var(--navy);margin:28px 0 12px">開催予定のイベント</h2>
+    <div class="event-list" id="event-list">
+      {events.map((e) => <EventCard event={e} />)}
+    </div>
+    <p class="empty" id="org-empty" hidden>いま開催予定のイベントはありません。</p>
+
+    <p class="meta" style="margin-top:24px">この主催者の方へ：次の開催日は<a href="/events/submit/">掲載フォーム</a>から追加できます（同じメールアドレスならすぐに公開されます）。</p>
+  </main>
+</Base>
+
+<script>
+  const show = () => {
+    const left = [...document.querySelectorAll<HTMLElement>('#event-list [data-event-item]')].filter((el) => !el.dataset.ended);
+    document.getElementById('org-empty')!.hidden = left.length > 0;
+  };
+  show();
+  window.addEventListener('events:ready', show);
+</script>

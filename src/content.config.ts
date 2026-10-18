@@ -94,9 +94,11 @@ const events = defineCollection({
     summary: z.string(), // 一覧に出る1〜2文の紹介
     url: z.string().url().optional(), // 主催者の公式ページ（詳細はこちらへ送る）
     organizer: z.object({
+      id: z.string().optional(), // 主催者のファイル名（src/content/organizers/）。書くと主催者ページにまとまる
       name: z.string(),
       self: z.boolean().default(false), // true = Pickleball Tokyo 主催（一覧の先頭に目立たせ、申込をサイト内で受ける）
     }),
+    organizerPosted: z.boolean().default(false), // 主催者本人が掲載フォームから載せたイベント（「主催者掲載」マークが付く）
     image: z.string().optional(),
     sources: z.array(z.string().url()).default([]),
     updatedAt: z.coerce.date(), // 情報を確認した日
@@ -104,4 +106,20 @@ const events = defineCollection({
   }),
 });
 
-export const collections = { courts, posts, events };
+// 主催者（サークル・施設・大会運営など）。1主催者＝1ファイル。イベント掲載フォームから自動で作られる
+// trusted: true の主催者は、次回から同じメールアドレスの申し込みが確認なしで即時公開される
+const organizers = defineCollection({
+  loader: glob({ pattern: '**/[^_]*.md', base: './src/content/organizers' }),
+  schema: z.object({
+    name: z.string(),
+    url: z.string().url().optional(), // 主催者のサイト・SNS
+    description: z.string().optional(), // 主催者ページに出る紹介文
+    trusted: z.boolean().default(false),
+    emailKeys: z.array(z.string()).default([]), // 申込メールアドレスの照合用ハッシュ（サイトには出さない）
+    self: z.boolean().default(false), // Pickleball Tokyo 自身
+    since: z.coerce.date().optional(),
+    hidden: z.boolean().default(false),
+  }),
+});
+
+export const collections = { courts, posts, events, organizers };

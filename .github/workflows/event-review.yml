@@ -1,0 +1,61 @@
+name: Event submission review
+
+# イベント掲載フォームから作られた PR（ブランチ名が event/ で始まる）を閉じたときに動く
+#   Merge した → 公開を待ってから、申請者に公開のお知らせ（/api/event-review）
+#   Close した → 受付台帳を「対応不要」にするだけ
+# 必要なシークレット：SUBMIT_SECRET（Vercel の環境変数と同じ値）
+on:
+  pull_request:
+    types: [closed]
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: read
+
+jobs:
+  notify:
+    if: startsWith(github.event.pull_request.head.ref, 'event/')
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PR_BODY: ${{ github.event.pull_request.body }}
+      MERGED: ${{ github.event.pull_request.merged }}
+      NUMBER: ${{ github.event.pull_request.number }}
+      BRANCH: ${{ github.event.pull_request.head.ref }}
+      SITE: https://www.pickleball-tokyo.com
+    steps:
+      - name: 公開されるページを調べる
+        id: info
+        run: |
+          slug=$(gh api "repos/$GITHUB_REPOSITORY/pulls/$NUMBER/files" --jq '.[].filename' \
+            | grep -E '^src/content/events/[a-z0-9-]+\.md$' | head -1 | sed -E 's#.*/([a-z0-9-]+)\.md#\1#')
+          meta=$(printf '%s' "$PR_BODY" | grep -oE 'pt-meta:[A-Za-z0-9_-]+' | head -1 | cut -d: -f2)
+          echo "slug=$slug" >> "$GITHUB_OUTPUT"
+          echo "meta=$meta" >> "$GITHUB_OUTPUT"
+          echo "ページ: /events/$slug/"
+
+      - name: 公開を待つ（最大8分）
+        if: env.MERGED == 'true' && steps.info.outputs.slug != ''
+        run: |
+          for i in $(seq 1 32); do
+            code=$(curl -s -o /dev/null -w '%{http_code}' "$SITE/events/${{ steps.info.outputs.slug }}/")
+            if [ "$code" = "200" ]; then echo "公開を確認"; sleep 20; exit 0; fi
+            sleep 15
+          done
+          echo "公開を確認できなかったが、通知は送る"
+
+      - name: 申請者への通知・台帳の更新
+        if: steps.info.outputs.meta != ''
+        env:
+          SUBMIT_SECRET: ${{ secrets.SUBMIT_SECRET }}
+        run: |
+          if [ -z "$SUBMIT_SECRET" ]; then echo "::warning::SUBMIT_SECRET が未設定のため通知できません"; exit 0; fi
+          jq -n --arg meta "${{ steps.info.outputs.meta }}" --arg slug "${{ steps.info.outputs.slug }}" --argjson merged "$MERGED" \
+            '{meta:$meta, slug:$slug, merged:$merged}' \
+          | curl -fsS -X POST "$SITE/api/event-review" -H "Authorization: Bearer $SUBMIT_SECRET" -H 'Content-Type: application/json' --data @-
+
+      - name: ブランチを片付ける
+        if: always()
+        run: gh api -X DELETE "repos/$GITHUB_REPOSITORY/git/refs/heads/$BRANCH" || true

@@ -36,6 +36,7 @@ const pref = venue.prefecture ? PREFECTURES[venue.prefecture] : null;
     <p class="event-tags">
       <span class={`etag etag-${d.type}`} data-ja={type.ja} data-en={type.en}>{type.ja}</span>
       {d.organizer.self && <span class="etag etag-self">Pickleball Tokyo 主催</span>}
+      {d.organizerPosted && !d.organizer.self && <span class="etag etag-posted">主催者掲載</span>}
       {d.level && beginnerOk(event) && <span class="etag etag-level" data-ja={LEVELS[d.level].ja} data-en={LEVELS[d.level].en}>{LEVELS[d.level].ja}</span>}
       {!d.entry.required && <span class="etag etag-level">予約不要</span>}
     </p>

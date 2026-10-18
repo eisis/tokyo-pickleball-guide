@@ -649,3 +649,32 @@ html[lang="en"] .hero h1 { font-family: var(--display); font-weight: 800; letter
 .owner-note .owner-note-title { font-weight: 800; color: var(--navy); margin-bottom: 4px; font-size: .95rem; }
 .owner-note-btn { flex: none; display: inline-block; background: var(--teal-dark); color: #fff; font-weight: 700; font-size: .9rem; padding: 10px 18px; border-radius: 999px; text-decoration: none; }
 .owner-note-btn:hover { filter: brightness(1.08); }
+
+/* ---------- 今週どこで打てる？（/this-week/） ---------- */
+.tw-days { display: flex; flex-direction: column; gap: 18px; margin-bottom: 32px; }
+.tw-day h2 { display: flex; align-items: baseline; gap: 10px; font-size: 1.05rem; color: var(--navy); padding: 0 4px 8px; border-bottom: 2px solid var(--line); margin-bottom: 10px; }
+.tw-head { font-family: var(--display); font-weight: 900; font-size: 1.2rem; }
+.tw-day.wd-0 .tw-head { color: #c2412b; }
+.tw-day.wd-6 .tw-head { color: var(--indoor); }
+.tw-sub { font-size: .85rem; color: var(--ink-soft); font-weight: 600; }
+.tw-count { margin-left: auto; font-size: .8rem; color: var(--teal-dark); font-weight: 700; }
+.tw-list { display: flex; flex-direction: column; gap: 8px; }
+.tw-none { display: none; font-size: .88rem; color: var(--ink-soft); padding: 4px 4px 0; }
+.tw-day.empty-day .tw-none { display: block; }
+.tw-item { display: flex; align-items: center; gap: 14px; background: #fff; border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 12px 14px; color: var(--ink); text-decoration: none; box-shadow: var(--shadow); transition: border-color .15s, transform .15s; }
+.tw-item:hover { border-color: var(--teal); transform: translateY(-1px); }
+.tw-item.self { border: 2px solid var(--coral); }
+.tw-time { flex: 0 0 52px; font-family: var(--display); font-weight: 800; font-size: 1.05rem; color: var(--navy); text-align: center; }
+.tw-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.tw-title { font-weight: 800; line-height: 1.45; }
+.tw-where { font-size: .85rem; color: var(--ink-soft); display: flex; flex-wrap: wrap; gap: 0 8px; }
+.tw-where > span:first-child { font-weight: 700; color: var(--teal-dark); }
+.tw-price { color: var(--ink); }
+.tw-go { color: var(--ink-soft); font-size: 1.4rem; }
+@media (max-width: 520px) { .tw-item { gap: 10px; padding: 11px 12px; } .tw-time { flex-basis: 44px; font-size: .95rem; } }
+
+/* ---------- 主催者ページ・主催者掲載マーク ---------- */
+.etag-posted { background: var(--foam); color: var(--teal-dark); }
+.etag-posted::before { content: '✓ '; }
+.org-head { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; }
+.org-head .org-link { font-size: .9rem; }

@@ -31,7 +31,7 @@ export default async function handler(req, res) {
           ${mailButton(pageUrl, 'コートのページを見る')}
           <p>料金や営業時間が変わったとき、写真を差し替えたいときは、下のページからいつでも更新をお申し込みいただけます。</p>
           <p><a href="${SITE_URL}/owners/${slug ? `?court=${encodeURIComponent(slug)}` : ''}" style="color:#0e8a8f">掲載内容を更新する</a></p>
-          <p>大会・練習会・体験会などのイベントも無料で掲載できます。<a href="${SITE_URL}/contact/?type=event" style="color:#0e8a8f">イベントの掲載はこちら</a></p>
+          <p>大会・練習会・体験会などのイベントも無料で掲載できます。<a href="${SITE_URL}/events/submit/" style="color:#0e8a8f">イベントの掲載はこちら</a></p>
           <p style="margin-top:20px;color:#5b6b73;font-size:13px">Instagram・X（@pickleballtokyo）でも新しいコートを紹介しています。<br>このメールにそのまま返信すると ${esc(process.env.CONTACT_TO || '')} に届きます。</p>`),
       });
     }

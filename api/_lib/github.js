@@ -37,6 +37,48 @@ export async function fileExists(path) {
   return (await gh(`/contents/${encodeURI(path)}?ref=${BASE}`, { allow404: true })) !== null;
 }
 
+/** main にあるフォルダのファイル名一覧（なければ []） */
+export async function listDir(path) {
+  const j = await gh(`/contents/${encodeURI(path)}?ref=${BASE}`, { allow404: true });
+  return Array.isArray(j) ? j.filter((f) => f.type === 'file').map((f) => f.name) : [];
+}
+
+/** files から、base の上に積むコミットを作る（ブランチはまだ動かさない） */
+async function makeCommit(baseSha, message, files) {
+  const baseCommit = await gh(`/git/commits/${baseSha}`);
+  const tree = [];
+  for (const f of files) {
+    const blob = await gh('/git/blobs', {
+      method: 'POST',
+      body: f.base64 ? { content: f.base64, encoding: 'base64' } : { content: f.content, encoding: 'utf-8' },
+    });
+    tree.push({ path: f.path, mode: '100644', type: 'blob', sha: blob.sha });
+  }
+  const newTree = await gh('/git/trees', { method: 'POST', body: { base_tree: baseCommit.tree.sha, tree } });
+  return gh('/git/commits', {
+    method: 'POST',
+    body: { message, tree: newTree.sha, parents: [baseSha], author: { name: 'Pickleball Tokyo 掲載フォーム', email: 'noreply@pickleball-tokyo.com' } },
+  });
+}
+
+/**
+ * 確認なしで main に直接反映する（承認済みの主催者のイベント用）。Vercel が自動で公開する
+ * 同時に別の変更が入って失敗したときは、最新の main に積み直して1回だけやり直す
+ * 戻り値：{ sha, url }
+ */
+export async function commitToMain({ message, files }) {
+  for (let i = 0; i < 2; i++) {
+    const ref = await gh(`/git/ref/heads/${BASE}`);
+    const commit = await makeCommit(ref.object.sha, message, files);
+    try {
+      await gh(`/git/refs/heads/${BASE}`, { method: 'PATCH', body: { sha: commit.sha, force: false } });
+      return { sha: commit.sha, url: commit.html_url || `https://github.com/${REPO}/commit/${commit.sha}` };
+    } catch (e) {
+      if (i === 1) throw e;
+    }
+  }
+}
+
 /**
  * files: [{ path, content(string) } | { path, base64 }]
  * 戻り値：{ number, url }

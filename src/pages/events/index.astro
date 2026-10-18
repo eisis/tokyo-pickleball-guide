@@ -22,6 +22,7 @@ const prefs = (Object.keys(PREFECTURES) as (keyof typeof PREFECTURES)[]).filter(
       <p class="eyebrow">Events</p>
       <h1 class="blog-title">大会・練習会・体験会</h1>
       <p class="blog-lead">東京近郊で開かれるピックルボールのイベントをまとめています。日程と会場を確認したら、申し込みは主催者のページからどうぞ。</p>
+      <p style="margin-top:12px"><a class="contact-btn" href="/this-week/">今週どこで打てる？ 日ごとに見る →</a></p>
     </div>
   </header>
 
@@ -55,10 +56,10 @@ const prefs = (Object.keys(PREFECTURES) as (keyof typeof PREFECTURES)[]).filter(
         <div class="owner-band-text">
           <p class="eyebrow">For Organizers</p>
           <h2>イベントを主催している方へ</h2>
-          <p>大会・練習会・体験会の掲載は無料です。開催日・会場・申込ページを送っていただければ、確認のうえ掲載します。</p>
+          <p>大会・練習会・体験会の掲載は無料です。初回だけ内容を確認し、2回目からは同じメールアドレスで申し込むとすぐに公開されます。</p>
         </div>
         <div class="owner-band-actions">
-          <a class="owner-btn" href="/contact/?type=event" data-track="event_submit" data-track-from="イベント一覧">イベントを掲載する</a>
+          <a class="owner-btn" href="/events/submit/" data-track="event_submit" data-track-from="イベント一覧">イベントを掲載する</a>
         </div>
       </div>
       <div class="event-note">

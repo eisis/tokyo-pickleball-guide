@@ -65,3 +65,18 @@ export async function getUpcomingEvents(): Promise<Event[]> {
 
 /** 詳細ページ用：公開中のイベントすべて（終了したものもページは残し「終了しました」と出す） */
 export const getAllEvents = () => getCollection('events', (e) => !e.data.hidden);
+
+// ---------------- 主催者 ----------------
+export type Organizer = CollectionEntry<'organizers'>;
+export const organizerUrl = (id: string) => `/organizers/${id}/`;
+export const getOrganizers = () => getCollection('organizers', (o) => !o.data.hidden);
+
+/** イベントの主催者ページ（organizer.id があり、ファイルがあるときだけ） */
+export async function organizerOf(e: Event): Promise<Organizer | undefined> {
+  if (!e.data.organizer.id) return undefined;
+  const o = await getEntry('organizers', e.data.organizer.id);
+  return o && !o.data.hidden ? o : undefined;
+}
+
+/** 開始時刻 "9:00〜11:00" → "09:00"（並べ替え用。なければ空） */
+export const startTime = (e: Event) => ((e.data.time ?? '').match(/\d{1,2}:\d{2}/)?.[0] ?? '').padStart(5, '0');

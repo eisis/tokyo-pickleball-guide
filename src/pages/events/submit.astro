@@ -1,0 +1,438 @@
+---
+// イベント掲載フォーム（/events/submit/）
+// 上から：なぜ載せるのか → 公開までの流れ（初回だけ確認・2回目から即時公開）→ フォーム（入力 → 確認 → 完了）→ よくある質問
+// 項目の定義は api/_lib/event-form.js（受付APIと共通）。受付は api/event-submit.js
+import Base from '../../layouts/Base.astro';
+import '../../styles/form.css';
+import '../../styles/owners.css';
+import { SECTIONS, GUIDELINES, DATE_LIMIT, PREFECTURE_OPTIONS } from '../../../api/_lib/event-form.js';
+import { getCourts, PREFECTURES } from '../../lib/courts';
+import { getUpcomingEvents } from '../../lib/events';
+
+const courts = await getCourts();
+const courtList = courts.map((c) => ({ id: c.id, name: c.data.name, area: c.data.area.ja, pref: c.data.prefecture }));
+const groups = Object.entries(PREFECTURES).map(([k, p]) => ({ label: p.full, items: courtList.filter((c) => c.pref === k) })).filter((g) => g.items.length);
+const upcoming = (await getUpcomingEvents()).length;
+
+const fieldMeta = SECTIONS.flatMap((s) => s.fields).map((f) => ({
+  name: f.name, type: f.type, label: f.label, required: !!f.required, maxLength: f.maxLength,
+  showIf: f.showIf, confirmOf: f.confirmOf, public: f.public !== false,
+  options: f.options ? f.options.map((o) => ({ v: o.v, label: o.label })) : undefined,
+}));
+const prefLabel = Object.fromEntries(PREFECTURE_OPTIONS.map((o) => [o.v, o.label]));
+const badge = (f) => (f.required ? '<span class="req">必須</span>' : '<span class="opt">任意</span>');
+---
+
+<Base title="イベントを掲載する｜ピックルボールの練習会・体験会・大会" description="東京・神奈川・千葉・埼玉で開くピックルボールの練習会・体験会・レッスン・大会を、主催者の方が無料で掲載できます。初回だけ内容を確認し、2回目からはすぐに公開されます。">
+  <main class="container owners contact">
+    <header class="owners-hero">
+      <p class="contact-eyebrow">For Organizers</p>
+      <h1>練習会・体験会・大会を、<br class="sp" />無料で載せられます</h1>
+      <p class="contact-lead">「今週どこで打てるか」を探している人に、あなたのイベントを届けます。いま {upcoming} 件のイベントを掲載中です。</p>
+      <ul class="owners-points">
+        <li><b>掲載は無料</b><span>掲載料も、参加申込の手数料もかかりません。申込は主催者のページ（LINE・フォーム・予約サイトなど）へそのまま案内します。</span></li>
+        <li><b>2回目からは即時公開</b><span>初回だけ内容を確認します。承認後は、同じメールアドレスで申し込むと確認なしですぐに公開されます。</span></li>
+        <li><b>定期開催もまとめて</b><span>「毎週土曜」のような開催は、くり返しで日付をまとめて入れられます。主催者ごとのページにも一覧で並びます。</span></li>
+      </ul>
+      <div class="owners-cta"><a class="contact-btn" href="#apply">イベントを掲載する</a><a class="contact-btn ghost" href="/this-week/">今週の掲載イベントを見る</a></div>
+    </header>
+
+    <section class="owners-flow" aria-label="公開までの流れ">
+      <ol>
+        <li><span>1</span><b>フォームに入力</b><small>日時・会場・参加費・申込ページ（3分ほど）</small></li>
+        <li><span>2</span><b>初回だけ確認</b><small>運営チームが申込ページと照らして確認（通常1〜2営業日）</small></li>
+        <li><span>3</span><b>公開・お知らせ</b><small>2回目からは送信してすぐ公開。URLをメールでお送りします</small></li>
+      </ol>
+    </section>
+
+    <section id="apply" class="owners-apply">
+      <ol class="contact-steps" id="steps" aria-label="入力の流れ">
+        <li data-step="2" class="on"><span>1</span><b>入力</b></li>
+        <li data-step="3"><span>2</span><b>確認</b></li>
+        <li data-step="4"><span>3</span><b>完了</b></li>
+      </ol>
+
+      <div class="contact-alert" id="notReady" hidden>
+        掲載フォームは現在準備中です。お急ぎの場合は <a href="mailto:info@pickleball-tokyo.com">info@pickleball-tokyo.com</a> までご連絡ください。
+      </div>
+
+      <div class="owners-layout" id="step2">
+        <form id="form" class="contact-panel" novalidate>
+          {SECTIONS.map((s, si) => (
+            <section class="owners-sec" id={`sec-${s.id}`}>
+              <h2><span>{si + 1}</span>{s.title}</h2>
+              {s.lead && <p class="owners-sec-lead">{s.lead}</p>}
+              {s.fields.map((f) => (
+                <div class="contact-field" id={`f-${f.name}`} data-showif={f.showIf ? JSON.stringify(f.showIf) : undefined}>
+                  {f.type === 'dates' ? (
+                    <>
+                      <span class="lbl">{f.label}<Fragment set:html={badge(f)} /></span>
+                      <div class="ev-dates" id="dateList"></div>
+                      <div class="ev-repeat">
+                        <button type="button" class="chip" id="addDate">＋ 日付を追加</button>
+                        <span class="ev-repeat-box">
+                          <label for="repeat">くり返し</label>
+                          <select id="repeat">
+                            <option value="">なし（日付を1つずつ入れる）</option>
+                            {[4, 8, 12].map((n) => <option value={`7:${n}`}>毎週・{n}回分</option>)}
+                            {[3, 6].map((n) => <option value={`14:${n}`}>隔週・{n}回分</option>)}
+                          </select>
+                        </span>
+                      </div>
+                      <div class="help">日付は{DATE_LIMIT.max}日まで。最初の日を入れてからくり返しを選ぶと、同じ曜日の日付がまとめて入ります（あとから1日ずつ消せます）。</div>
+                    </>
+                  ) : f.type === 'radio' ? (
+                    <>
+                      <span class="lbl">{f.label}<Fragment set:html={badge(f)} /></span>
+                      <div class="contact-choices" role="radiogroup" aria-label={f.label}>
+                        {f.options.map((o) => <label><input type="radio" name={f.name} value={o.v} />{o.label}</label>)}
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <label for={`in-${f.name}`}>{f.label}<Fragment set:html={badge(f)} /></label>
+                      {f.type === 'court' ? (
+                        <select id={`in-${f.name}`} name={f.name}>
+                          <option value="">選択してください</option>
+                          {groups.map((g) => (
+                            <optgroup label={g.label}>{g.items.map((c) => <option value={c.id}>{c.name}（{c.area}）</option>)}</optgroup>
+                          ))}
+                          <optgroup label="一覧にない会場"><option value="other">その他の会場（体育館・公園など）</option></optgroup>
+                        </select>
+                      ) : f.type === 'select' ? (
+                        <select id={`in-${f.name}`} name={f.name}>
+                          <option value="">選択してください</option>
+                          {f.options.map((o) => <option value={o.v}>{o.label}</option>)}
+                        </select>
+                      ) : f.type === 'textarea' ? (
+                        <textarea id={`in-${f.name}`} name={f.name} rows={f.rows || 4} maxlength={f.maxLength} placeholder={f.placeholder}></textarea>
+                      ) : (
+                        <input type={f.type} id={`in-${f.name}`} name={f.name} maxlength={f.maxLength} placeholder={f.placeholder} autocomplete={f.autocomplete} step={f.type === 'time' ? 300 : undefined} />
+                      )}
+                      {f.maxLength && f.type === 'textarea' && <div class="owners-count" data-count={f.name}>0 / {f.maxLength}</div>}
+                    </>
+                  )}
+                  {f.help && <div class="help">{f.help}</div>}
+                  <div class="error" hidden></div>
+                </div>
+              ))}
+            </section>
+          ))}
+
+          <div class="owners-guide">
+            <p class="lbl">掲載基準</p>
+            <ul>{GUIDELINES.map((g) => <li>{g}</li>)}</ul>
+          </div>
+          <div class="contact-hp" aria-hidden="true"><label>Website<input type="text" name="website" tabindex="-1" autocomplete="off" /></label></div>
+          <div class="contact-field" id="f-agree">
+            <label class="contact-agree"><input type="checkbox" id="agree" /> <span>掲載基準と<a href="/privacy/" target="_blank" rel="noopener">プライバシーポリシー</a>に同意します</span></label>
+            <div class="error" hidden></div>
+          </div>
+          <div class="contact-actions"><button class="contact-btn" type="submit">入力内容を確認する</button></div>
+          <p class="owners-saved meta" id="saved" hidden>入力内容はこの端末に一時保存しています。</p>
+        </form>
+
+        <aside class="owners-preview" aria-label="一覧での見え方">
+          <p class="owners-preview-title">一覧での見え方</p>
+          <article class="event-card" id="pv">
+            <span class="event-date"><span class="event-m" id="pvM">月</span><span class="event-d" id="pvD">–</span><span class="event-w" id="pvW"></span></span>
+            <div class="event-body">
+              <p class="event-tags" id="pvTags"></p>
+              <h3 id="pvTitle">イベント名</h3>
+              <p class="event-where" id="pvWhere"><span>会場</span></p>
+              <p class="event-when" id="pvWhen"></p>
+            </div>
+          </article>
+          <p class="meta owners-preview-note" id="pvSummary">ひとこと紹介は、イベントのページと「今週どこで打てる？」に出ます。</p>
+        </aside>
+      </div>
+
+      <section class="contact-panel owners-narrow" id="step3" hidden>
+        <h2>入力内容のご確認</h2>
+        <div class="contact-alert" id="sendError" hidden></div>
+        <div id="confirm"></div>
+        <div id="ts"></div>
+        <div class="contact-actions">
+          <button class="contact-btn ghost" type="button" id="back">修正する</button>
+          <button class="contact-btn" type="button" id="send">この内容で申し込む</button>
+        </div>
+      </section>
+
+      <section class="contact-panel contact-done owners-narrow" id="step4" hidden>
+        <div class="contact-ball" aria-hidden="true">🏓</div>
+        <h2 id="doneTitle">お申し込みを受け付けました</h2>
+        <p id="doneText"></p>
+        <div class="contact-receipt" id="receipt"></div>
+        <p class="meta">ご入力のメールアドレス宛に確認メールをお送りしました。<br />届かない場合は迷惑メールフォルダもご確認ください。</p>
+        <div class="contact-actions">
+          <a class="contact-btn" id="doneLink" href="/this-week/">今週の掲載イベントを見る</a>
+          <button class="contact-btn ghost" type="button" id="again">続けて別のイベントを載せる</button>
+        </div>
+      </section>
+    </section>
+
+    <section class="owners-faq">
+      <h2>よくあるご質問</h2>
+      <details><summary>本当に無料ですか？</summary><p>イベントの掲載は無料です。申込は主催者のページへそのまま案内するので、手数料もかかりません。今後、有料の上位表示などを用意する場合も、通常の掲載は無料のままです。</p></details>
+      <details><summary>なぜ初回だけ確認があるのですか？</summary><p>実在しないイベントや、参加者に誤解を招く内容が載らないようにするためです。初回に申込ページと照らして確認し、承認した主催者の方は、次回から同じメールアドレスでお申し込みいただくとすぐに公開されます。</p></details>
+      <details><summary>日程の変更・中止はどうすればいいですか？</summary><p>受付メールにそのまま返信してお知らせください。確認のうえ、ページを直します。次の開催日を追加するときは、このフォームから新しく申し込んでください。</p></details>
+      <details><summary>主催者ではないのですが、イベントを紹介できますか？</summary><p>はい、お立場で「参加者・情報提供」を選んでお申し込みください。主催者のページで内容を確認してから掲載します。</p></details>
+      <details><summary>コートも掲載できますか？</summary><p>コートの掲載・更新は<a href="/owners/">コート運営者の方へ</a>のフォームからお申し込みいただけます。</p></details>
+    </section>
+  </main>
+
+  <script is:inline id="ev-data" type="application/json" set:html={JSON.stringify({ fields: fieldMeta, courts: courtList, prefLabel, prefShort: Object.fromEntries(Object.entries(PREFECTURES).map(([k, p]) => [k, p.ja])), maxDates: DATE_LIMIT.max }).replace(/</g, '\\u003c')}></script>
+  <script is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
+  <script is:inline>
+  (() => {
+    const $ = (s, r = document) => r.querySelector(s);
+    const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+    const DATA = JSON.parse($('#ev-data').textContent);
+    const FIELDS = DATA.fields;
+    const F = Object.fromEntries(FIELDS.map((f) => [f.name, f]));
+    const form = $('#form');
+    const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    const WEEK = ['日', '月', '火', '水', '木', '金', '土'];
+    const TYPE_CLASS = { practice: '練習会', trial: '体験会', lesson: 'レッスン', tournament: '大会', festival: 'イベント' };
+    const today = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
+    const state = { config: null, startedAt: Date.now(), tsWidget: null, tsToken: '', dates: [] };
+    const DRAFT = 'pt-event-draft-v1';
+    const store = { get(k) { try { return localStorage.getItem(k); } catch { return null; } }, set(k, v) { try { localStorage.setItem(k, v); return true; } catch { return false; } }, del(k) { try { localStorage.removeItem(k); } catch {} } };
+
+    // ---------- 開催日 ----------
+    const addDays = (d, n) => new Date(Date.parse(d + 'T00:00:00Z') + n * 86400000).toISOString().slice(0, 10);
+    const md = (d) => { const x = new Date(d + 'T00:00:00Z'); return `${x.getUTCMonth() + 1}/${x.getUTCDate()}（${WEEK[x.getUTCDay()]}）`; };
+    function renderDates() {
+      const box = $('#dateList');
+      if (!state.dates.length) state.dates = [''];
+      box.innerHTML = state.dates.map((d, i) => `<span class="ev-date"><input type="date" min="${today}" value="${esc(d)}" data-i="${i}" aria-label="開催日${i + 1}" />${state.dates.length > 1 ? `<button type="button" class="ev-date-x" data-x="${i}" aria-label="この日を消す">×</button>` : ''}</span>`).join('');
+      $('#addDate').hidden = state.dates.length >= DATA.maxDates;
+    }
+    const cleanDates = () => [...new Set(state.dates.filter(Boolean))].sort();
+    $('#dateList').addEventListener('input', (e) => { const i = e.target.dataset.i; if (i != null) { state.dates[+i] = e.target.value; refresh(); } });
+    $('#dateList').addEventListener('click', (e) => { const x = e.target.dataset.x; if (x != null) { state.dates.splice(+x, 1); renderDates(); refresh(); } });
+    $('#addDate').onclick = () => {
+      const last = cleanDates().pop();
+      state.dates.push(last ? addDays(last, 7) : '');
+      renderDates(); refresh();
+      $$('#dateList input').pop().focus();
+    };
+    function applyRepeat() {
+      const [step, n] = ($('#repeat').value || '0:0').split(':').map(Number);
+      const first = cleanDates()[0];
+      if (!n || !first) return;
+      state.dates = [...Array(Math.min(n, DATA.maxDates))].map((_, i) => addDays(first, i * step));
+      renderDates(); refresh();
+    }
+    $('#repeat').onchange = applyRepeat;
+
+    // ---------- 入力値 ----------
+    function getValues() {
+      const v = {};
+      FIELDS.forEach((f) => {
+        if (f.type === 'dates') v.dates = cleanDates();
+        else if (f.type === 'radio') v[f.name] = ($(`[name="${f.name}"]:checked`, form) || {}).value || '';
+        else v[f.name] = (form.elements[f.name].value || '').trim();
+      });
+      return v;
+    }
+    function setValues(v) {
+      FIELDS.forEach((f) => {
+        if (f.type === 'dates') { state.dates = (v.dates || []).filter((d) => d >= today); return; }
+        if (f.type === 'radio') { $$(`[name="${f.name}"]`, form).forEach((i) => (i.checked = i.value === v[f.name])); return; }
+        if (v[f.name] != null && form.elements[f.name]) form.elements[f.name].value = v[f.name];
+      });
+      renderDates();
+    }
+    const isShown = (f, v) => !f.showIf || Object.entries(f.showIf).every(([k, want]) => want.includes(v[k]));
+    const optLabel = (name, val) => (F[name].options || []).find((o) => o.v === val)?.label || val;
+    const courtOf = (id) => DATA.courts.find((c) => c.id === id);
+
+    function refresh() {
+      const v = getValues();
+      FIELDS.forEach((f) => { const el = $(`#f-${f.name}`); if (el) el.hidden = !isShown(f, v); });
+      $$('[data-count]').forEach((c) => (c.textContent = `${(form.elements[c.dataset.count].value || '').length} / ${F[c.dataset.count].maxLength}`));
+      renderPreview(v);
+      saveDraft(v);
+    }
+
+    function renderPreview(v) {
+      const d = v.dates[0];
+      if (d) { const x = new Date(d + 'T00:00:00Z'); $('#pvM').textContent = `${x.getUTCMonth() + 1}月`; $('#pvD').textContent = x.getUTCDate(); $('#pvW').textContent = WEEK[x.getUTCDay()]; }
+      else { $('#pvM').textContent = '月'; $('#pvD').textContent = '–'; $('#pvW').textContent = ''; }
+      const tags = [];
+      if (v.type) tags.push(`<span class="etag etag-${v.type}">${TYPE_CLASS[v.type]}</span>`);
+      if (v.role === 'organizer' || v.role === 'staff') tags.push('<span class="etag etag-posted">主催者掲載</span>');
+      if (v.level === 'beginner' || v.level === 'all') tags.push(`<span class="etag etag-level">${optLabel('level', v.level)}</span>`);
+      if (v.entry === 'walkin') tags.push('<span class="etag etag-level">予約不要</span>');
+      $('#pvTags').innerHTML = tags.join('');
+      $('#pvTitle').textContent = v.title || 'イベント名';
+      const c = courtOf(v.court);
+      const where = c ? [DATA.prefShort[c.pref], `${c.area}・${c.name}`] : v.court === 'other' ? [DATA.prefShort[v.venuePref] || '', v.venueName || '会場名'] : ['', '会場'];
+      $('#pvWhere').innerHTML = where.filter(Boolean).map((x) => `<span>${esc(x)}</span>`).join('');
+      const weekly = v.dates.length >= 3 && v.dates.every((x, i) => i === 0 || (Date.parse(x) - Date.parse(v.dates[i - 1])) / 86400000 === 7);
+      const time = v.timeStart ? `${v.timeStart.replace(/^0/, '')}〜${v.timeEnd ? v.timeEnd.replace(/^0/, '') : ''}` : '';
+      const when = [];
+      if (weekly) when.push(`毎週${WEEK[new Date(v.dates[0] + 'T00:00:00Z').getUTCDay()]}曜 ${time}`.trim());
+      else { if (time) when.push(time); if (v.dates.length > 1) when.push(`ほか${v.dates.length - 1}日`); }
+      if (v.price) when.push(v.price);
+      $('#pvWhen').innerHTML = when.map((x) => `<span>${esc(x)}</span>`).join('');
+      $('#pvSummary').textContent = v.summary || 'ひとこと紹介は、イベントのページと「今週どこで打てる？」に出ます。';
+    }
+
+    // ---------- 下書き ----------
+    let saveTimer;
+    function saveDraft(v) {
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(() => {
+        const { email, emailConfirm, ...rest } = v; // メールアドレス以外を保存（主催者情報は次回も使えるように残す）
+        if (store.set(DRAFT, JSON.stringify(rest))) $('#saved').hidden = false;
+      }, 400);
+    }
+    const loadDraft = () => { try { return JSON.parse(store.get(DRAFT) || 'null'); } catch { return null; } };
+
+    // ---------- 入力チェック ----------
+    function check(v) {
+      const errs = {};
+      FIELDS.forEach((f) => {
+        if (!isShown(f, v)) return;
+        if (f.type === 'dates') {
+          if (!v.dates.length) errs.dates = '開催日を1つ以上入れてください。';
+          else if (v.dates[0] < today) errs.dates = '過ぎた日付が含まれています。';
+          return;
+        }
+        const x = v[f.name];
+        if (f.required && !x) errs[f.name] = f.type === 'radio' || f.type === 'select' || f.type === 'court' ? '選択してください。' : '必須項目です。';
+        else if (x && f.maxLength && x.length > f.maxLength) errs[f.name] = `${f.maxLength}文字以内で入力してください。`;
+        else if (x && f.type === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(x)) errs[f.name] = 'メールアドレスの形式が正しくありません。';
+        else if (x && f.type === 'url' && !/^https?:\/\/\S+$/.test(x)) errs[f.name] = 'http(s):// から始まるURLを入力してください。';
+      });
+      if (!errs.emailConfirm && v.email !== v.emailConfirm) errs.emailConfirm = 'メールアドレスが一致しません。';
+      if (!errs.timeEnd && v.timeEnd && v.timeStart && v.timeEnd <= v.timeStart) errs.timeEnd = '開始より後の時刻にしてください。';
+      if (!$('#agree').checked) errs.agree = '同意が必要です。';
+      return errs;
+    }
+    function showErrors(errs) {
+      $$('.contact-field .error', form).forEach((e) => { e.hidden = true; e.textContent = ''; });
+      $$('.contact-field', form).forEach((e) => e.classList.remove('has-error'));
+      let first = null;
+      Object.entries(errs).forEach(([k, m]) => {
+        const box = $(`#f-${k}`);
+        if (!box) return;
+        const e = $('.error', box); e.textContent = m; e.hidden = false; box.classList.add('has-error');
+        if (!first && !box.hidden) first = box;
+      });
+      if (first) first.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    // ---------- 画面の切り替え ----------
+    function showStep(n, noPush) {
+      $('#step2').hidden = n !== 2; $('#step3').hidden = n !== 3; $('#step4').hidden = n !== 4;
+      $$('#steps li').forEach((li) => li.classList.toggle('on', +li.dataset.step <= n));
+      if (!noPush) history.pushState({ step: n }, '');
+      if (n === 3) renderTurnstile();
+      $('#apply').scrollIntoView({ behavior: 'smooth' });
+    }
+    window.addEventListener('popstate', (e) => showStep((e.state && e.state.step) || 2, true));
+
+    form.addEventListener('input', refresh);
+    form.addEventListener('change', refresh);
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const v = getValues();
+      const errs = check(v);
+      showErrors(errs);
+      if (Object.keys(errs).length) return;
+      const rows = FIELDS.filter((f) => !f.confirmOf && isShown(f, v)).map((f) => {
+        let x = v[f.name];
+        if (f.type === 'dates') x = v.dates.map(md).join('、');
+        else if (f.type === 'court') x = v.court === 'other' ? 'その他の会場' : `${courtOf(v.court)?.name}（${courtOf(v.court)?.area}）`;
+        else if (f.options) x = optLabel(f.name, x);
+        return `<div><dt>${esc(f.label)}${f.public ? '' : '<small>非公開</small>'}</dt><dd>${x ? esc(x) : '<span class="contact-empty">（未入力）</span>'}</dd></div>`;
+      });
+      $('#confirm').innerHTML = `<dl class="contact-confirm">${rows.join('')}</dl><div class="owners-confirm-card"><p class="owners-preview-title">一覧での見え方</p></div>`;
+      const card = $('#pv').cloneNode(true);
+      card.removeAttribute('id');
+      $$('[id]', card).forEach((el) => el.removeAttribute('id'));
+      $('.owners-confirm-card', $('#confirm')).appendChild(card);
+      $('#sendError').hidden = true;
+      showStep(3);
+    });
+    $('#back').onclick = () => history.back();
+
+    function renderTurnstile() {
+      const key = state.config && state.config.turnstileSiteKey;
+      if (!key) return;
+      const go = () => {
+        if (!window.turnstile) return setTimeout(go, 200);
+        if (state.tsWidget !== null) { turnstile.reset(state.tsWidget); state.tsToken = ''; return; }
+        state.tsWidget = turnstile.render('#ts', { sitekey: key, language: 'ja', callback: (t) => (state.tsToken = t), 'expired-callback': () => (state.tsToken = '') });
+      };
+      go();
+    }
+
+    $('#send').onclick = async () => {
+      const btn = $('#send');
+      if (state.config && state.config.turnstileSiteKey && !state.tsToken) return showSendError('自動確認（ロボットでないことの確認）が終わるまで少しお待ちください。');
+      btn.disabled = true; btn.textContent = '送信中…';
+      try {
+        const r = await fetch('/api/event-submit', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ data: getValues(), agree: $('#agree').checked, website: form.elements.website.value, startedAt: state.startedAt, turnstileToken: state.tsToken, source: document.referrer }),
+        });
+        const j = await r.json().catch(() => ({ ok: false, error: '送信に失敗しました。' }));
+        if (!j.ok) {
+          if (j.fieldErrors) { showStep(2); showErrors(j.fieldErrors); }
+          else showSendError(j.error);
+          if (state.tsWidget !== null) { turnstile.reset(state.tsWidget); state.tsToken = ''; }
+          return;
+        }
+        $('#receipt').textContent = j.id;
+        if (j.mode === 'live') {
+          $('#doneTitle').textContent = 'イベントを公開しました';
+          $('#doneText').textContent = '承認済みの主催者として、確認なしで公開しました。1〜2分ほどでページに反映されます。';
+          $('#doneLink').href = j.page; $('#doneLink').textContent = 'イベントのページを見る';
+        } else {
+          $('#doneTitle').textContent = '掲載のお申し込みを受け付けました';
+          $('#doneText').textContent = '内容を確認のうえ、通常1〜2営業日で公開します。公開したら、ページのURLをメールでお知らせします。';
+        }
+        history.replaceState(null, '', location.pathname);
+        showStep(4, true);
+      } catch { showSendError('通信に失敗しました。電波の良い場所で再度お試しください。'); }
+      finally { btn.disabled = false; btn.textContent = 'この内容で申し込む'; }
+    };
+    function showSendError(m) { const a = $('#sendError'); a.textContent = m; a.hidden = false; }
+
+    // 続けて別のイベント：主催者情報は残し、イベントの中身だけ空にする
+    $('#again').onclick = () => {
+      ['title', 'summary', 'detail', 'entryUrl', 'deadline', 'url', 'timeStart', 'timeEnd'].forEach((n) => (form.elements[n].value = ''));
+      state.dates = []; renderDates(); state.startedAt = Date.now();
+      form.elements.emailConfirm.value = form.elements.email.value;
+      refresh(); showStep(2);
+    };
+
+    // ---------- 初期化 ----------
+    const draft = loadDraft();
+    if (draft) setValues(draft); else renderDates();
+    refresh();
+
+    fetch('/api/event-submit').then((r) => r.json()).then((cfg) => {
+      state.config = cfg;
+      if (!cfg.ready) { $('#notReady').hidden = false; $('#step2').hidden = true; $('#steps').hidden = true; }
+    }).catch(() => { state.config = { ready: true, turnstileSiteKey: '' }; });
+  })();
+  </script>
+</Base>
+
+<style is:global>
+  .ev-dates { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+  .ev-date { display: inline-flex; align-items: center; gap: 4px; }
+  .ev-date input { width: auto; }
+  .ev-date-x { border: 0; background: var(--foam); color: var(--ink-soft); width: 28px; height: 28px; border-radius: 50%; cursor: pointer; }
+  .ev-date-x:hover { background: #fde7e1; color: #b4402a; }
+  .ev-repeat { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; }
+  .ev-repeat-box { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: .9rem; color: var(--ink-soft); }
+  .ev-repeat-box select { width: auto; }
+  #f-timeStart input, #f-timeEnd input { max-width: 180px; }
+  .owners-preview .event-card { box-shadow: none; }
+</style>

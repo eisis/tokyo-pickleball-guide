@@ -82,9 +82,10 @@ const upcoming = (await getUpcomingEvents()).slice(0, 4);
             <p class="eyebrow">Events</p>
             <h2 class="section-title" data-ja="近日のイベント" data-en="Upcoming Events">近日のイベント</h2>
           </div>
-          <a class="more-link" href="/events/" data-ja="イベント一覧 →" data-en="All events →">イベント一覧 →</a>
+          <a class="more-link" href="/this-week/" data-ja="今週どこで打てる？ →" data-en="This week →">今週どこで打てる？ →</a>
         </div>
         <div class="event-list">{upcoming.map((e) => <EventCard event={e} />)}</div>
+        <p class="meta" style="margin-top:12px"><a href="/events/">イベント一覧</a>　／　<a href="/events/submit/">イベントを掲載する（無料）</a></p>
       </section>
     )}
 

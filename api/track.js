@@ -1,10 +1,10 @@
 // ============================================================
 // 送客計測API（Vercel Serverless Function）
-//   POST /api/track  … 予約・空き状況・地図リンクのクリックを、受付台帳の「送客ログ」タブに1行ずつ記録する
+//   POST /api/track  … 予約・空き状況・地図・イベント申込リンクのクリックを、受付台帳の「送客ログ」タブに1行ずつ記録する
 //   個人を特定する情報（IP・名前など）は記録しない
 // ============================================================
 
-const KINDS = { booking: '予約', availability: '空き状況', map: '地図' };
+const KINDS = { booking: '予約', availability: '空き状況', map: '地図', event_entry: 'イベント申込', event_detail: 'イベント詳細' };
 const BOT = /bot|crawl|spider|slurp|preview|facebookexternalhit|headless|lighthouse/i;
 
 export default async function handler(req, res) {
@@ -17,7 +17,9 @@ export default async function handler(req, res) {
     const b = JSON.parse(raw || '{}');
     const kind = KINDS[b.kind];
     const courtId = String(b.courtId || '').slice(0, 80);
-    if (!kind || !/^[a-z0-9-]+$/.test(courtId)) return res.status(204).end();
+    const eventId = String(b.eventId || '').slice(0, 80);
+    const isEvent = String(b.kind || '').startsWith('event_');
+    if (!kind || !/^[a-z0-9-]+$/.test(isEvent ? eventId : courtId)) return res.status(204).end();
 
     const url = process.env.SHEET_WEBHOOK_URL;
     if (!url) return res.status(204).end();
@@ -26,6 +28,8 @@ export default async function handler(req, res) {
       日時: new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' }),
       コートID: courtId,
       コート名: String(b.courtName || '').slice(0, 100),
+      イベントID: isEvent ? eventId : '',
+      イベント名: isEvent ? String(b.eventName || '').slice(0, 100) : '',
       クリック種別: kind,
       クリック場所: String(b.from || '').slice(0, 20),
       遷移先URL: String(b.url || '').slice(0, 300),

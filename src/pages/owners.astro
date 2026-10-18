@@ -5,6 +5,7 @@
 // ・入口：/owners/（新規）、/owners/?court=<コートのファイル名>（更新。詳細ページのボタンから）
 import Base from '../layouts/Base.astro';
 import '../styles/form.css';
+import '../styles/owners.css';
 import { SECTIONS, GUIDELINES, PHOTO_LIMIT, PREFECTURE_OPTIONS } from '../../api/_lib/court-form.js';
 import { fromCourtData } from '../../api/_lib/court-markdown.js';
 import { getCourts, PREFECTURES } from '../lib/courts';
@@ -217,7 +218,7 @@ const attrs = (f) => ({
         <div class="contact-receipt" id="receipt"></div>
         <p class="meta">ご入力のメールアドレス宛に確認メールをお送りしました。<br />届かない場合は迷惑メールフォルダもご確認ください。</p>
         <div class="contact-actions">
-          <a class="contact-btn" href="/contact/?type=event">イベントも掲載する</a>
+          <a class="contact-btn" href="/events/submit/">イベントも掲載する</a>
           <a class="contact-btn ghost" href="/">トップへ戻る</a>
         </div>
       </section>
@@ -556,105 +557,3 @@ const attrs = (f) => ({
   })();
   </script>
 </Base>
-
-<style is:global>
-  .owners { max-width: 1080px; }
-  .owners br.sp { display: none; }
-  .owners-hero { text-align: center; padding: 8px 0 28px; }
-  .owners-hero h1 { color: var(--navy); font-size: clamp(1.6rem, 4.2vw, 2.4rem); line-height: 1.35; margin: 6px 0 12px; }
-  .owners-hero .contact-lead { max-width: 640px; margin: 0 auto; }
-  .owners-points { list-style: none; display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); margin: 28px 0 24px; text-align: left; }
-  .owners-points li { background: #fff; border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 18px; box-shadow: var(--shadow); }
-  .owners-points b { display: block; color: var(--navy); font-size: 1.05rem; margin-bottom: 4px; }
-  .owners-points span { color: var(--ink-soft); font-size: .9rem; }
-  .owners-cta { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
-
-  .owners-flow ol { list-style: none; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 8px 0 40px; counter-reset: none; }
-  .owners-flow li { background: var(--foam); border-radius: var(--radius-sm); padding: 14px 16px; position: relative; }
-  .owners-flow li span { display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--teal-dark); color: #fff; font-weight: 800; font-size: .85rem; margin-right: 8px; }
-  .owners-flow b { color: var(--navy); }
-  .owners-flow small { display: block; color: var(--ink-soft); margin-top: 6px; font-size: .84rem; }
-
-  .owners-apply { scroll-margin-top: calc(var(--header-h) + 12px); }
-  .owners-layout { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 24px; align-items: start; }
-  .owners-layout[hidden] { display: none; }
-  .owners-narrow { max-width: 760px; margin: 0 auto; }
-  .owners-preview { position: sticky; top: calc(var(--header-h) + 16px); }
-  .owners-preview-title { font-weight: 800; color: var(--navy); margin-bottom: 10px; font-size: .9rem; }
-  .owners-preview .card:hover { transform: none; }
-  .owners-preview .card-actions .button, .owners-preview .map-button { pointer-events: none; }
-  .owners-preview-note { margin-top: 10px; font-size: .78rem; }
-
-  .owners-mode { border: 0; margin: 0 0 20px; padding: 0; }
-  .owners-mode legend { font-weight: 700; margin-bottom: 8px; }
-  .owners-seg { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-  .owners-seg label { cursor: pointer; }
-  .owners-seg input { position: absolute; opacity: 0; pointer-events: none; }
-  .owners-seg span { display: block; text-align: center; padding: 12px; border: 1.5px solid var(--line); border-radius: var(--radius-sm); font-weight: 700; color: var(--ink-soft); background: #fff; }
-  .owners-seg input:checked + span { border-color: var(--teal); background: var(--foam); color: var(--navy); }
-  .owners-seg input:focus-visible + span { outline: 3px solid var(--teal-light); }
-
-  .owners-dup { background: #fff7e0; border-radius: var(--radius-sm); padding: 12px 14px; margin-bottom: 18px; font-size: .92rem; }
-  .owners .linkish { border: 0; background: none; padding: 0; color: var(--teal-dark); font: inherit; font-weight: 700; text-decoration: underline; cursor: pointer; }
-
-  .owners-sec { border-top: 1px solid var(--line); padding-top: 22px; margin-top: 8px; }
-  .owners-sec h2 { display: flex; align-items: center; gap: 10px; font-size: 1.1rem; margin-bottom: 6px; }
-  .owners-sec h2 span { display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: var(--navy); color: #fff; font-size: .85rem; }
-  .owners-sec-lead { color: var(--ink-soft); font-size: .88rem; margin-bottom: 18px; }
-  .owners .contact-field[hidden] { display: none; }
-  .owners textarea { min-height: 0; }
-  .owners-count { text-align: right; font-size: .78rem; color: var(--ink-soft); margin-top: 2px; }
-  .owners-count.over { color: #c83b2a; font-weight: 700; }
-  .owners input[type=date] { width: 100%; font: inherit; font-size: 16px; padding: 11px 14px; border: 1.5px solid var(--line); border-radius: var(--radius-sm); background: #fff; color: var(--ink); }
-
-  .owners-options { display: grid; gap: 8px; }
-  .owners-options label { display: flex; gap: 10px; align-items: flex-start; border: 1.5px solid var(--line); border-radius: var(--radius-sm); padding: 12px 14px; cursor: pointer; background: #fff; }
-  .owners-options label:has(input:checked) { border-color: var(--teal); background: var(--foam); }
-  .owners-options input { margin-top: 5px; accent-color: var(--teal-dark); }
-  .owners-options b { display: block; color: var(--navy); font-size: .95rem; }
-  .owners-options small { display: block; color: var(--ink-soft); font-size: .82rem; margin-top: 2px; }
-
-  .owners-photos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 10px; }
-  .owners-photos:empty { display: none; }
-  .owners-photos.small { max-width: 420px; margin: 0 0 16px; }
-  .owners-thumb { margin: 0; border-radius: var(--radius-sm); overflow: hidden; border: 1.5px solid var(--line); background: #fff; }
-  .owners-thumb.main { border-color: var(--teal); }
-  .owners-thumb img { display: block; width: 100%; aspect-ratio: 16 / 10; object-fit: cover; }
-  .owners-thumb figcaption { display: flex; justify-content: space-between; gap: 4px; padding: 6px 8px; font-size: .78rem; font-weight: 700; color: var(--teal-dark); }
-  .owners-thumb button { border: 0; background: none; padding: 0; font: inherit; color: var(--ink-soft); text-decoration: underline; cursor: pointer; }
-  .owners-photo-add { display: flex; align-items: center; justify-content: center; border: 2px dashed var(--teal); border-radius: var(--radius-sm); padding: 18px; cursor: pointer; font-weight: 700; color: var(--teal-dark); background: var(--foam); }
-  .owners-photo-add[hidden] { display: none; }
-  .owners-photo-add input { position: absolute; opacity: 0; width: 1px; height: 1px; }
-  .owners-photo-add:focus-within { outline: 3px solid var(--teal-light); }
-  .owners-current { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: .85rem; color: var(--ink-soft); margin-top: 10px; }
-  .owners-current img { width: 72px; height: 45px; object-fit: cover; border-radius: 6px; }
-
-  .owners-guide { background: var(--sand); border-radius: var(--radius-sm); padding: 14px 16px; margin: 24px 0 16px; font-size: .88rem; }
-  .owners-guide .lbl { font-weight: 700; margin-bottom: 6px; }
-  .owners-guide ul { padding-left: 1.2em; color: var(--ink-soft); }
-  .owners-saved { text-align: center; margin-top: 10px; font-size: .78rem; }
-
-  .owners-confirm-mode { font-weight: 800; color: var(--navy); margin-bottom: 14px; }
-  .owners-confirm-card { max-width: 340px; margin: 24px auto 0; }
-  .owners-confirm-card .card:hover { transform: none; }
-  .contact-confirm dt small { display: inline-block; margin-left: 6px; font-size: .7rem; font-weight: 600; color: var(--ink-soft); background: var(--sand-deep); border-radius: 4px; padding: 0 6px; }
-
-  .owners-faq { max-width: 760px; margin: 48px auto 0; }
-  .owners-faq h2 { color: var(--navy); font-size: 1.2rem; margin-bottom: 12px; }
-  .owners-faq details { background: #fff; border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 14px 18px; margin-bottom: 10px; }
-  .owners-faq summary { font-weight: 700; cursor: pointer; color: var(--navy); }
-  .owners-faq details p { margin-top: 8px; color: var(--ink-soft); font-size: .92rem; }
-
-  @media (max-width: 900px) {
-    .owners-layout { grid-template-columns: 1fr; }
-    .owners-preview { display: none; } /* スマホでは確認画面でカードを見せる */
-  }
-  @media (max-width: 640px) {
-    .owners br.sp { display: inline; }
-    .owners-points { gap: 10px; margin: 22px 0 20px; }
-    .owners-points li { padding: 14px 16px; }
-    .owners-flow ol { grid-template-columns: 1fr; }
-    .owners-seg { grid-template-columns: 1fr; }
-    .owners-photos { grid-template-columns: repeat(2, 1fr); }
-  }
-</style>

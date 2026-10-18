@@ -1,0 +1,162 @@
+---
+// 「今週どこで打てる？」：今日から7日間に開催されるイベントを、日ごとに並べる
+// ・ビルド時は先の開催日をすべて出しておき、見た人の今日（日本時間）でスクリプトが7日分に振り分ける
+//   （サイトを更新しなくても、毎日正しい「今週」になる）
+// ・同じ日の中は Pickleball Tokyo 主催 → 開始時刻の順
+import Base from '../layouts/Base.astro';
+import { getUpcomingEvents, EVENT_TYPES, LEVELS, venueOf, upcomingDates, eventUrl, beginnerOk, startTime } from '../lib/events';
+import { PREFECTURES } from '../lib/courts';
+
+const events = await getUpcomingEvents();
+const items = (
+  await Promise.all(
+    events.map(async (e) => {
+      const venue = await venueOf(e);
+      return upcomingDates(e).map((date) => ({ e, venue, date }));
+    })
+  )
+).flat();
+const prefs = (Object.keys(PREFECTURES) as (keyof typeof PREFECTURES)[]).filter((p) => items.some((x) => x.venue.prefecture === p));
+---
+
+<Base
+  title="今週どこで打てる？東京近郊のピックルボール練習会・体験会"
+  description="今日から1週間のうちに東京・神奈川・千葉・埼玉で参加できるピックルボールの練習会・体験会・レッスン・大会を、日ごとにまとめました。初心者OK・予約不要でも絞り込めます。"
+>
+  <header class="blog-head">
+    <div class="blog-head-inner">
+      <nav class="crumbs" aria-label="パンくず"><a href="/">トップ</a><span aria-hidden="true">›</span><a href="/events/">イベント</a><span aria-hidden="true">›</span><span>今週どこで打てる？</span></nav>
+      <p class="eyebrow">This Week</p>
+      <h1 class="blog-title">今週どこで打てる？</h1>
+      <p class="blog-lead" id="tw-range">今日から7日間に参加できる練習会・体験会・レッスン・大会です。コートを借りなくても、ひとりで行っても打てる場所が見つかります。</p>
+    </div>
+  </header>
+
+  <main class="container events-page">
+    <div class="event-filters" id="tw-filters">
+      {prefs.length > 1 && (
+        <div class="chips" role="group" aria-label="エリア">
+          <button type="button" class="chip active" data-key="pref" data-value="all">全エリア</button>
+          {prefs.map((p) => <button type="button" class="chip" data-key="pref" data-value={p}>{PREFECTURES[p].ja}</button>)}
+        </div>
+      )}
+      <div class="chips" role="group" aria-label="条件">
+        <button type="button" class="chip" data-toggle="beginner" aria-pressed="false">初心者OK</button>
+        <button type="button" class="chip" data-toggle="walkin" aria-pressed="false">予約不要</button>
+      </div>
+    </div>
+
+    <div class="tw-days" id="tw-days"></div>
+
+    <template id="tw-pool">
+      {items.map(({ e, venue, date }) => (
+        <a
+          class:list={['tw-item', { self: e.data.organizer.self }]}
+          href={eventUrl(e)}
+          data-tw
+          data-date={date}
+          data-time={startTime(e) || '99:99'}
+          data-self={e.data.organizer.self ? '1' : '0'}
+          data-pref={venue.prefecture ?? ''}
+          data-beginner={beginnerOk(e) ? '1' : '0'}
+          data-walkin={e.data.entry.required ? '0' : '1'}
+        >
+          <span class="tw-time">{e.data.time ? e.data.time.split('〜')[0] : ''}</span>
+          <span class="tw-main">
+            <span class="event-tags">
+              <span class={`etag etag-${e.data.type}`}>{EVENT_TYPES[e.data.type].ja}</span>
+              {e.data.organizer.self && <span class="etag etag-self">Pickleball Tokyo 主催</span>}
+              {e.data.level && beginnerOk(e) && <span class="etag etag-level">{LEVELS[e.data.level].ja}</span>}
+              {!e.data.entry.required && <span class="etag etag-level">予約不要</span>}
+            </span>
+            <span class="tw-title">{e.data.title}</span>
+            <span class="tw-where">{venue.prefecture && <span>{PREFECTURES[venue.prefecture].ja}</span>}{venue.area ? `${venue.area}・` : ''}{venue.name}{e.data.price && <span class="tw-price">{e.data.price}</span>}</span>
+          </span>
+          <span class="tw-go" aria-hidden="true">›</span>
+        </a>
+      ))}
+    </template>
+
+    <section class="event-bands">
+      <div class="owner-band">
+        <div class="owner-band-text">
+          <p class="eyebrow">For Organizers</p>
+          <h2>練習会・体験会を載せませんか</h2>
+          <p>掲載は無料です。初回だけ内容を確認し、2回目からは同じメールアドレスで申し込むとすぐに公開されます。定期開催は日付をまとめて入れられます。</p>
+        </div>
+        <div class="owner-band-actions">
+          <a class="owner-btn" href="/events/submit/" data-track="event_submit" data-track-from="今週">イベントを掲載する</a>
+        </div>
+      </div>
+      <div class="event-note">
+        <p><b>決まった相手がいなくても大丈夫です。</b>練習会やオープンプレーは、集まった人同士で試合を回すものが多く、ひとりでの参加も歓迎されています。参加条件は各イベントのページでご確認ください。</p>
+        <a class="event-note-link" href="/#courts">コートを借りて打つなら、コート一覧へ →</a>
+      </div>
+    </section>
+
+    <p class="meta">内容は変更されることがあります。参加前に必ず主催者のページで最新情報をご確認ください。</p>
+  </main>
+</Base>
+
+<script>
+  const WEEK = ['日', '月', '火', '水', '木', '金', '土'];
+  const base = Date.now() + 9 * 3600 * 1000; // 日本時間
+  const days = [...Array(7)].map((_, i) => new Date(base + i * 86400000).toISOString().slice(0, 10));
+  const label = (d: string, i: number) => {
+    const x = new Date(d + 'T00:00:00Z');
+    const head = i === 0 ? '今日' : i === 1 ? '明日' : `${WEEK[x.getUTCDay()]}曜`;
+    return { head, sub: `${x.getUTCMonth() + 1}/${x.getUTCDate()}（${WEEK[x.getUTCDay()]}）`, wd: x.getUTCDay() };
+  };
+
+  // 7日分の枠を作って、イベントを振り分ける
+  const wrap = document.getElementById('tw-days')!;
+  const pool = (document.getElementById('tw-pool') as HTMLTemplateElement).content;
+  const all = [...pool.querySelectorAll<HTMLElement>('[data-tw]')];
+  const sections = days.map((d, i) => {
+    const l = label(d, i);
+    const sec = document.createElement('section');
+    sec.className = `tw-day wd-${l.wd}`;
+    sec.innerHTML = `<h2><span class="tw-head">${l.head}</span><span class="tw-sub">${l.sub}</span><span class="tw-count"></span></h2><div class="tw-list"></div><p class="tw-none">この日の掲載イベントはまだありません。</p>`;
+    const list = sec.querySelector('.tw-list')!;
+    all
+      .filter((el) => el.dataset.date === d)
+      .sort((a, b) => Number(b.dataset.self) - Number(a.dataset.self) || (a.dataset.time ?? '').localeCompare(b.dataset.time ?? ''))
+      .forEach((el) => list.append(el));
+    wrap.append(sec);
+    return sec;
+  });
+  const first = new Date(days[0] + 'T00:00:00Z'), last = new Date(days[6] + 'T00:00:00Z');
+  document.getElementById('tw-range')!.textContent =
+    `${first.getUTCMonth() + 1}/${first.getUTCDate()}〜${last.getUTCMonth() + 1}/${last.getUTCDate()}に参加できる練習会・体験会・レッスン・大会です。コートを借りなくても、ひとりで行っても打てる場所が見つかります。`;
+
+  // 絞り込み
+  const root = document.getElementById('tw-filters')!;
+  const state = { pref: 'all', beginner: false, walkin: false };
+  function apply() {
+    sections.forEach((sec) => {
+      let n = 0;
+      sec.querySelectorAll<HTMLElement>('[data-tw]').forEach((el) => {
+        const ok = (state.pref === 'all' || el.dataset.pref === state.pref) && (!state.beginner || el.dataset.beginner === '1') && (!state.walkin || el.dataset.walkin === '1');
+        el.hidden = !ok;
+        if (ok) n++;
+      });
+      sec.querySelector<HTMLElement>('.tw-count')!.textContent = n ? `${n}件` : '';
+      sec.classList.toggle('empty-day', n === 0);
+    });
+    root.querySelectorAll<HTMLButtonElement>('.chip[data-key]').forEach((b) => b.classList.toggle('active', state.pref === b.dataset.value));
+    root.querySelectorAll<HTMLButtonElement>('[data-toggle]').forEach((b) => {
+      const on = state[b.dataset.toggle as 'beginner' | 'walkin'];
+      b.classList.toggle('active', on);
+      b.setAttribute('aria-pressed', String(on));
+    });
+  }
+  root.addEventListener('click', (e) => {
+    const el = e.target as HTMLElement;
+    const t = el.closest<HTMLButtonElement>('[data-toggle]');
+    if (t) state[t.dataset.toggle as 'beginner' | 'walkin'] = !state[t.dataset.toggle as 'beginner' | 'walkin'];
+    const b = el.closest<HTMLButtonElement>('.chip[data-key]');
+    if (b) state.pref = b.dataset.value!;
+    apply();
+  });
+  apply();
+</script>
