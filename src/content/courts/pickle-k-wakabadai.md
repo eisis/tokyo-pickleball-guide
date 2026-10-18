@@ -18,6 +18,7 @@ imageUrl: https://prcdn.freetls.fastly.net/release_image/185955/2/185955-2-f7ab4
 image: /images/courts/pickle-k-wakabadai.jpg
 imageSource: https://andpickle.jp/PickleK/
 booking: { url: "https://reserve.andpickle.jp/reserve", label: book }
+bookingSystem: "自社サイト（reserve.andpickle.jp・システム名は未特定）" # 社内用メモ：予約に使っているシステム（サイトには出さない）
 location: { lat: 35.620407, lng: 139.471176 }
 mapQuery: Pickle K フレスポ若葉台
 openedAt: 2026-09-01

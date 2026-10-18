@@ -19,6 +19,7 @@ description:
 officialUrl: https://example.com/   # 施設の公式サイト。書いておくと、そこのシェア用画像を自動で取ってくる
 # image: の行は書かなくてOK（自動で追加される）。自分で用意した写真を使うときだけ書く
 booking: { url: "https://example.com/", label: book }   # label: book=予約する / info=詳細を見る
+bookingSystem: "RESERVA"                                # 社内用メモ：予約に使っているシステム（サイトには出さない・分からなければ消す）
 availabilityUrl: https://example.com/availability       # 空き状況ページがなければこの行を消す
 location: { lat: 35.6812, lng: 139.7671 }   # 地図のピン位置。Googleマップで場所を右クリック→一番上の数字をコピー（左が lat、右が lng）
 mapQuery: Googleマップで検索する名前

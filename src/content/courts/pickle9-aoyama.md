@@ -11,6 +11,7 @@ description:
   en: The first indoor pickleball court in the Aoyama/Omotesando area, with golf simulators on site.
 image: /images/courts/pickle9-aoyama.jpg
 booking: { url: "https://www.pickle9.jp/", label: book }
+bookingSystem: "hacomono" # 社内用メモ：予約に使っているシステム（サイトには出さない）
 location: { lat: 35.66656, lng: 139.71559 }
 mapQuery: Pickle9 Minami Aoyama
 openedAt: 2026-07-15

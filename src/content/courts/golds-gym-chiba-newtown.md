@@ -13,6 +13,7 @@ description:
   en: Gym space rentable by the hour for pickleball, with paddles and balls provided.
 image: /images/courts/golds-gym-chiba-newtown.jpg
 booking: { url: "https://www.instabase.jp/space/4731017233", label: book }
+bookingSystem: "instabase" # 社内用メモ：予約に使っているシステム（サイトには出さない）
 location: { lat: 35.79978, lng: 140.11782 }
 mapQuery: ゴールドジム千葉ニュータウン
 updatedAt: 2026-10-17

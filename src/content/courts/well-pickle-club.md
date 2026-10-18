@@ -19,6 +19,7 @@ imageUrl: https://pickleclub.well-k.jp/wp-content/uploads/2025/04/hed02-02.jpg
 image: /images/courts/well-pickle-club.jpg
 imageSource: https://pickleclub.well-k.jp/
 booking: { url: "https://pickleclub.well-k.jp/reservation/", label: book }
+bookingSystem: "aero.lan.jp（サービス名は未特定）" # 社内用メモ：予約に使っているシステム（サイトには出さない）
 location: { lat: 35.790924, lng: 139.852478 }
 mapQuery: WELL PICKLE CLUB 葛飾
 openedAt: 2025-05-05

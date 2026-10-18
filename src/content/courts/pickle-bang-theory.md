@@ -19,6 +19,7 @@ imageUrl: https://www.thepicklebang.com/images/facility.webp
 image: /images/courts/pickle-bang-theory.jpg
 imageSource: https://www.thepicklebang.com/
 booking: { url: "https://www.thepicklebang.com/reserve?tab=pickleball", label: book }
+bookingSystem: "LaBOLA" # 社内用メモ：予約に使っているシステム（サイトには出さない）
 location: { lat: 35.721508, lng: 139.926834 }
 mapQuery: THE PICKLE BANG THEORY 本八幡
 updatedAt: 2026-10-17

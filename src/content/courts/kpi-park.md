@@ -12,6 +12,7 @@ description:
   en: A relaxed outdoor court in Yokohama with a spacious open atmosphere.
 image: /images/courts/kpi-park.png
 booking: { url: "https://yoyaku.labola.jp/r/shop/3302/calendar_week/2026/10/12/?tab_name=%E3%83%94%E3%83%83%E3%82%AF%E3%83%AB%E3%83%9C%E3%83%BC%E3%83%AB%E3%82%B3%E3%83%BC%E3%83%88", label: book }
+bookingSystem: "LaBOLA" # 社内用メモ：予約に使っているシステム（サイトには出さない）
 location: { lat: 35.44065, lng: 139.55614 }
 mapQuery: KPI Park Yokohama
 updatedAt: 2026-10-17

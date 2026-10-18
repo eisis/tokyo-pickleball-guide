@@ -19,6 +19,7 @@ imageUrl: https://www.oceangp.com/common/image/about/sports/court-front.jpg
 image: /images/courts/ocean-pickle-club.jpg
 imageSource: https://www.oceangp.com/about/sports/
 booking: { url: "https://ocean-pickle-club.stores.jp/reserve/tsurumi", label: book }
+bookingSystem: "STORES予約" # 社内用メモ：予約に使っているシステム（サイトには出さない）
 location: { lat: 35.500771, lng: 139.65741 }
 mapQuery: OCEAN PICKLE CLUB 鶴見
 updatedAt: 2026-10-17

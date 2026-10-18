@@ -34,6 +34,7 @@ const courts = defineCollection({
       url: z.string().url(),
       label: z.enum(['book', 'info']).default('book'), // book=予約する / info=詳細を見る
     }),
+    bookingSystem: z.string().optional(), // 社内用メモ：予約に使っているシステム（例: RESERVA / STORES予約）。サイトには出さない
     availabilityUrl: z.string().url().optional(), // 空き状況ページ（あれば）
     location: z.object({ lat: z.number(), lng: z.number() }).optional(), // 地図のピン位置（なければ地図に出ない）
     mapQuery: z.string(), // Googleマップ検索語

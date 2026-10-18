@@ -13,6 +13,7 @@ description:
   en: A countryside stay facility combining a private guesthouse with pickleball courts. Day visits welcome.
 image: /images/courts/tokigawa-pickleball.jpg
 booking: { url: "https://lin.ee/XweaHuI", label: book }
+bookingSystem: "LINE" # 社内用メモ：予約に使っているシステム（サイトには出さない）
 location: { lat: 35.99865, lng: 139.28129 }
 mapQuery: 埼玉県比企郡ときがわ町馬場434
 updatedAt: 2026-10-17

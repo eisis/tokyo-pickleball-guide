@@ -14,6 +14,7 @@ description:
   en: Convenient indoor courts near the station. Great for playing regardless of weather.
 image: /images/courts/pickleball-one-ginza.png
 booking: { url: "https://reserva.be/pboneginza", label: book }
+bookingSystem: "RESERVA" # 社内用メモ：予約に使っているシステム（サイトには出さない）
 availabilityUrl: https://reserva.be/pboneginza/availability
 location: { lat: 35.66649, lng: 139.75874 }
 mapQuery: Pickleball One Ginza Shimbashi

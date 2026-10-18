@@ -11,6 +11,7 @@ description:
   en: A popular outdoor court with Tokyo Bay views and a refreshing open-air atmosphere.
 image: /images/courts/pacific-pickle-club.png
 booking: { url: "https://pacificpickleclub.resv.jp/", label: book }
+bookingSystem: "resv.jp（サービス名は未特定）" # 社内用メモ：予約に使っているシステム（サイトには出さない）
 location: { lat: 35.64091, lng: 139.78958 }
 mapQuery: Pacific Pickle Club Tokyo
 updatedAt: 2026-10-17
