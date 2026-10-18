@@ -18,7 +18,7 @@ bookingSystem: "RESERVA" # 社内用メモ：予約に使っているシステ�
 availabilityUrl: https://reserva.be/pboneginza/availability
 location: { lat: 35.66649, lng: 139.75874 }
 mapQuery: Pickleball One Ginza Shimbashi
-updatedAt: 2026-10-17
+updatedAt: 2026-10-18
 sources:
   - https://oggi.jp/7887651
 ---
