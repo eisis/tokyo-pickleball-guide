@@ -25,21 +25,43 @@ const next = upcomingDates(event)[0] ?? iso(dates[dates.length - 1]);
 const desc = `${md(new Date(next + 'T00:00:00Z'))}開催。${venue.name}（${pref}）で行われるピックルボールの${type.ja}。${d.summary}`;
 
 // 検索結果にイベントとして出やすくするための構造化データ（次の開催日）
+// 掲載データにある事実だけで埋める（料金・終了時刻・画像が分からない項目は出さない）
+const times = (d.time ?? '').match(/\d{1,2}:\d{2}/g) ?? [];
+const at = (t: string) => `${next}T${t.padStart(5, '0')}:00+09:00`;
+const pageUrl = new URL(`/events/${event.id}/`, SITE.url).href;
+const yen = d.price?.match(/([\d,]+)\s*円/);
+const price = d.price?.startsWith('無料') || d.price?.startsWith('入場無料') ? 0 : yen ? Number(yen[1].replace(/,/g, '')) : null;
+const img = d.image ?? venue.court?.data.image;
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'SportsEvent',
   name: d.title,
   description: d.summary,
   sport: 'Pickleball',
-  startDate: d.time && /^\d{1,2}:\d{2}/.test(d.time) ? `${next}T${d.time.slice(0, 5).padStart(5, '0')}:00+09:00` : next,
+  startDate: times[0] ? at(times[0]) : next,
+  endDate: times[1] ? at(times[1]) : times[0] ? at(times[0]) : next,
   eventStatus: 'https://schema.org/EventScheduled',
   eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
   location: { '@type': 'Place', name: venue.name, address: venue.address ?? pref },
-  organizer: { '@type': 'Organization', name: d.organizer.name },
-  ...(d.url ? { url: d.url } : {}),
-  ...(d.price === '無料' ? { isAccessibleForFree: true } : {}),
+  organizer: {
+    '@type': 'Organization',
+    name: d.organizer.name,
+    url: d.organizer.self ? SITE.url + '/' : (d.url ?? pageUrl),
+  },
+  ...(img ? { image: [new URL(img, SITE.url).href] } : {}),
+  ...(price !== null ? {
+    offers: {
+      '@type': 'Offer',
+      price,
+      priceCurrency: 'JPY',
+      availability: 'https://schema.org/InStock',
+      url: entryUrl ?? pageUrl,
+    },
+  } : {}),
+  ...(price === 0 ? { isAccessibleForFree: true } : {}),
+  url: pageUrl,
 };
----
+------
 
 <Base title={`${d.title}｜ピックルボールの${type.ja}`} description={desc} image={d.image ?? venue.court?.data.image}>
   <script slot="head" type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
