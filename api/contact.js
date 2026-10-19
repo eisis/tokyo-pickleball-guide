@@ -155,10 +155,10 @@ function sendAutoReply({ id, type, fields, values }) {
   return sendMail({
     to: values.email,
     reply_to: process.env.CONTACT_TO,
-    subject: `【${SITE_NAME}】お問い合わせを受け付けました（${id}）`,
+    subject: `【${SITE_NAME}】${type.replySubject || 'お問い合わせを受け付けました'}（${id}）`,
     html: mailLayout(`
       <p>${esc(values.name)} 様</p>
-      <p>${SITE_NAME} へのお問い合わせありがとうございます。<br>以下の内容で受け付けました。内容を確認のうえ、通常3営業日以内にご連絡いたします。</p>
+      <p>${type.replyLead ? esc(type.replyLead) : `${SITE_NAME} へのお問い合わせありがとうございます。<br>以下の内容で受け付けました。内容を確認のうえ、通常3営業日以内にご連絡いたします。`}</p>
       ${type.autoReplyNote ? `<p>${esc(type.autoReplyNote)}</p>` : ''}
       <p style="margin:16px 0 4px">受付番号：<b>${esc(id)}</b>／種別：${esc(type.label)}</p>
       ${table(fields, values)}
