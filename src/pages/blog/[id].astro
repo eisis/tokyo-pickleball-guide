@@ -91,7 +91,7 @@ const jsonLd = {
     </header>
 
     {showCover && (
-      <figure class="article-cover">
+      <figure class:list={["article-cover", { "fit-contain": d.coverFit === "contain" }]}>
         <img src={cover.src} alt={cover.alt} />
       </figure>
     )}

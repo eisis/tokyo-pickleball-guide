@@ -677,3 +677,8 @@ html[lang="en"] .hero h1 { font-family: var(--display); font-weight: 800; letter
 .etag-posted::before { content: '✓ '; }
 .org-head { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; }
 .org-head .org-link { font-size: .9rem; }
+
+/* 文字入りの画像（coverFit: contain）は切り取らずに全体を見せる */
+.article-cover.fit-contain img, .article-cover.fit-contain img { aspect-ratio: auto; object-fit: contain; }
+.pcard-media.fit-contain img { object-fit: contain; }
+.pcard-media.fit-contain { background: #1f7fb8; }

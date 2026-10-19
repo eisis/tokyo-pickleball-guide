@@ -7,6 +7,7 @@ tags: [初心者, 始め方, レンタル]
 courts: [tokyo-tower, vip-toyocho, pacific-pickle-club, sansan-ikebukuro]
 cover: /images/posts/start-with-friends.png
 coverAlt: 友達とピックルボールを始めるなら、この順番で
+coverFit: contain
 points:
   - 4人いれば1コートで試合ができる。まずは誘うところから
   - 「レンタルあり」のコートを選べば、道具がなくても行ける

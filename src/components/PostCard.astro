@@ -14,7 +14,7 @@ const cat = POST_CATEGORIES[d.category];
 ---
 
 <article class={`pcard pcard-${variant}`} data-post-item data-category={d.category} data-search={searchText(post).toLowerCase()}>
-  <a class="pcard-media" href={postUrl(post)} tabindex="-1" aria-hidden="true">
+  <a class:list={["pcard-media", { "fit-contain": d.coverFit === "contain" }]} href={postUrl(post)} tabindex="-1" aria-hidden="true">
     {cover ? <img src={cover.src} alt="" loading="lazy" /> : <span class="pcard-noimg">{cat.en}</span>}
   </a>
   <div class="pcard-body">
