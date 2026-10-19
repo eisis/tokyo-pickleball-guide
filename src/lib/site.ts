@@ -11,3 +11,7 @@ export const SITE = {
   description:
     '東京近郊（東京・神奈川・千葉・埼玉）のピックルボールコートまとめ。地図とエリア別一覧で屋内・屋外コートを比較して、そのまま予約できます。',
 } as const;
+
+/** 構造化データ（<script type="application/ld+json">）に安全に埋め込む。「</script>」などで抜け出せないよう < > & を逃がす */
+export const ldJson = (data: unknown) =>
+  JSON.stringify(data).replace(/</g, '\\u003c').replace(/>/g, '\\u003e').replace(/&/g, '\\u0026');

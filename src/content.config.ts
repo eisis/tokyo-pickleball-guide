@@ -108,7 +108,7 @@ const events = defineCollection({
 });
 
 // 主催者（サークル・施設・大会運営など）。1主催者＝1ファイル。イベント掲載フォームから自動で作られる
-// trusted: true の主催者は、次回から同じメールアドレスの申し込みが確認なしで即時公開される
+// trusted: true の主催者は、次回から同じメールアドレスの申し込みが、そのアドレスに届くボタンを押すだけで即時公開される
 const organizers = defineCollection({
   loader: glob({ pattern: '**/[^_]*.md', base: './src/content/organizers' }),
   schema: z.object({

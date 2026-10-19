@@ -62,49 +62,38 @@ async function makeCommit(baseSha, message, files) {
 }
 
 /**
- * 確認なしで main に直接反映する（承認済みの主催者のイベント用）。Vercel が自動で公開する
- * 同時に別の変更が入って失敗したときは、最新の main に積み直して1回だけやり直す
- * 戻り値：{ sha, url }
- */
-export async function commitToMain({ message, files }) {
-  for (let i = 0; i < 2; i++) {
-    const ref = await gh(`/git/ref/heads/${BASE}`);
-    const commit = await makeCommit(ref.object.sha, message, files);
-    try {
-      await gh(`/git/refs/heads/${BASE}`, { method: 'PATCH', body: { sha: commit.sha, force: false } });
-      return { sha: commit.sha, url: commit.html_url || `https://github.com/${REPO}/commit/${commit.sha}` };
-    } catch (e) {
-      if (i === 1) throw e;
-    }
-  }
-}
-
-/**
  * files: [{ path, content(string) } | { path, base64 }]
  * 戻り値：{ number, url }
  */
 export async function createPullRequest({ branch, title, body, message, files, labels = [] }) {
-  const ref = await gh(`/git/ref/heads/${BASE}`);
-  const baseSha = ref.object.sha;
-  const baseCommit = await gh(`/git/commits/${baseSha}`);
-
-  const tree = [];
-  for (const f of files) {
-    const blob = await gh('/git/blobs', {
-      method: 'POST',
-      body: f.base64 ? { content: f.base64, encoding: 'base64' } : { content: f.content, encoding: 'utf-8' },
-    });
-    tree.push({ path: f.path, mode: '100644', type: 'blob', sha: blob.sha });
-  }
-  const newTree = await gh('/git/trees', { method: 'POST', body: { base_tree: baseCommit.tree.sha, tree } });
-  const commit = await gh('/git/commits', {
-    method: 'POST',
-    body: { message, tree: newTree.sha, parents: [baseSha], author: { name: 'Pickleball Tokyo 掲載フォーム', email: 'noreply@pickleball-tokyo.com' } },
-  });
-  await gh('/git/refs', { method: 'POST', body: { ref: `refs/heads/${branch}`, sha: commit.sha } });
+  await createBranch({ branch, message, files });
   const pr = await gh('/pulls', { method: 'POST', body: { title, head: branch, base: BASE, body, maintainer_can_modify: true } });
   if (labels.length) {
     try { await gh(`/issues/${pr.number}/labels`, { method: 'POST', body: { labels } }); } catch (e) { console.error('label failed', e.message); }
   }
   return { number: pr.number, url: pr.html_url };
+}
+
+/** main の上に files を積んだブランチを作る（まだ公開されない）。戻り値：{ sha } */
+export async function createBranch({ branch, message, files }) {
+  const ref = await gh(`/git/ref/heads/${BASE}`);
+  const commit = await makeCommit(ref.object.sha, message, files);
+  await gh('/git/refs', { method: 'POST', body: { ref: `refs/heads/${branch}`, sha: commit.sha } });
+  return { sha: commit.sha };
+}
+
+/**
+ * ブランチを main に取り込んで公開する（主催者がメールの確認ボタンを押したとき）
+ * 戻り値：'merged'（取り込んだ）／'already'（取り込み済み）／'missing'（ブランチがない＝期限切れ・処理済み）
+ */
+export async function mergeBranch(branch, message) {
+  const head = await gh(`/git/ref/heads/${branch}`, { allow404: true });
+  if (!head) return 'missing';
+  const r = await gh('/merges', { method: 'POST', body: { base: BASE, head: branch, commit_message: message } });
+  await deleteBranch(branch);
+  return r ? 'merged' : 'already';
+}
+
+export async function deleteBranch(branch) {
+  try { await gh(`/git/refs/heads/${branch}`, { method: 'DELETE', allow404: true }); } catch (e) { console.error('delete branch failed', e.message); }
 }

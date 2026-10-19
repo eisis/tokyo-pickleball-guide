@@ -5,7 +5,9 @@
 //
 // 公開のしかたは、申請者の「信頼度」で分ける
 //   承認済みの主催者（organizers/*.md が trusted: true で、メールのキーが一致）
-//     → main に直接反映して即時公開（1〜2分）。運営者には「公開しました」の通知だけ届く（事後チェック）
+//     → 公開待ちのブランチを作り、主催者のメールアドレスに「公開する」ボタンを送る
+//        ボタンを押すと /api/event-confirm が main に取り込み、即時公開（1〜2分）
+//        （メールアドレスを知っているだけの第三者が、承認済みの主催者になりすまして即時公開できないように）
 //   はじめての主催者・情報提供
 //     → 承認待ちの変更（PR）を作る。Merge で公開＋主催者のファイルが作られ、次回から即時公開になる
 //        → GitHub Actions（event-review.yml）が /api/event-review を呼び、申請者に公開のお知らせ
@@ -17,10 +19,11 @@ import {
   sheetAppend, sendMail, mailTable, mailButton, mailLayout, esc, seal,
 } from './_lib/common.js';
 import { ALL_FIELDS, ORGANIZER_ROLES, DATE_LIMIT } from './_lib/event-form.js';
-import { githubReady, readFile, fileExists, listDir, createPullRequest, commitToMain } from './_lib/github.js';
+import { githubReady, readFile, fileExists, listDir, createPullRequest, createBranch } from './_lib/github.js';
 import { emailKey, parseFrontmatter, slugify, organizerSlugBase, serializeEvent, serializeOrganizer } from './_lib/event-markdown.js';
 
 const MIN_FILL_MS = 6000;
+const CONFIRM_DAYS = 7; // 承認済みの主催者が「公開する」ボタンを押せる期限
 const SHEET = 'イベント掲載申請';
 const EVENT_DIR = 'src/content/events';
 const ORG_DIR = 'src/content/organizers';
@@ -80,7 +83,7 @@ export default async function handler(req, res) {
     }
     try { await sendAutoReply(r); } catch (e) { console.error('autoreply failed', e); }
 
-    return res.status(200).json({ ok: true, id, mode: r.link ? r.mode : 'review', page: r.mode === 'live' ? `/events/${r.slug}/` : '' });
+    return res.status(200).json({ ok: true, id, mode: r.link ? r.mode : 'review' });
   } catch (e) {
     console.error(e);
     return res.status(500).json({ ok: false, error: '送信に失敗しました。時間をおいて再度お試しください。' });
@@ -177,22 +180,25 @@ async function publish(r, today) {
   const message = `イベント掲載：${v.title}（${r.orgName}／${r.id}）`;
   if (trusted) {
     try {
-      r.link = await commitToMain({ message, files });
-      r.mode = 'live';
+      const branch = `event/${r.id.toLowerCase()}`;
+      await createBranch({ branch, message, files });
+      const token = seal({ id: r.id, branch, slug: r.slug, title: v.title, message, exp: Date.now() + CONFIRM_DAYS * 86400000 });
+      r.confirmUrl = `${SITE_URL}/api/event-confirm?t=${token}`;
+      r.link = { url: `https://github.com/${process.env.GITHUB_REPO || 'eisis/tokyo-pickleball-guide'}/tree/${branch}` };
+      r.mode = 'confirm';
       return;
     } catch (e) {
-      // main を直接更新できない設定のときは、承認待ちに回す
-      console.error('direct publish failed, fallback to PR', e.message);
+      console.error('confirm branch failed, fallback to PR', e.message);
       r.fallback = true;
     }
   }
 
   const notes = [];
-  if (r.newOrganizer && r.isOrganizer) notes.push(`主催者「${v.organizerName}」のファイルも作ります（\`trusted: true\`）。Merge すると、次回から同じメールアドレスの申し込みは確認なしで即時公開になります。即時公開にしたくない場合は、Files changed で \`trusted: false\` に直してから Merge してください。`);
+  if (r.newOrganizer && r.isOrganizer) notes.push(`主催者「${v.organizerName}」のファイルも作ります（\`trusted: true\`）。Merge すると、次回から同じメールアドレスの申し込みは、主催者がメールのボタンを押すだけで即時公開になります。そうしたくない場合は、Files changed で \`trusted: false\` に直してから Merge してください。`);
   if (r.newOrganizer && !r.isOrganizer) notes.push('主催者本人ではなく情報提供のため、主催者は「承認済み」にしていません（`trusted: false`）。');
   if (r.newOrganizer) notes.push(`すでに掲載している主催者と同じ団体なら、Files changed で organizers のファイルを消し、イベントの \`organizer.id\` を既存のファイル名に直してください。`);
   if (org && !trusted) notes.push(`主催者「${r.orgName}」は登録済みですが、承認済み（trusted）ではないため確認に回っています。`);
-  if (r.fallback) notes.push('承認済みの主催者でしたが、main に直接反映できなかったため承認待ちにしています。');
+  if (r.fallback) notes.push('承認済みの主催者でしたが、公開待ちのブランチを作れなかったため承認待ちにしています。');
 
   const prBody = [
     `イベントの掲載申請です。受付番号 **${r.id}**`,
@@ -246,7 +252,7 @@ function rows(r, staff) {
 function saveToSheet(r) {
   const row = {
     受付番号: r.id, 受付日時: r.receivedAt,
-    ステータス: r.mode === 'live' && r.link ? '公開済み（即時）' : '未対応',
+    ステータス: r.mode === 'confirm' ? '主催者の確認待ち' : '未対応',
     イベント名: r.values.title, 主催者: r.orgName,
     主催者ページ: r.orgSlug ? `/organizers/${r.orgSlug}/` : '',
     ページ: r.slug ? `/events/${r.slug}/` : '',
@@ -261,16 +267,16 @@ function saveToSheet(r) {
 
 function sendNotification(r) {
   const v = r.values;
-  const live = r.mode === 'live' && r.link;
+  const live = r.mode === 'confirm';
   const status = live
-    ? `<p>承認済みの主催者からの申し込みのため、<b>確認なしで公開しました</b>（1〜2分で反映）。内容に問題があれば、ページのファイルに <code>hidden: true</code> を足すか削除してください。</p>${mailButton(`${SITE_URL}/events/${r.slug}/`, '公開したページを見る')}<p style="font-size:13px"><a href="${r.link.url}">変更内容（GitHub）</a></p>`
+    ? `<p>承認済みの主催者からの申し込みです。主催者のメールアドレスに「公開する」ボタンを送りました。<b>押された時点で確認なしで公開</b>されます（${CONFIRM_DAYS}日以内）。公開後に問題があれば、ページのファイルに <code>hidden: true</code> を足すか削除してください。</p><p style="font-size:13px"><a href="${r.link.url}">公開待ちの内容（GitHub）</a>／公開予定のページ：${SITE_URL}/events/${r.slug}/<br>主催者にメールが届かない場合は、<a href="${r.confirmUrl}">こちらから公開</a>できます。</p>`
     : r.link
       ? `<p>承認待ちの変更を作りました。Vercel のプレビューで見た目を確認し、問題なければ Merge してください。申請者に公開のお知らせが自動で届きます。</p>${mailButton(r.link.url, '承認画面を開く（GitHub）')}`
       : `<p style="color:#a23224">承認画面を作れませんでした${r.ghError ? `：${esc(r.ghError)}` : '（GITHUB_SUBMIT_TOKEN が未設定）'}。内容は台帳に残っています。</p>`;
   return sendMail({
     to: process.env.CONTACT_TO,
     reply_to: v.email,
-    subject: `【イベント${live ? '公開' : '掲載申請'}】${v.title}（${r.orgName}／${r.id}）`,
+    subject: `【イベント${live ? '確認待ち' : '掲載申請'}】${v.title}（${r.orgName}／${r.id}）`,
     html: mailLayout(`
       <p style="margin:0 0 12px">受付番号：<b>${esc(r.id)}</b>／${esc(r.receivedAt)}</p>
       ${status}
@@ -280,20 +286,19 @@ function sendNotification(r) {
 
 function sendAutoReply(r) {
   const v = r.values;
-  const live = r.mode === 'live' && r.link;
-  const pageUrl = `${SITE_URL}/events/${r.slug}/`;
+  const live = r.mode === 'confirm';
   const next = live
-    ? `<p>承認済みの主催者として、イベントを公開しました。1〜2分ほどでページに反映されます。</p>${mailButton(pageUrl, 'イベントのページを見る')}`
+    ? `<p>承認済みの主催者からのお申し込みです。下のボタンを押すと、確認なしですぐに公開されます（1〜2分でページに反映）。</p>${mailButton(r.confirmUrl, 'このイベントを公開する')}<p style="font-size:13px;color:#5b6b73">ボタンの期限は${CONFIRM_DAYS}日です。お心当たりのない場合は、このメールは破棄してください（公開されません）。</p>`
     : `<p>このあとの流れ</p>
        <ol style="margin:0 0 12px;padding-left:20px">
          <li>運営チームが内容を確認します（通常1〜2営業日）。確認のためにご連絡する場合があります。</li>
          <li>公開したら、ページのURLをメールでお知らせします。</li>
-         ${r.isOrganizer ? '<li>次回からは、このメールアドレスでお申し込みいただくと確認なしですぐに公開されます。</li>' : ''}
+         ${r.isOrganizer ? '<li>次回からは、このメールアドレスでお申し込みいただくと、届いたメールのボタンを押すだけですぐに公開できます。</li>' : ''}
        </ol>`;
   return sendMail({
     to: v.email,
     reply_to: process.env.CONTACT_TO,
-    subject: live ? `【${SITE_NAME}】「${v.title}」を公開しました（${r.id}）` : `【${SITE_NAME}】イベント掲載のお申し込みを受け付けました（${r.id}）`,
+    subject: live ? `【${SITE_NAME}】「${v.title}」の公開ボタンをお送りします（${r.id}）` : `【${SITE_NAME}】イベント掲載のお申し込みを受け付けました（${r.id}）`,
     html: mailLayout(`
       <p>${esc(v.contactName)} 様</p>
       <p>${SITE_NAME} へのイベント掲載のお申し込み、ありがとうございます。</p>

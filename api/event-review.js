@@ -26,7 +26,7 @@ export default async function handler(req, res) {
           <p>${esc(meta.name)} 様</p>
           <p>お待たせしました。「${esc(meta.title)}」をイベントページに公開しました。</p>
           ${mailButton(pageUrl, 'イベントのページを見る')}
-          ${meta.trusted ? '<p>次回からは、このメールアドレスでお申し込みいただくと、確認なしですぐに公開されます。</p>' : ''}
+          ${meta.trusted ? '<p>次回からは、このメールアドレスでお申し込みいただくと、届いたメールのボタンを押すだけですぐに公開できます。</p>' : ''}
           <p>次の開催日は <a href="${SITE_URL}/events/submit/" style="color:#0e8a8f">掲載フォーム</a> からいつでも追加できます。日程の変更・中止は、このメールに返信してお知らせください。</p>`),
       });
     }

@@ -50,6 +50,14 @@ export function weeklyLabel(dates) {
 
 export const timeLabel = (v) => (v.timeStart ? `${v.timeStart.replace(/^0/, '')}〜${v.timeEnd ? v.timeEnd.replace(/^0/, '') : ''}` : '');
 
+/** 本文に書かれたHTMLタグ・危険なリンクを取り除く（ページにそのまま埋め込まれないように） */
+export const cleanBody = (s) =>
+  String(s || '')
+    .replace(/<\/?[a-zA-Z!?][^>\n]*>?/g, '')
+    .replace(/\]\(\s*(javascript|vbscript|data):[^)]*\)/gi, '](#)')
+    .replace(/^---\s*$/gm, '―――')
+    .trim();
+
 /** フォームの値 → イベントのファイル */
 export function serializeEvent(v, { dates, organizer, today, posted }) {
   const time = timeLabel(v);
@@ -83,15 +91,15 @@ export function serializeEvent(v, { dates, organizer, today, posted }) {
   L.push(`updatedAt: ${today}`);
   if (sources.length) L.push(`sources:`, ...sources.map((s) => `  - ${q(s)}`));
   if (posted) L.push(`organizerPosted: true`);
-  const body = (v.detail || '').trim();
+  const body = cleanBody(v.detail);
   return `---\n${L.join('\n')}\n---\n${body ? `\n${body}\n` : ''}`;
 }
 
-/** 新しい主催者のファイル。trusted: true の主催者は、次回から確認なしで即時公開される */
+/** 新しい主催者のファイル。trusted: true の主催者は、次回からメールのボタンを押すだけで即時公開される */
 export function serializeOrganizer({ name, url, trusted, keys, today }) {
   const L = [`name: ${q(name)}`];
   if (url) L.push(`url: ${q(url)}`);
-  L.push(`trusted: ${trusted}           # true = 次回から同じメールアドレスの申し込みは確認なしで即時公開`);
+  L.push(`trusted: ${trusted}           # true = 次回から同じメールアドレスの申し込みは、メールのボタンで即時公開`);
   if (keys.length) L.push(`emailKeys: [${keys.map(q).join(', ')}]   # 申込メールアドレスの照合用（元のアドレスには戻せない）`);
   L.push(`since: ${today}`);
   return `---\n${L.join('\n')}\n---\n`;

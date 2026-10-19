@@ -12,6 +12,9 @@ export default async function handler(req, res) {
   try {
     const ua = String(req.headers['user-agent'] || '');
     if (BOT.test(ua)) return res.status(204).end();
+    // 自サイトのページから送られたものだけ記録する（外部から台帳を水増しされないように）
+    const from = String(req.headers.origin || req.headers.referer || '');
+    if (!/^https:\/\/(www\.)?pickleball-tokyo\.com(\/|$)|^https?:\/\/localhost(:\d+)?(\/|$)/.test(from)) return res.status(204).end();
 
     const raw = typeof req.body === 'string' ? req.body : Buffer.isBuffer(req.body) ? req.body.toString() : JSON.stringify(req.body || {});
     const b = JSON.parse(raw || '{}');

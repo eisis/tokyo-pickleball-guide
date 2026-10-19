@@ -31,7 +31,7 @@ jobs:
         run: |
           slug=$(gh api "repos/$GITHUB_REPOSITORY/pulls/$NUMBER/files" --jq '.[].filename' \
             | grep -E '^src/content/events/[a-z0-9-]+\.md$' | head -1 | sed -E 's#.*/([a-z0-9-]+)\.md#\1#')
-          meta=$(printf '%s' "$PR_BODY" | grep -oE 'pt-meta:[A-Za-z0-9_-]+' | head -1 | cut -d: -f2)
+          meta=$(printf '%s' "$PR_BODY" | grep -oE '<!-- pt-meta:[A-Za-z0-9_-]+ -->' | tail -1 | sed -E 's/<!-- pt-meta:([^ ]+) -->/\1/')
           echo "slug=$slug" >> "$GITHUB_OUTPUT"
           echo "meta=$meta" >> "$GITHUB_OUTPUT"
           echo "ページ: /events/$slug/"

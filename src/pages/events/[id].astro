@@ -4,7 +4,7 @@
 import { render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import CourtCard from '../../components/CourtCard.astro';
-import { SITE } from '../../lib/site';
+import { SITE, ldJson } from '../../lib/site';
 import { PREFECTURES } from '../../lib/courts';
 import { getAllEvents, EVENT_TYPES, LEVELS, venueOf, organizerOf, organizerUrl, iso, md, upcomingDates, type Event } from '../../lib/events';
 
@@ -65,7 +65,7 @@ const jsonLd = {
 ---
 
 <Base title={`${d.title}｜ピックルボールの${type.ja}`} description={desc} image={d.image ?? venue.court?.data.image}>
-  <script slot="head" type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  <script slot="head" type="application/ld+json" set:html={ldJson(jsonLd)} />
   <main class="container narrow">
     <nav class="crumbs" aria-label="パンくず"><a href="/">トップ</a><span aria-hidden="true">›</span><a href="/events/">イベント</a></nav>
 

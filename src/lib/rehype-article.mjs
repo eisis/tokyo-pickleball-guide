@@ -6,6 +6,7 @@
 //    種類：POINT（ポイント）/ TIP（ワンポイント）/ CAUTION（注意）/ NOTE（メモ）
 // 2. 写真だけの段落は、写真の説明（![ここ](...)）を下に小さく表示する
 // 3. 表は横にスクロールできる枠で包む（スマホではみ出さないように）
+// 4. 安全対策：javascript: などの危険なリンク・画像の指定は無効にする（フォームから載ったイベント本文などに備える）
 
 const BOXES = {
   POINT: 'ポイント',
@@ -17,8 +18,17 @@ const BOXES = {
 const el = (tagName, properties, children) => ({ type: 'element', tagName, properties, children });
 const isBlank = (n) => n.type === 'text' && !n.value.trim();
 
+const UNSAFE = /^\s*(javascript|vbscript|data):/i;
+function scrub(node) {
+  const p = node.properties;
+  if (!p) return;
+  for (const k of ['href', 'src', 'action', 'formAction', 'xlinkHref']) if (typeof p[k] === 'string' && UNSAFE.test(p[k])) delete p[k];
+  for (const k of Object.keys(p)) if (/^on/i.test(k)) delete p[k];
+}
+
 function transform(node) {
   if (!node.children) return;
+  node.children.forEach((c) => c.type === 'element' && scrub(c));
   node.children = node.children.map((child) => {
     if (child.type !== 'element') return child;
 

@@ -1,0 +1,24 @@
+name: Daily rebuild
+
+# 毎朝サイトを作り直す（日本時間 4:07）
+#   サイトは「ビルドした日」を基準に、終わったイベントを一覧から外したり「終了しました」と出したりしている。
+#   更新のない日が続いても、検索エンジンやSNSのプレビューに古いイベントが残らないようにするため。
+# 必要なシークレット：VERCEL_DEPLOY_HOOK（Vercel の Settings → Git → Deploy Hooks で作ったURL）
+on:
+  schedule:
+    - cron: '7 19 * * *' # UTC 19:07 = 日本時間 4:07
+  workflow_dispatch: {}
+
+permissions: {}
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Vercel に再ビルドを依頼
+        env:
+          HOOK: ${{ secrets.VERCEL_DEPLOY_HOOK }}
+        run: |
+          if [ -z "$HOOK" ]; then echo "::warning::VERCEL_DEPLOY_HOOK が未設定のため、再ビルドしません"; exit 0; fi
+          curl -fsS -X POST "$HOOK" > /dev/null && echo "再ビルドを依頼しました"

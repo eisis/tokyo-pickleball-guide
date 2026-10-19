@@ -31,7 +31,7 @@ const badge = (f) => (f.required ? '<span class="req">必須</span>' : '<span cl
       <p class="contact-lead">「今週どこで打てるか」を探している人に、あなたのイベントを届けます。いま {upcoming} 件のイベントを掲載中です。</p>
       <ul class="owners-points">
         <li><b>申込は主催者のページへ</b><span>参加の申し込みは、主催者のページ（LINE・フォーム・予約サイトなど）へそのまま案内します。</span></li>
-        <li><b>2回目からは即時公開</b><span>初回だけ内容を確認します。承認後は、同じメールアドレスで申し込むと確認なしですぐに公開されます。</span></li>
+        <li><b>2回目からは即時公開</b><span>初回だけ内容を確認します。承認後は、同じメールアドレスで申し込むと、届いたメールのボタンを押すだけですぐに公開されます。</span></li>
         <li><b>定期開催もまとめて</b><span>「毎週土曜」のような開催は、くり返しで日付をまとめて入れられます。主催者ごとのページにも一覧で並びます。</span></li>
       </ul>
       <div class="owners-cta"><a class="contact-btn" href="#apply">イベントを掲載する</a><a class="contact-btn ghost" href="/this-week/">今週の掲載イベントを見る</a></div>
@@ -388,10 +388,9 @@ const badge = (f) => (f.required ? '<span class="req">必須</span>' : '<span cl
           return;
         }
         $('#receipt').textContent = j.id;
-        if (j.mode === 'live') {
-          $('#doneTitle').textContent = 'イベントを公開しました';
-          $('#doneText').textContent = '承認済みの主催者として、確認なしで公開しました。1〜2分ほどでページに反映されます。';
-          $('#doneLink').href = j.page; $('#doneLink').textContent = 'イベントのページを見る';
+        if (j.mode === 'confirm') {
+          $('#doneTitle').textContent = 'メールの「公開する」ボタンで公開できます';
+          $('#doneText').textContent = '承認済みの主催者として受け付けました。ご入力のメールアドレスに届くボタンを押すと、確認なしですぐに公開されます（1〜2分で反映）。';
         } else {
           $('#doneTitle').textContent = '掲載のお申し込みを受け付けました';
           $('#doneText').textContent = '内容を確認のうえ、通常1〜2営業日で公開します。公開したら、ページのURLをメールでお知らせします。';

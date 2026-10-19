@@ -93,7 +93,7 @@ export const SECTIONS = [
       { name: 'organizerUrl', label: '主催者のサイト・SNS', type: 'url', required: false, maxLength: 300, placeholder: 'https://www.instagram.com/...', help: '主催者のページに載せます。' },
       { name: 'role', label: 'お立場', type: 'radio', required: true, options: ROLE_OPTIONS, public: false },
       { name: 'contactName', label: 'ご担当者名', type: 'text', required: true, maxLength: 40, autocomplete: 'name', public: false },
-      { name: 'email', label: 'メールアドレス', type: 'email', required: true, maxLength: 120, autocomplete: 'email', public: false, help: '受付と公開のお知らせが届きます。次回から同じアドレスで申し込むと、確認なしですぐ公開されます。' },
+      { name: 'email', label: 'メールアドレス', type: 'email', required: true, maxLength: 120, autocomplete: 'email', public: false, help: '受付と公開のお知らせが届きます。次回から同じアドレスで申し込むと、届いたメールのボタンですぐ公開できます。' },
       { name: 'emailConfirm', label: 'メールアドレス（確認）', type: 'email', required: true, maxLength: 120, confirmOf: 'email', public: false },
     ],
   },
