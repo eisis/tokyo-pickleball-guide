@@ -8,8 +8,9 @@ interface Props {
   title: string;
   description: string;
   image?: string; // SNSで共有したときの画像（/images/... または https://...）
+  noindex?: boolean; // 検索結果に出さない（準備中のページなど）
 }
-const { title, description, image } = Astro.props;
+const { title, description, image, noindex } = Astro.props;
 // SNS で共有したときの画像。ページごとの画像がなければサイト共通のカード画像（public/og-default.png）を使う
 const ogImage = new URL(image || '/og-default.png', Astro.site).href;
 const siteName = SITE.name;
@@ -32,6 +33,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Pickleball Tokyo","url":"https://www.pickleball-tokyo.com/"}</script>
     <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
     <link rel="canonical" href={canonical} />
     <link rel="sitemap" href="/sitemap.xml" />
     <meta property="og:title" content={fullTitle} />
@@ -88,11 +90,9 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
           <a href="/events/" data-ja="イベント" data-en="Events">イベント</a>
           <a href="/events/submit/" data-ja="イベントの掲載" data-en="List your event">イベントの掲載</a>
           <a href="/blog/" data-ja="記事" data-en="Articles">記事</a>
-          <a href="/my-paddle/" data-ja="マイパドルを作る" data-en="Make your paddle">マイパドルを作る</a>
           <a href="/owners/" data-ja="コートの掲載・更新" data-en="List or update your court">コートの掲載・更新</a>
           <a href="/contact/" data-ja="お問い合わせ" data-en="Contact">お問い合わせ</a>
           <a href="/privacy/" data-ja="プライバシーポリシー" data-en="Privacy">プライバシーポリシー</a>
-          <a href="/tokushoho/" data-ja="特定商取引法に基づく表示" data-en="Legal notice">特定商取引法に基づく表示</a>
         </nav>
 
       </div>

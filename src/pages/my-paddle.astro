@@ -6,7 +6,7 @@
 // ・柄と色は下の templates / palettes。描画はページ下部のスクリプト（draw 関数）
 import Base from '../layouts/Base.astro';
 
-const ORDER_OPEN = true; // 受付を止めるときは false にする
+const ORDER_OPEN = false; // 非公開中。公開するときは true にし、Base.astro のメニューと sitemap の除外も戻す
 const PRICE = '16,800';
 
 const templates = [
@@ -26,7 +26,7 @@ const palettes = [
 ];
 ---
 
-<Base title="マイパドル｜好きな柄で、コートに立とう" description="柄と色を選んで、名前を入れる。あなたのためだけのピックルボールパドルを1本から作れます。仲間とのおそろいや贈り物にも。">
+<Base noindex title="マイパドル｜好きな柄で、コートに立とう" description="柄と色を選んで、名前を入れる。あなたのためだけのピックルボールパドルを1本から作れます。仲間とのおそろいや贈り物にも。">
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@1,9..144,500;1,9..144,600&display=swap" rel="stylesheet" />
 
