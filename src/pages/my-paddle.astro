@@ -3,194 +3,273 @@
 // ・製作は ZEAMI Goods（https://zeamigoods.com/product/115）に、当サイトが1本ずつ代理で発注する受注制
 // ・申し込みはお問い合わせフォームの「マイパドル」種別（api/_lib/contact-types.js の paddle）
 // ・受付の開け閉めは ORDER_OPEN と、contact-types.js の paddle 種別（enabled: false で非表示）。販売条件は /tokushoho/ と合わせること
+// ・柄と色は下の templates / palettes。描画はページ下部のスクリプト（draw 関数）
 import Base from '../layouts/Base.astro';
 
 const ORDER_OPEN = true; // 受付を止めるときは false にする
 const PRICE = '16,800';
 
 const templates = [
-  { id: 'dot', name: 'ドット' },
-  { id: 'wave', name: 'ウェーブ' },
-  { id: 'bloom', name: 'フラワー' },
-  { id: 'mono', name: 'イニシャル' },
+  { id: 'court', name: 'コート' },
+  { id: 'sunset', name: 'サンセット' },
+  { id: 'bloom', name: 'ブルーム' },
+  { id: 'gingham', name: 'ギンガム' },
+  { id: 'mono', name: 'モノグラム' },
 ];
+// base：地の色 / a・b：柄の色 / line：線と明るい差し色 / ink：文字 / edge：フチとグリップ / stage：プレビューの背景
 const palettes = [
-  { id: 'peach', name: 'ピーチ', bg: '#ffd9cf', a: '#ff8a73', b: '#fff4ec', ink: '#7a2e22' },
-  { id: 'mint', name: 'ミント', bg: '#cdf3e6', a: '#14b8a6', b: '#f2fffb', ink: '#0f4d45' },
-  { id: 'lilac', name: 'ライラック', bg: '#e4dcff', a: '#8b74e8', b: '#f8f5ff', ink: '#3b2b7a' },
-  { id: 'lemon', name: 'レモン', bg: '#f4f7b8', a: '#c9d82b', b: '#fffde8', ink: '#4a5310' },
-  { id: 'night', name: 'ナイト', bg: '#1d2b3a', a: '#d7f23a', b: '#33475b', ink: '#f4f7ea' },
+  { id: 'sorbet', name: 'ソルベ', base: '#F6E7DC', a: '#EE9A7A', b: '#E3BDB6', line: '#FFF8F1', ink: '#5A2E22', edge: '#3B2A25', stage: '#FBF1EA' },
+  { id: 'matcha', name: '抹茶', base: '#E4EAD6', a: '#93AE7E', b: '#4F6E50', line: '#F8FAF1', ink: '#24361F', edge: '#26301F', stage: '#F1F4EA' },
+  { id: 'lavender', name: 'ラベンダー', base: '#E9E5F3', a: '#B3A6DD', b: '#6C5FA8', line: '#FBFAFF', ink: '#2E2852', edge: '#2B2738', stage: '#F4F2FA' },
+  { id: 'sea', name: 'シーグラス', base: '#DCEBEA', a: '#86BFC1', b: '#22737B', line: '#F6FBFB', ink: '#0F3A3E', edge: '#173235', stage: '#EDF5F4' },
+  { id: 'night', name: 'ナイトコート', base: '#1E2532', a: '#D7F23A', b: '#C9C2B2', line: '#E8E1D1', ink: '#F3EFE4', edge: '#0E1218', stage: '#E6E8EC' },
 ];
 ---
 
-<Base title="マイパドル｜自分だけのピックルボールパドルを1本から" description="好きな柄と色、名前を選んで、自分だけのピックルボールパドルを1本から作れます。練習やサークル、おそろいや贈り物に。">
-  <main class="container mp">
-    <header class="mp-hero">
-      <p class="mp-eyebrow">My Paddle</p>
-      <h1>自分だけのパドルを、1本から。</h1>
-      <p class="mp-lead">柄と色を選んで名前を入れるだけで、世界に一本のピックルボールパドルが届きます。サークルのおそろいや、ピックルボール仲間への贈り物にもどうぞ。</p>
+<Base title="マイパドル｜好きな柄で、コートに立とう" description="柄と色を選んで、名前を入れる。あなたのためだけのピックルボールパドルを1本から作れます。仲間とのおそろいや贈り物にも。">
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@1,9..144,500;1,9..144,600&display=swap" rel="stylesheet" />
+
+  <main class="mp">
+    <header class="mp-hero container">
+      <p class="mp-eyebrow">My Paddle<span>1本から作れるオーダーパドル</span></p>
+      <h1>好きな柄で、<br class="sp" />コートに立とう。</h1>
+      <p class="mp-lead">柄と色を選んで、名前を入れる。それだけで、あなたのためだけのパドルが1本から届きます。仲間とのおそろいにも、大切な人への贈り物にも。</p>
     </header>
 
     <section class="mp-studio" aria-label="デザインする">
-      <div class="mp-preview">
-        <svg id="paddle" viewBox="0 0 220 440" role="img" aria-label="パドルのデザインイメージ" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <clipPath id="face"><rect x="10" y="10" width="200" height="290" rx="64" ry="64" /></clipPath>
-          </defs>
-          <rect x="88" y="290" width="44" height="140" rx="14" fill="#2b2b2b" />
-          <rect x="88" y="300" width="44" height="6" fill="#444" />
-          <g clip-path="url(#face)" id="art"></g>
-          <rect x="10" y="10" width="200" height="290" rx="64" ry="64" fill="none" stroke="#2b2b2b" stroke-width="7" />
-        </svg>
-        <p class="mp-note">画面のイメージです。いただいたデザインは、印刷前にこちらで整えてから見本をお送りします。</p>
+      <div class="mp-stage" id="stage">
+        <svg id="paddle" class="mp-paddle" viewBox="0 0 240 480" role="img" aria-label="パドルのデザインイメージ" xmlns="http://www.w3.org/2000/svg"></svg>
+        <p class="mp-caption" id="caption"></p>
       </div>
 
-      <form class="mp-controls" id="ctl" onsubmit="return false">
+      <form class="mp-panel" id="ctl" onsubmit="return false">
         <fieldset>
-          <legend>1. 柄を選ぶ</legend>
-          <div class="mp-chips">
+          <legend><span>01</span>柄</legend>
+          <div class="mp-tpls">
             {templates.map((t, i) => (
-              <label><input type="radio" name="tpl" value={t.id} checked={i === 0} /><span>{t.name}</span></label>
+              <label>
+                <input type="radio" name="tpl" value={t.id} checked={i === 0} />
+                <span class="mp-thumb"><svg viewBox="0 0 240 480" data-thumb={t.id} aria-hidden="true"></svg></span>
+                <small>{t.name}</small>
+              </label>
             ))}
           </div>
         </fieldset>
+
         <fieldset>
-          <legend>2. 色を選ぶ</legend>
-          <div class="mp-swatches">
+          <legend><span>02</span>色</legend>
+          <div class="mp-pals">
             {palettes.map((p, i) => (
-              <label title={p.name}>
+              <label>
                 <input type="radio" name="pal" value={p.id} checked={i === 0} />
-                <span style={`background:linear-gradient(135deg,${p.bg} 50%,${p.a} 50%)`}></span>
+                <span class="mp-chip">
+                  <i style={`background:${p.base}`}></i><i style={`background:${p.a}`}></i><i style={`background:${p.b}`}></i>
+                </span>
                 <small>{p.name}</small>
               </label>
             ))}
           </div>
         </fieldset>
+
         <fieldset>
-          <legend>3. 名前を入れる</legend>
-          <input class="mp-text" id="name" type="text" maxlength="12" placeholder="例：HANA" value="HANA" />
-          <p class="mp-help">英字なら12文字まで。イニシャルの柄では最初の1文字が大きく入ります。</p>
+          <legend><span>03</span>名前</legend>
+          <input class="mp-text" id="name" type="text" maxlength="12" placeholder="HANA" value="HANA" autocomplete="off" />
+          <p class="mp-help">英字12文字まで。ニックネームやイニシャルがきれいに収まります。</p>
         </fieldset>
-        <button type="button" class="mp-btn ghost" id="save">デザインを画像で保存</button>
+
+        <div class="mp-buy">
+          <p class="mp-price">{PRICE}<span>円</span><small>税込・送料込み</small></p>
+          {ORDER_OPEN ? (
+            <a class="mp-btn" id="order" href="/contact/?type=paddle">このデザインで申し込む</a>
+          ) : (
+            <p class="mp-soon">お申し込みの受付は準備中です。Instagram <a href="https://www.instagram.com/pickleballtokyo/" target="_blank" rel="noopener">@pickleballtokyo</a> でお知らせします。</p>
+          )}
+          <button type="button" class="mp-link" id="save">画像で保存する</button>
+        </div>
       </form>
     </section>
 
-    <section class="mp-info">
-      <h2>届くまでの流れ</h2>
+    <section class="mp-info container">
+      <h2>届くまで</h2>
       <ol class="mp-flow">
-        <li><b>デザインして申し込む</b><span>このページで作った画像か、使いたいイラスト・ロゴを添えて申し込みフォームから送ります。</span></li>
-        <li><b>見本の確認とお支払い</b><span>印刷用に整えた見本と金額をメールでお送りします。フォームを送った時点ではご注文は確定せず、見本にご納得いただいてお振込みいただいた時点で確定します。</span></li>
-        <li><b>製作</b><span>お振込みを確認したら、提携の制作工房に発注します。工房で1本ずつ印刷・検品されます。</span></li>
-        <li><b>お届け</b><span>お振込みの確認から2〜3週間ほどでお届けします。</span></li>
+        <li><b>デザインして申し込む</b><span>このページで作ったデザインのまま申し込めます。自分で描いたイラストやロゴも使えます。</span></li>
+        <li><b>見本を確かめる</b><span>印刷用に整えた見本と金額をメールでお送りします。この時点では、まだご注文は確定しません。</span></li>
+        <li><b>お振込み</b><span>見本にご納得いただけたら銀行振込でお支払いください。入金を確認した時点で確定し、提携の工房で製作に入ります。</span></li>
+        <li><b>お届け</b><span>ご入金の確認から2〜3週間ほどで届きます。</span></li>
       </ol>
 
-      <div class="mp-cta">
-        <p class="mp-price">1本 {PRICE}円<small>（税込・送料込み）</small></p>
-        {ORDER_OPEN ? (
-          <a class="mp-btn" id="order" href="/contact/?type=paddle">このデザインで申し込む</a>
-        ) : (
-          <p class="mp-soon">お申し込みの受付は準備中です。もうすぐ始めますので、Instagram <a href="https://www.instagram.com/pickleballtokyo/" target="_blank" rel="noopener">@pickleballtokyo</a> でお知らせします。</p>
-        )}
+      <div class="mp-cols">
+        <div>
+          <h2>パドルのこと</h2>
+          <p>大阪の制作工房 ZEAMI Goods のオリジナルパドルに印刷します。打球面はサンドブラスト加工のグラスファイバー、芯はPPハニカム。大きさは415×190mm、厚さ16mm、重さは220g前後です。工房によると初級〜中級の人が気持ちよく打てるように作られていて、はじめての一本にも向いています。</p>
+          <p>ひとつだけ知っておいてほしいのは、公認大会用の認定を受けていないことです。普段の練習やサークル、仲間内の交流戦では問題なく使えますが、大会の要項で承認パドルを指定している公式戦には使えません。</p>
+        </div>
+        <div>
+          <h2>お申し込みの前に</h2>
+          <p>キャラクターやスポーツチーム、ブランドのロゴなど、権利を持っていない画像は印刷できません。ご自分で描いたイラストや写真、権利を持っているロゴでお願いします。</p>
+          <p>一本ずつ作るオーダー品のため、ご注文確定後のキャンセルや変更はお受けできません。届いたものに印刷の不良や破損があったときは、作り直してお送りします。お支払いやお届けの条件は <a href="/tokushoho/">特定商取引法に基づく表示</a> に、そのほかのご質問は <a href="/contact/">お問い合わせ</a> からどうぞ。</p>
+        </div>
       </div>
-
-      <h2>パドルについて</h2>
-      <p>大阪の制作工房 ZEAMI Goods のオリジナルパドルを使っています。打球面はグラスファイバーにサンドブラスト加工をしたもの、芯はPPハニカムで、大きさは415×190mm、厚さ16mm、重さは220g前後です。工房によると初級〜中級の人が気持ちよく打てるように作られていて、はじめての一本にも向いています。</p>
-      <p>ひとつ知っておいてほしいのは、このパドルが公認大会用の認定を受けていないことです。普段の練習やサークル、仲間内の交流戦では問題なく使えますが、大会の要項で承認パドルを指定している公式戦には使えません。公式戦に出る予定があるときは、承認済みの市販パドルを別に用意してください。</p>
-
-      <h2>デザインとお申し込みの注意</h2>
-      <p>アニメやゲームのキャラクター、スポーツチームやブランドのロゴなど、権利を持っていない画像は印刷できません。ご自分で描いたイラストや写真、権利を持っているロゴでお願いします。該当しそうなものは、こちらからご相談の連絡をします。</p>
-      <p>一本ずつ作るオーダー品のため、発注後のキャンセルやデザインの変更はお受けできない場合があります。印刷のかすれや傷など、届いたものに不具合があったときは作り直してお送りします。</p>
-      <p>お支払いやお届けの条件は <a href="/tokushoho/">特定商取引法に基づく表示</a> にまとめています。わからないことは <a href="/contact/">お問い合わせ</a> からどうぞ。</p>
     </section>
   </main>
 
-  <script define:vars={{ palettes }}>
+  <script define:vars={{ palettes, templates }}>
     const NS = 'http://www.w3.org/2000/svg';
-    const art = document.getElementById('art');
+    const SERIF = "'Fraunces', Georgia, serif";
+    const SANS = "'Bricolage Grotesque', 'Zen Kaku Gothic New', sans-serif";
+    const FACE = 'M20 100 Q20 16 104 16 H136 Q220 16 220 100 V262 Q220 318 166 318 H74 Q20 318 20 262 Z';
     const form = document.getElementById('ctl');
     const nameInput = document.getElementById('name');
 
-    function el(tag, attrs) {
+    function el(tag, attrs, parent) {
       const n = document.createElementNS(NS, tag);
       for (const k in attrs) n.setAttribute(k, attrs[k]);
+      if (parent) parent.appendChild(n);
       return n;
     }
-    function label(text, p, size, y) {
-      const t = el('text', { x: 110, y, 'text-anchor': 'middle', fill: p.ink, 'font-size': size, 'font-weight': 800, 'letter-spacing': 2, 'font-family': "'Bricolage Grotesque', 'Zen Kaku Gothic New', sans-serif" });
-      t.textContent = text;
+    function text(parent, str, attrs) {
+      const t = el('text', Object.assign({ 'text-anchor': 'middle' }, attrs), parent);
+      t.textContent = str;
       return t;
     }
-    function flower(cx, cy, r, p) {
-      const g = el('g', {});
-      for (let i = 0; i < 5; i++) {
-        const a = (i / 5) * Math.PI * 2;
-        g.appendChild(el('circle', { cx: cx + Math.cos(a) * r, cy: cy + Math.sin(a) * r, r: r * 0.85, fill: p.b }));
-      }
-      g.appendChild(el('circle', { cx, cy, r: r * 0.7, fill: p.a }));
-      return g;
+    function leaf(parent, cx, cy, len, w, rot, fill) {
+      el('path', { d: `M0 ${-len} C ${w} ${-len / 2} ${w} ${len / 2} 0 ${len} C ${-w} ${len / 2} ${-w} ${-len / 2} 0 ${-len} Z`, transform: `translate(${cx} ${cy}) rotate(${rot})`, fill }, parent);
+    }
+    // 名前はサインのように小さく、字間を広げて入れる
+    function signature(g, name, p, y, fill) {
+      if (name) text(g, name, { x: 120, y, fill: fill || p.ink, 'font-family': SANS, 'font-size': 12, 'font-weight': 700, 'letter-spacing': 4.2 });
     }
 
-    function draw() {
-      const tpl = form.tpl.value;
-      const p = palettes.find((x) => x.id === form.pal.value);
-      const name = (nameInput.value || '').trim().toUpperCase();
+    const ART = {
+      court(g, p, name) {
+        el('rect', { x: 0, y: 0, width: 240, height: 330, fill: p.base }, g);
+        el('rect', { x: 46, y: 190, width: 148, height: 62, fill: p.a }, g);
+        const L = { stroke: p.line, 'stroke-width': 2.4, fill: 'none' };
+        el('path', Object.assign({ d: 'M46 330 V44 H194 V330 M46 190 H194 M120 44 V190' }, L), g);
+        el('path', { d: 'M20 252 H220', stroke: p.edge, 'stroke-width': 3, 'stroke-dasharray': '2 5', opacity: 0.55 }, g);
+        const ball = el('g', { transform: 'translate(160 112)' }, g);
+        el('circle', { r: 11, fill: p.id === 'night' ? p.a : p.b }, ball);
+        [[-4, -3], [4, -4], [0, 4], [-5, 5], [5, 4]].forEach(([x, y]) => el('circle', { cx: x, cy: y, r: 1.6, fill: p.base, opacity: 0.8 }, ball));
+        signature(g, name, p, 292, p.line);
+      },
+      sunset(g, p, name) {
+        el('rect', { x: 0, y: 0, width: 240, height: 330, fill: p.base }, g);
+        el('circle', { cx: 120, cy: 176, r: 74, fill: p.a }, g);
+        for (let i = 0, y = 150, h = 2; y < 250; i++) { el('rect', { x: 0, y, width: 240, height: h, fill: p.base }, g); y += h + 9 - i; h += 1.6; }
+        el('rect', { x: 0, y: 236, width: 240, height: 100, fill: p.b }, g);
+        el('path', { d: 'M0 236 H240', stroke: p.line, 'stroke-width': 1.5, opacity: 0.7 }, g);
+        signature(g, name, p, 288, p.line);
+      },
+      bloom(g, p, name) {
+        el('rect', { x: 0, y: 0, width: 240, height: 330, fill: p.base }, g);
+        leaf(g, 62, 112, 96, 42, -32, p.a);
+        leaf(g, 186, 196, 92, 42, 28, p.b);
+        leaf(g, 168, 64, 50, 22, 64, p.a);
+        leaf(g, 70, 236, 40, 17, -70, p.b);
+        el('circle', { cx: 150, cy: 136, r: 17, fill: p.line }, g);
+        el('circle', { cx: 52, cy: 206, r: 7, fill: p.ink, opacity: 0.85 }, g);
+        el('circle', { cx: 198, cy: 118, r: 5, fill: p.ink, opacity: 0.85 }, g);
+        signature(g, name, p, 300);
+        if (name) g.lastChild.setAttribute('stroke', p.base), g.lastChild.setAttribute('stroke-width', 5), g.lastChild.setAttribute('paint-order', 'stroke');
+      },
+      gingham(g, p, name) {
+        el('rect', { x: 0, y: 0, width: 240, height: 330, fill: p.base }, g);
+        for (let x = 4; x < 240; x += 36) el('rect', { x, y: 0, width: 18, height: 330, fill: p.a, opacity: 0.45 }, g);
+        for (let y = 4; y < 330; y += 36) el('rect', { x: 0, y, width: 240, height: 18, fill: p.a, opacity: 0.45 }, g);
+        if (name) text(g, name.length > 7 ? name : name[0] + name.slice(1).toLowerCase(), {
+          x: 120, y: 182, fill: p.ink, 'font-family': SERIF, 'font-style': 'italic', 'font-weight': 600,
+          'font-size': name.length > 7 ? 26 : 38, stroke: p.base, 'stroke-width': 7, 'paint-order': 'stroke', 'stroke-linejoin': 'round',
+        });
+      },
+      mono(g, p, name) {
+        el('rect', { x: 0, y: 0, width: 240, height: 330, fill: p.base }, g);
+        text(g, (name || 'P')[0], { x: 126, y: 286, fill: p.a, 'font-family': SERIF, 'font-style': 'italic', 'font-weight': 600, 'font-size': 250 });
+        signature(g, name, p, 64);
+        el('path', { d: 'M104 78 H136', stroke: p.b, 'stroke-width': 2 }, g);
+      },
+    };
+
+    let uid = 0;
+    function draw(svg, tplId, p, name) {
+      const id = `f${uid++}`;
+      svg.replaceChildren();
+      const defs = el('defs', {}, svg);
+      el('path', { d: FACE }, el('clipPath', { id: `${id}c` }, defs));
+      const sheen = el('linearGradient', { id: `${id}s`, x1: 0, y1: 0, x2: 1, y2: 1 }, defs);
+      el('stop', { offset: 0, 'stop-color': '#fff', 'stop-opacity': 0.28 }, sheen);
+      el('stop', { offset: 0.45, 'stop-color': '#fff', 'stop-opacity': 0 }, sheen);
+      const wrap = el('pattern', { id: `${id}w`, width: 10, height: 10, patternUnits: 'userSpaceOnUse', patternTransform: 'rotate(-24)' }, defs);
+      el('rect', { width: 10, height: 10, fill: p.edge }, wrap);
+      el('rect', { width: 10, height: 1.6, fill: '#fff', opacity: 0.12 }, wrap);
+
+      // グリップ・スロート
+      el('path', { d: 'M100 316 H140 L136 340 H104 Z', fill: p.edge }, svg);
+      el('rect', { x: 103, y: 336, width: 34, height: 128, rx: 9, fill: `url(#${id}w)` }, svg);
+      el('rect', { x: 99, y: 456, width: 42, height: 14, rx: 7, fill: p.id === 'night' ? p.a : p.a }, svg);
+      // 打球面
+      const g = el('g', { 'clip-path': `url(#${id}c)` }, svg);
+      ART[tplId](g, p, name);
+      el('path', { d: FACE, fill: `url(#${id}s)` }, svg);
+      el('path', { d: FACE, fill: 'none', stroke: p.edge, 'stroke-width': 5 }, svg);
+    }
+
+    function current() {
+      return {
+        tpl: form.tpl.value,
+        p: palettes.find((x) => x.id === form.pal.value),
+        name: (nameInput.value || '').replace(/[^A-Za-z0-9 .&'-]/g, '').trim().toUpperCase(),
+      };
+    }
+
+    function render() {
+      const { tpl, p, name } = current();
+      draw(document.getElementById('paddle'), tpl, p, name);
+      document.querySelectorAll('[data-thumb]').forEach((s) => draw(s, s.dataset.thumb, p, ''));
+      document.getElementById('stage').style.background = p.stage;
+      const tplName = templates.find((t) => t.id === tpl).name;
+      document.getElementById('caption').textContent = `${tplName} ／ ${p.name}${name ? ` ／ ${name}` : ''}`;
       const order = document.getElementById('order');
-      if (order) {
-        const tplName = form.querySelector('input[name=tpl]:checked').nextElementSibling.textContent;
-        const q = new URLSearchParams({ type: 'paddle', design: `${tplName}／${p.name}／${name || '名前なし'}`, quantity: '1' });
-        order.href = `/contact/?${q}`;
-      }
-      art.replaceChildren(el('rect', { x: 0, y: 0, width: 220, height: 310, fill: p.bg }));
-
-      if (tpl === 'dot') {
-        for (let y = 0; y < 320; y += 34) {
-          for (let x = (y / 34) % 2 ? 17 : 0; x < 230; x += 34) art.appendChild(el('circle', { cx: x, cy: y, r: 7, fill: p.a }));
-        }
-        art.appendChild(el('rect', { x: 30, y: 128, width: 160, height: 54, rx: 27, fill: p.b }));
-        if (name) art.appendChild(label(name, p, 26, 164));
-      } else if (tpl === 'wave') {
-        for (let i = 0; i < 6; i++) {
-          const y = 40 + i * 50;
-          art.appendChild(el('path', { d: `M-10 ${y} Q 45 ${y - 26} 100 ${y} T 210 ${y} T 320 ${y} V ${y + 22} Q 265 ${y - 4} 210 ${y + 22} T 100 ${y + 22} T -10 ${y + 22} Z`, fill: i % 2 ? p.a : p.b }));
-        }
-        if (name) {
-          art.appendChild(el('rect', { x: 40, y: 236, width: 140, height: 40, rx: 20, fill: p.bg }));
-          art.appendChild(label(name, p, 20, 263));
-        }
-      } else if (tpl === 'bloom') {
-        [[52, 60, 16], [160, 48, 11], [176, 150, 18], [44, 190, 12], [120, 238, 15], [70, 120, 8], [150, 210, 8]].forEach(([x, y, r]) => art.appendChild(flower(x, y, r, p)));
-        if (name) art.appendChild(label(name, p, 24, 116));
-      } else {
-        art.appendChild(el('circle', { cx: 110, cy: 140, r: 78, fill: p.a }));
-        art.appendChild(el('circle', { cx: 110, cy: 140, r: 66, fill: 'none', stroke: p.b, 'stroke-width': 3 }));
-        const ini = label(name ? name[0] : 'P', p, 92, 172);
-        ini.setAttribute('fill', p.b);
-        art.appendChild(ini);
-        if (name) art.appendChild(label(name, p, 16, 262));
-      }
+      if (order) order.href = '/contact/?' + new URLSearchParams({ type: 'paddle', design: `${tplName}／${p.name}／${name || '名前なし'}`, quantity: '1' });
     }
 
-    form.addEventListener('change', draw);
-    nameInput.addEventListener('input', draw);
-    draw();
+    form.addEventListener('change', render);
+    nameInput.addEventListener('input', render);
+    render();
+    if (document.fonts) document.fonts.ready.then(render);
 
-    // SVG を PNG にして保存する
-    document.getElementById('save').addEventListener('click', () => {
+    // 画像で保存：使っているフォントを埋め込んでから PNG にする
+    async function fontCss(name) {
+      try {
+        const chars = encodeURIComponent(Array.from(new Set((name || 'P') + 'P')).join(''));
+        const url = `https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@1,9..144,600&family=Bricolage+Grotesque:opsz,wght@12..96,700&text=${chars}`;
+        let css = await (await fetch(url)).text();
+        for (const m of css.match(/url\([^)]+\)/g) || []) {
+          const buf = await (await fetch(m.slice(4, -1))).arrayBuffer();
+          let bin = ''; new Uint8Array(buf).forEach((b) => (bin += String.fromCharCode(b)));
+          css = css.replace(m, `url(data:font/woff2;base64,${btoa(bin)})`);
+        }
+        return css;
+      } catch (e) { return ''; }
+    }
+    document.getElementById('save').addEventListener('click', async () => {
+      const { tpl, p, name } = current();
       const svg = document.getElementById('paddle').cloneNode(true);
-      svg.setAttribute('width', 660);
-      svg.setAttribute('height', 1320);
+      const style = el('style', {});
+      style.textContent = await fontCss(name);
+      svg.insertBefore(style, svg.firstChild);
+      svg.setAttribute('width', 720); svg.setAttribute('height', 1440);
       const url = URL.createObjectURL(new Blob([new XMLSerializer().serializeToString(svg)], { type: 'image/svg+xml' }));
       const img = new Image();
       img.onload = () => {
         const c = document.createElement('canvas');
-        c.width = 660; c.height = 1320;
+        c.width = 900; c.height = 1600;
         const ctx = c.getContext('2d');
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(0, 0, c.width, c.height);
-        ctx.drawImage(img, 0, 0, c.width, c.height);
+        ctx.fillStyle = p.stage; ctx.fillRect(0, 0, c.width, c.height);
+        ctx.drawImage(img, 90, 80, 720, 1440);
         URL.revokeObjectURL(url);
         const a = document.createElement('a');
-        a.download = `my-paddle-${form.tpl.value}-${form.pal.value}.png`;
+        a.download = `my-paddle-${tpl}-${p.id}.png`;
         a.href = c.toDataURL('image/png');
         a.click();
       };
@@ -199,51 +278,76 @@ const palettes = [
   </script>
 
   <style>
-    .mp { max-width: 980px; padding-bottom: 64px; }
-    .mp-hero { text-align: center; padding: 28px 0 8px; }
-    .mp-eyebrow { font-family: var(--display); color: var(--teal-dark); font-weight: 800; letter-spacing: .12em; text-transform: uppercase; font-size: 13px; margin: 0; }
-    .mp-hero h1 { color: var(--navy); font-size: clamp(26px, 5vw, 38px); margin: 8px 0 12px; }
-    .mp-lead { color: var(--ink-soft); max-width: 560px; margin: 0 auto; line-height: 1.9; }
+    .mp { --serif: 'Fraunces', Georgia, serif; padding-bottom: 72px; }
+    .mp-hero { text-align: center; padding: 40px 16px 8px; }
+    .mp-eyebrow { font-family: var(--serif); font-style: italic; font-size: 20px; color: var(--teal-dark); margin: 0; }
+    .mp-eyebrow span { display: block; font-family: inherit; font-style: normal; font-size: 12px; letter-spacing: .14em; color: var(--ink-soft); margin-top: 4px; font-family: 'Zen Kaku Gothic New', sans-serif; }
+    .mp-hero h1 { color: var(--ink); font-size: clamp(30px, 5.4vw, 48px); line-height: 1.35; letter-spacing: .02em; margin: 18px 0 16px; font-weight: 900; }
+    .mp-lead { color: var(--ink-soft); max-width: 520px; margin: 0 auto; line-height: 2; font-size: 15px; }
 
-    .mp-studio { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; align-items: start; margin: 28px 0 40px; background: var(--sand); border-radius: var(--radius); padding: 28px; }
-    .mp-preview { text-align: center; }
-    .mp-preview svg { width: min(260px, 70vw); height: auto; filter: drop-shadow(0 14px 22px rgba(7, 52, 58, .18)); }
-    .mp-note { font-size: 12px; color: var(--ink-soft); margin: 14px auto 0; max-width: 300px; line-height: 1.7; }
+    .mp-studio { display: grid; grid-template-columns: 1.05fr 1fr; gap: 0; max-width: 1120px; margin: 36px auto 64px; border-radius: 28px; overflow: hidden; box-shadow: var(--shadow); background: #fff; }
+    .mp-stage { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 48px 24px 32px; transition: background .4s ease; min-height: 560px; }
+    .mp-paddle { width: min(250px, 62vw); height: auto; transform: rotate(-9deg); filter: drop-shadow(14px 22px 22px rgba(20, 24, 30, .22)); transition: transform .4s ease; }
+    .mp-stage:hover .mp-paddle { transform: rotate(-5deg) translateY(-4px); }
+    .mp-caption { margin: 28px 0 0; font-size: 12px; letter-spacing: .12em; color: var(--ink-soft); }
 
-    .mp-controls fieldset { border: 0; padding: 0; margin: 0 0 22px; }
-    .mp-controls legend { font-weight: 700; color: var(--navy); margin-bottom: 10px; }
-    .mp-chips { display: flex; flex-wrap: wrap; gap: 8px; }
-    .mp-chips input, .mp-swatches input { position: absolute; opacity: 0; pointer-events: none; }
-    .mp-chips span { display: inline-block; padding: 9px 16px; border-radius: 999px; background: #fff; border: 2px solid var(--line); cursor: pointer; font-weight: 500; }
-    .mp-chips input:checked + span { border-color: var(--teal); background: var(--foam); color: var(--teal-dark); font-weight: 700; }
-    .mp-chips input:focus-visible + span, .mp-swatches input:focus-visible + span { outline: 3px solid var(--teal-light); outline-offset: 2px; }
-    .mp-swatches { display: flex; flex-wrap: wrap; gap: 12px; }
-    .mp-swatches label { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; }
-    .mp-swatches span { width: 44px; height: 44px; border-radius: 50%; border: 3px solid #fff; box-shadow: 0 0 0 2px var(--line); }
-    .mp-swatches input:checked + span { box-shadow: 0 0 0 3px var(--teal); }
-    .mp-swatches small { font-size: 11px; color: var(--ink-soft); }
-    .mp-text { width: 100%; padding: 12px 14px; border-radius: var(--radius-sm); border: 2px solid var(--line); font-size: 16px; background: #fff; }
-    .mp-text:focus { outline: none; border-color: var(--teal); }
-    .mp-help { font-size: 12px; color: var(--ink-soft); margin: 6px 0 0; }
+    .mp-panel { padding: 40px 36px 36px; display: flex; flex-direction: column; gap: 30px; }
+    .mp-panel fieldset { border: 0; margin: 0; padding: 0; min-width: 0; }
+    .mp-panel legend { font-weight: 700; color: var(--ink); font-size: 15px; margin-bottom: 14px; display: flex; align-items: baseline; gap: 10px; }
+    .mp-panel legend span { font-family: var(--serif); font-style: italic; font-weight: 500; color: var(--teal-dark); font-size: 15px; }
+    .mp-panel input[type=radio] { position: absolute; opacity: 0; pointer-events: none; }
 
-    .mp-btn { display: inline-block; padding: 13px 26px; border-radius: 999px; background: var(--teal-dark); color: #fff; font-weight: 700; text-decoration: none; border: 2px solid var(--teal-dark); cursor: pointer; font-size: 15px; }
-    .mp-btn.ghost { background: #fff; color: var(--teal-dark); }
-    .mp-btn:hover { filter: brightness(1.08); }
+    .mp-tpls { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+    .mp-tpls label, .mp-pals label { display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; }
+    .mp-thumb { display: grid; place-items: center; width: 100%; aspect-ratio: 3 / 4; border-radius: 14px; background: #f6f5f2; border: 1.5px solid transparent; transition: border-color .2s, background .2s; }
+    .mp-thumb svg { width: 46%; height: auto; }
+    .mp-tpls small, .mp-pals small { font-size: 11px; color: var(--ink-soft); white-space: nowrap; }
+    .mp-tpls input:checked + .mp-thumb { border-color: var(--ink); background: #fff; }
+    .mp-tpls input:checked ~ small, .mp-pals input:checked ~ small { color: var(--ink); font-weight: 700; }
 
-    .mp-info { max-width: 720px; margin: 0 auto; line-height: 1.95; }
-    .mp-info h2 { color: var(--navy); font-size: 22px; margin: 40px 0 14px; }
-    .mp-flow { list-style: none; padding: 0; margin: 0; counter-reset: s; }
-    .mp-flow li { counter-increment: s; position: relative; padding: 0 0 18px 48px; }
-    .mp-flow li::before { content: counter(s); position: absolute; left: 0; top: 2px; width: 32px; height: 32px; border-radius: 50%; background: var(--ball); color: var(--ball-ink); font-weight: 800; display: grid; place-items: center; font-family: var(--display); }
-    .mp-flow b { display: block; color: var(--ink); }
-    .mp-flow span { color: var(--ink-soft); font-size: 15px; }
-    .mp-cta { margin: 20px 0 8px; padding: 24px; border-radius: var(--radius); background: var(--foam); text-align: center; }
-    .mp-price { font-family: var(--display); font-size: 28px; font-weight: 800; color: var(--navy); margin: 0 0 14px; }
-    .mp-price small { font-size: 13px; font-weight: 500; color: var(--ink-soft); margin-left: 6px; }
-    .mp-soon { margin: 0; color: var(--ink-soft); font-size: 15px; }
+    .mp-pals { display: flex; flex-wrap: wrap; gap: 14px 18px; }
+    .mp-chip { display: flex; padding: 4px; border-radius: 999px; border: 1.5px solid transparent; transition: border-color .2s; }
+    .mp-chip i { width: 22px; height: 22px; border-radius: 50%; margin-left: -6px; box-shadow: 0 0 0 2px #fff; }
+    .mp-chip i:first-child { margin-left: 0; }
+    .mp-pals input:checked + .mp-chip { border-color: var(--ink); }
+    .mp-panel input:focus-visible + span { outline: 2px solid var(--teal); outline-offset: 2px; }
 
-    @media (max-width: 760px) {
-      .mp-studio { grid-template-columns: 1fr; padding: 20px 16px; }
+    .mp-text { width: 100%; padding: 13px 16px; border-radius: 12px; border: 1.5px solid #e4e1da; font-size: 17px; letter-spacing: .14em; background: #fff; font-weight: 700; color: var(--ink); text-transform: uppercase; }
+    .mp-text:focus { outline: none; border-color: var(--ink); }
+    .mp-help { font-size: 12px; color: var(--ink-soft); margin: 8px 0 0; }
+
+    .mp-buy { margin-top: auto; padding-top: 24px; border-top: 1px solid #eeebe4; display: grid; gap: 14px; justify-items: start; }
+    .mp-price { margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 32px; color: var(--ink); line-height: 1; }
+    .mp-price span { font-size: 16px; margin-left: 2px; }
+    .mp-price small { font-family: 'Zen Kaku Gothic New', sans-serif; font-weight: 500; font-size: 12px; color: var(--ink-soft); margin-left: 10px; }
+    .mp-btn { display: block; width: 100%; text-align: center; padding: 16px 24px; border-radius: 999px; background: var(--ink); color: #fff; font-weight: 700; text-decoration: none; letter-spacing: .04em; transition: transform .15s, background .2s; }
+    .mp-btn:hover { background: var(--deep); transform: translateY(-1px); }
+    .mp-link { background: none; border: 0; padding: 0; color: var(--ink-soft); font-size: 13px; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; justify-self: center; }
+    .mp-soon { margin: 0; color: var(--ink-soft); font-size: 14px; }
+
+    .mp-info { max-width: 960px; line-height: 2; }
+    .mp-info h2 { color: var(--ink); font-size: 20px; margin: 0 0 16px; }
+    .mp-flow { list-style: none; padding: 0; margin: 0 0 56px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; counter-reset: s; }
+    .mp-flow li { counter-increment: s; background: #fff; border-radius: 18px; padding: 20px 18px; box-shadow: var(--shadow); }
+    .mp-flow li::before { content: '0' counter(s); display: block; font-family: var(--serif); font-style: italic; color: var(--teal-dark); font-size: 18px; margin-bottom: 6px; }
+    .mp-flow b { display: block; color: var(--ink); margin-bottom: 4px; }
+    .mp-flow span { color: var(--ink-soft); font-size: 13.5px; line-height: 1.85; display: block; }
+    .mp-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+    .mp-cols p { color: var(--ink-soft); font-size: 14.5px; margin: 0 0 14px; }
+
+    @media (max-width: 860px) {
+      .mp-studio { grid-template-columns: 1fr; border-radius: 22px; margin: 28px 16px 48px; }
+      .mp-stage { min-height: 0; padding: 36px 16px 20px; }
+      .mp-panel { padding: 28px 16px; }
+      .mp-flow { grid-template-columns: 1fr 1fr; }
+      .mp-cols { grid-template-columns: 1fr; gap: 8px; }
+    }
+    @media (max-width: 420px) {
+      .mp-tpls { gap: 6px; }
+      .mp-pals { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+      .mp-chip i { width: 16px; height: 16px; margin-left: -5px; }
+      .mp-pals small { font-size: 10px; }
+      .mp-flow { grid-template-columns: 1fr; }
     }
   </style>
 </Base>
