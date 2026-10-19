@@ -1,0 +1,45 @@
+---
+// 特定商取引法に基づく表示（/tokushoho/）。マイパドルの販売条件を変えたらここも直す
+// ・販売業者の氏名・住所・電話番号は、請求があれば遅滞なくメールで提供する形で省略している
+//   （消費者庁 特定商取引法ガイド「通信販売広告Q&A」Q15・Q17。請求が来たら当日中を目安に返信すること）
+import Base from '../layouts/Base.astro';
+import { SITE } from '../lib/site';
+
+const contactEmail = 'info@pickleball-tokyo.com';
+const revised = '2026年10月19日';
+const rows = [
+  ['販売業者', `${SITE.name} 運営者。氏名・住所・電話番号は、ご請求があれば遅滞なく電子メールでお知らせします。`],
+  ['お問い合わせ先', `メール：${contactEmail}（お問い合わせフォームからも受け付けます）`],
+  ['販売価格', 'マイパドル 1本 16,800円（税込・送料込み）'],
+  ['商品代金以外の必要料金', '銀行振込の手数料はお客さまのご負担となります。送料はかかりません。'],
+  ['お支払い方法', '銀行振込（前払い）'],
+  ['お支払い時期', '見本と金額をメールでお送りした日から7日以内にお振込みください。期限を過ぎた場合は、お申し込みを取り消すことがあります。'],
+  ['ご注文の確定', 'フォームの送信だけではご注文は確定しません。見本をご確認のうえお振込みいただき、当方で入金を確認した時点で確定します。'],
+  ['商品のお届け時期', 'ご入金の確認から2〜3週間ほどでお届けします。'],
+  ['キャンセル・返品', 'お客さまのデザインで1本ずつ作るオーダー品のため、ご注文確定後のキャンセル、お客さまのご都合による返品・交換はお受けできません。'],
+  ['不良品の場合', '印刷の不良や破損など、届いた商品に不具合があった場合は、到着から7日以内にご連絡ください。作り直してお送りします。'],
+];
+---
+
+<Base title="特定商取引法に基づく表示" description={`${SITE.name} のマイパドル販売に関する特定商取引法に基づく表示です。`}>
+  <main class="container narrow">
+    <h1 style="margin:12px 0 20px;color:var(--navy)">特定商取引法に基づく表示</h1>
+    <div class="prose">
+      <table class="tk">
+        <tbody>
+          {rows.map(([k, v]) => (<tr><th>{k}</th><td>{v}</td></tr>))}
+        </tbody>
+      </table>
+      <p class="meta">最終改定日：{revised}</p>
+    </div>
+  </main>
+  <style>
+    .tk { width: 100%; border-collapse: collapse; margin: 8px 0 24px; }
+    .tk th, .tk td { text-align: left; vertical-align: top; padding: 14px 12px; border-bottom: 1px solid var(--line); line-height: 1.8; }
+    .tk th { width: 34%; color: var(--navy); font-weight: 700; white-space: nowrap; }
+    @media (max-width: 640px) {
+      .tk th, .tk td { display: block; width: auto; padding: 6px 0; border: 0; }
+      .tk td { padding-bottom: 16px; border-bottom: 1px solid var(--line); }
+    }
+  </style>
+</Base>

@@ -77,9 +77,7 @@ const TYPES = [
   },
   {
     // マイパドルの申し込み（/my-paddle/ のボタンから、デザインを入れた状態で開く）
-    // 特定商取引法に基づく表示ページを公開するまでは enabled: false のまま
     id: 'paddle',
-    enabled: false,
     sheetName: 'マイパドル', // 受付台帳のタブ名
     label: 'マイパドルを申し込む',
     description: '自分だけのデザインのパドルを1本から。',
