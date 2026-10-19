@@ -76,6 +76,28 @@ const TYPES = [
     ],
   },
   {
+    // マイパドルの申し込み（/my-paddle/ のボタンから、デザインを入れた状態で開く）
+    // 特定商取引法に基づく表示ページを公開するまでは enabled: false のまま
+    id: 'paddle',
+    enabled: false,
+    sheetName: 'マイパドル', // 受付台帳のタブ名
+    label: 'マイパドルを申し込む',
+    description: '自分だけのデザインのパドルを1本から。',
+    icon: '🎨',
+    subjectField: 'design',
+    autoReplyNote: '印刷用に整えた見本と、お支払い金額・振込先をメールでお送りします。ご自分のイラストやロゴを使いたい場合は、このメールに画像を添付して返信してください。',
+    fields: [
+      { name: 'design', label: 'デザイン（柄・色・名前）', type: 'text', required: true, maxLength: 120,
+        placeholder: '例：ドット／ピーチ／HANA　（自作のイラストを使う場合は「自作イラスト」）' },
+      { name: 'quantity', label: '本数', type: 'number', required: true, min: 1, max: 20 },
+      { name: 'phone', label: '電話番号（配送用）', type: 'tel', required: true, maxLength: 20, autocomplete: 'tel' },
+      { name: 'address', label: 'お届け先（郵便番号・住所）', type: 'textarea', required: true, maxLength: 300,
+        placeholder: '〒000-0000 東京都〇〇区…' },
+      { name: 'message', label: 'ご要望', type: 'textarea', required: false, maxLength: 2000,
+        placeholder: '色の調整や、名前の書体の希望など' },
+    ],
+  },
+  {
     id: 'other',
     sheetName: 'その他', // 受付台帳のタブ名
     label: 'その他のお問い合わせ',

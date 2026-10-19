@@ -1,11 +1,11 @@
 ---
 // マイパドル（/my-paddle/）：自分だけのピックルボールパドルをデザインして注文できるページ
 // ・製作は ZEAMI Goods（https://zeamigoods.com/product/115）に、当サイトが1本ずつ代理で発注する受注制
-// ・申し込みは Google フォーム。FORM_URL が空のあいだは「受付準備中」と表示する
-// ・販売を始める前に、特定商取引法に基づく表示ページを用意すること
+// ・申し込みはお問い合わせフォームの「マイパドル」種別（api/_lib/contact-types.js の paddle）
+// ・ORDER_OPEN を true にし、paddle 種別の enabled を外すと受付開始。その前に特定商取引法に基づく表示ページを公開すること
 import Base from '../layouts/Base.astro';
 
-const FORM_URL = ''; // Google フォームの URL を入れると申し込みボタンが有効になる
+const ORDER_OPEN = false; // 受付を始めるときに true にする
 const PRICE = '16,800';
 
 const templates = [
@@ -86,8 +86,8 @@ const palettes = [
 
       <div class="mp-cta">
         <p class="mp-price">1本 {PRICE}円<small>（税込・送料込み）</small></p>
-        {FORM_URL ? (
-          <a class="mp-btn" href={FORM_URL} target="_blank" rel="noopener">申し込みフォームへ</a>
+        {ORDER_OPEN ? (
+          <a class="mp-btn" id="order" href="/contact/?type=paddle">このデザインで申し込む</a>
         ) : (
           <p class="mp-soon">お申し込みの受付は準備中です。もうすぐ始めますので、Instagram <a href="https://www.instagram.com/pickleballtokyo/" target="_blank" rel="noopener">@pickleballtokyo</a> でお知らせします。</p>
         )}
@@ -134,6 +134,12 @@ const palettes = [
       const tpl = form.tpl.value;
       const p = palettes.find((x) => x.id === form.pal.value);
       const name = (nameInput.value || '').trim().toUpperCase();
+      const order = document.getElementById('order');
+      if (order) {
+        const tplName = form.querySelector('input[name=tpl]:checked').nextElementSibling.textContent;
+        const q = new URLSearchParams({ type: 'paddle', design: `${tplName}／${p.name}／${name || '名前なし'}`, quantity: '1' });
+        order.href = `/contact/?${q}`;
+      }
       art.replaceChildren(el('rect', { x: 0, y: 0, width: 220, height: 310, fill: p.bg }));
 
       if (tpl === 'dot') {

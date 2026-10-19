@@ -83,6 +83,8 @@ import '../styles/form.css';
       const pre = new URLSearchParams(location.search).get('type');
       const preType = pre && cfg.types.find((t) => t.id === pre);
       if (preType && preType.href) { location.replace(preType.href); return; }
+      // ?type= 以外のパラメータで項目に値を入れて開ける（例：/contact/?type=paddle&design=...）
+      if (preType) new URLSearchParams(location.search).forEach((v, k) => { if (k !== 'type') state.values[k] = v.slice(0, 300); });
       if (preType) selectType(pre, true);
       else showStep(1, true);
     }).catch(() => { $('#types').innerHTML = '<p class="contact-alert">フォームを読み込めませんでした。時間をおいて再度お試しください。</p>'; });
