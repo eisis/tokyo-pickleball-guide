@@ -167,10 +167,16 @@ import '../styles/form.css';
       allFields().forEach((f) => {
         if (f.type === 'checkbox') v[f.name] = [...form.querySelectorAll(`[name="${f.name}"]:checked`)].map((i) => i.value);
         else if (f.type === 'radio') v[f.name] = (form.querySelector(`[name="${f.name}"]:checked`) || {}).value || '';
-        else v[f.name] = form.elements[f.name].value.trim();
+        else v[f.name] = normalizeValue(f, form.elements[f.name].value.trim());
       });
       return v;
     }
+
+// 項目の normalize / pattern（contact-types.js で指定）。画面とサーバーで同じ規則を使う
+function normalizeValue(f, v) {
+  if (f.normalize === 'digits') return v.replace(/[０-９]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 0xfee0)).replace(/[\s\-‐－ー―〒]/g, '');
+  return v;
+}
 
     function check(v) {
       const errs = {};
@@ -181,6 +187,8 @@ import '../styles/form.css';
         if (f.type === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(x)) errs[f.name] = 'メールアドレスの形式が正しくありません。';
         if (f.type === 'url' && !/^https?:\/\/\S+$/.test(x)) errs[f.name] = 'http(s):// から始まるURLを入力してください。';
         if (f.type === 'number' && (!Number.isInteger(+x) || (f.min != null && +x < f.min) || (f.max != null && +x > f.max))) errs[f.name] = `${f.min}〜${f.max}の数字で入力してください。`;
+        if (f.pattern && !new RegExp(f.pattern).test(x)) errs[f.name] = f.patternMessage || '入力の形式が正しくありません。';
+        if (/https?:\/\//i.test(x) && f.type !== 'url' && f.type !== 'textarea') errs[f.name] = 'URLは入力できません。';
         if (f.confirmOf && !errs[f.name] && x !== v[f.confirmOf]) errs[f.name] = 'メールアドレスが一致しません。';
       });
       if (!$('#agree').checked) errs.agree = 'プライバシーポリシーへの同意が必要です。';

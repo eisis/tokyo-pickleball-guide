@@ -86,6 +86,11 @@ function sendConfig(res) {
 }
 
 // ---------------- 検証 ----------------
+// 項目の normalize / pattern（contact-types.js で指定）。画面とサーバーで同じ規則を使う
+function normalizeValue(f, v) {
+  if (f.normalize === 'digits') return v.replace(/[０-９]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 0xfee0)).replace(/[\s\-‐－ー―〒]/g, '');
+  return v;
+}
 function validate(fields, raw) {
   const values = {};
   const errors = {};
@@ -97,7 +102,7 @@ function validate(fields, raw) {
       values[f.name] = v;
       continue;
     }
-    v = typeof v === 'string' || typeof v === 'number' ? String(v).trim() : '';
+    v = typeof v === 'string' || typeof v === 'number' ? normalizeValue(f, String(v).trim()) : '';
     if (!v) {
       if (f.required) errors[f.name] = '必須項目です。';
       values[f.name] = '';
@@ -108,6 +113,8 @@ function validate(fields, raw) {
     if (f.type === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) errors[f.name] = 'メールアドレスの形式が正しくありません。';
     if (f.type === 'url' && !/^https?:\/\/\S+$/.test(v)) errors[f.name] = 'http(s):// から始まるURLを入力してください。';
     if (f.type === 'tel' && !/^[0-9+\-() ]{8,20}$/.test(v)) errors[f.name] = '電話番号の形式が正しくありません。';
+    if (f.pattern && !new RegExp(f.pattern).test(v)) errors[f.name] = f.patternMessage || '入力の形式が正しくありません。';
+    if (/https?:\/\//i.test(v) && f.type !== 'url' && f.type !== 'textarea') errors[f.name] = 'URLは入力できません。';
     if (f.type === 'number') {
       const n = Number(v);
       if (!Number.isInteger(n) || (f.min != null && n < f.min) || (f.max != null && n > f.max)) errors[f.name] = `${f.min}〜${f.max}の数字で入力してください。`;
