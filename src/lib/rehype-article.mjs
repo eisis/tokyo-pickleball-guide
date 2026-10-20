@@ -4,6 +4,7 @@
 //      > [!POINT]
 //      > ここに大事なことを書く
 //    種類：POINT（ポイント）/ TIP（ワンポイント）/ CAUTION（注意）/ NOTE（メモ）
+//    数字を大きく見せる：[!STAT] の次の行に数字、その次の行に説明（例：> [!STAT]\n> 約2,400万人\n> アメリカでプレーした人）
 // 2. 写真だけの段落は、写真の説明（![ここ](...)）を下に小さく表示する
 // 3. 表は横にスクロールできる枠で包む（スマホではみ出さないように）
 // 4. 安全対策：javascript: などの危険なリンク・画像の指定は無効にする（フォームから載ったイベント本文などに備える）
@@ -36,6 +37,15 @@ function transform(node) {
     if (child.tagName === 'blockquote') {
       const firstP = child.children.find((c) => c.type === 'element' && c.tagName === 'p');
       const firstText = firstP?.children?.[0];
+      const statM = firstText?.type === 'text' && firstText.value.match(/^\s*\[!STAT\]\s*/);
+      if (statM) {
+        const lines = firstP.children.map((c) => (c.type === 'text' ? c.value : '')).join('').replace(statM[0], '').split('\n').map((l) => l.trim()).filter(Boolean);
+        const [num, ...rest] = lines;
+        return el('aside', { className: ['stat'] }, [
+          el('p', { className: ['stat-num'] }, [{ type: 'text', value: num ?? '' }]),
+          ...(rest.length ? [el('p', { className: ['stat-cap'] }, [{ type: 'text', value: rest.join(' ') }])] : []),
+        ]);
+      }
       const m = firstText?.type === 'text' && firstText.value.match(/^\s*\[!(POINT|TIP|CAUTION|NOTE)\]\s*/);
       if (m) {
         const kind = m[1];

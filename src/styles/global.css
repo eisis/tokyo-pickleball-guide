@@ -685,3 +685,9 @@ html[lang="en"] .hero h1 { font-family: var(--display); font-weight: 800; letter
 
 /* トップ：エリア別ページへのリンク */
 .area-page-links { display: flex; flex-wrap: wrap; gap: 8px 16px; margin-top: 14px; font-size: .9rem; color: var(--ink-soft); }
+
+/* 数字を大きく見せる箱（[!STAT]） */
+.stat { margin: 1.8em 0; padding: 26px 20px 22px; border-radius: 18px; text-align: center; color: #fff;
+  background: linear-gradient(135deg, var(--navy) 0%, #1f7fb8 100%); box-shadow: var(--shadow); }
+.stat .stat-num { margin: 0; font-family: var(--display); font-weight: 900; font-size: clamp(2.2rem, 8vw, 3.2rem); line-height: 1.15; color: #ffd678; letter-spacing: .01em; }
+.stat .stat-cap { margin: 8px 0 0; font-size: .95rem; font-weight: 700; color: #d8ecf8; line-height: 1.6; }
