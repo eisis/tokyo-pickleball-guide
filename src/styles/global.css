@@ -682,3 +682,6 @@ html[lang="en"] .hero h1 { font-family: var(--display); font-weight: 800; letter
 .article-cover.fit-contain img, .article-cover.fit-contain img { aspect-ratio: auto; object-fit: contain; }
 .pcard-media.fit-contain img { object-fit: contain; }
 .pcard-media.fit-contain { background: #1f7fb8; }
+
+/* トップ：エリア別ページへのリンク */
+.area-page-links { display: flex; flex-wrap: wrap; gap: 8px 16px; margin-top: 14px; font-size: .9rem; color: var(--ink-soft); }

@@ -1,7 +1,7 @@
 ---
 // 全ページ共通の枠（ヘッダー・フッター・言語切替）。ページごとに title と description を渡す
 import '../styles/global.css';
-import { SITE } from '../lib/site';
+import { SITE, ldJson } from '../lib/site';
 import SnsLinks from '../components/SnsLinks.astro';
 
 interface Props {
@@ -16,6 +16,23 @@ const ogImage = new URL(image || '/og-default.png', Astro.site).href;
 const siteName = SITE.name;
 const fullTitle = title === siteName ? title : `${title} | ${siteName}`;
 const canonical = new URL(Astro.url.pathname, Astro.site);
+// サイト全体の構造化データ：サイトと運営者（SNS・問い合わせ先）を1つの存在として結びつける
+const siteLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    { '@type': 'WebSite', '@id': `${SITE.url}/#website`, name: SITE.name, url: `${SITE.url}/`, inLanguage: 'ja', publisher: { '@id': `${SITE.url}/#org` } },
+    {
+      '@type': 'Organization',
+      '@id': `${SITE.url}/#org`,
+      name: SITE.name,
+      url: `${SITE.url}/`,
+      logo: `${SITE.url}/icon-512.png`,
+      email: 'info@pickleball-tokyo.com',
+      areaServed: ['東京都', '神奈川県', '千葉県', '埼玉県'],
+      sameAs: ['https://www.instagram.com/pickleballtokyo/', 'https://x.com/pickleballtokyo'],
+    },
+  ],
+};
 ---
 
 <!doctype html>
@@ -31,7 +48,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
     <link rel="icon" href="/icon-192.png" type="image/png" sizes="192x192">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-    <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Pickleball Tokyo","url":"https://www.pickleball-tokyo.com/"}</script>
+    <script type="application/ld+json" set:html={ldJson(siteLd)} />
     <meta name="description" content={description} />
     {noindex && <meta name="robots" content="noindex, nofollow" />}
     <link rel="canonical" href={canonical} />

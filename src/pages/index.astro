@@ -106,6 +106,10 @@ const upcoming = (await getUpcomingEvents()).slice(0, 4);
           </button>
         ))}
       </div>
+      <p class="area-page-links">
+        <span data-ja="エリア別の一覧ページ：" data-en="Area pages: ">エリア別の一覧ページ：</span>
+        {areas.filter((a) => a.count > 0).map((a) => <a href={`/areas/${a.id}/`}><span data-ja={`${a.ja}のコート`} data-en={a.en}>{a.ja}のコート</span></a>)}
+      </p>
     </section>
 
     <!-- コート運営者向け：掲載依頼の入口（スマホではヘッダーのボタンが隠れるので、ここが主な入口） -->

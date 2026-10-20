@@ -5,7 +5,8 @@ import Base from '../../layouts/Base.astro';
 import CourtMap from '../../components/CourtMap.astro';
 import EventCard from '../../components/EventCard.astro';
 import { getUpcomingEvents } from '../../lib/events';
-import { getCourts, PREFECTURES, ENVIRONMENTS, mapUrl, isNew, rentalText, reservationText, type Court } from '../../lib/courts';
+import { getCourts, PREFECTURES, ENVIRONMENTS, mapUrl, courtUrl, isNew, rentalText, reservationText, type Court } from '../../lib/courts';
+import { SITE, ldJson } from '../../lib/site';
 
 export async function getStaticPaths() {
   const courts = await getCourts();
@@ -20,12 +21,41 @@ const env = d.environment.map((e) => ENVIRONMENTS[e].ja).join('・');
 const pref = PREFECTURES[d.prefecture].full;
 const bookLabel = d.booking.label === 'info' ? '公式サイトで詳細を見る →' : '公式サイトで予約する →';
 const ymd = (date: Date) => date.toISOString().slice(0, 10);
+// 構造化データ：検索エンジンとAIに「どこにある、どんな施設か」を正確に伝える。書いてある項目だけを出す
+const pageUrl = SITE.url + courtUrl(court);
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'SportsActivityLocation',
+      '@id': `${pageUrl}#place`,
+      name: d.name,
+      description: d.description.ja,
+      url: pageUrl,
+      sameAs: [d.officialUrl ?? d.booking.url],
+      ...(d.image ? { image: new URL(d.image, SITE.url).href } : {}),
+      address: { '@type': 'PostalAddress', addressRegion: pref, addressCountry: 'JP', ...(d.address ? { streetAddress: d.address } : {}) },
+      ...(d.location ? { geo: { '@type': 'GeoCoordinates', latitude: d.location.lat, longitude: d.location.lng } } : {}),
+      amenityFeature: d.environment.map((e) => ({ '@type': 'LocationFeatureSpecification', name: ENVIRONMENTS[e].ja, value: true })),
+      hasMap: mapUrl(court),
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'トップ', item: SITE.url + '/' },
+        { '@type': 'ListItem', position: 2, name: `${PREFECTURES[d.prefecture].ja}のコート`, item: `${SITE.url}/areas/${d.prefecture}/` },
+        { '@type': 'ListItem', position: 3, name: d.name, item: pageUrl },
+      ],
+    },
+  ],
+};
 const desc = `${d.name}（${pref}・${d.area.ja}）のピックルボールコート情報。${d.description.ja}`;
 ---
 
 <Base title={`${d.name}｜${d.area.ja}のピックルボールコート`} description={desc} image={d.image}>
+  <script slot="head" type="application/ld+json" set:html={ldJson(jsonLd)} />
   <main class="container narrow">
-    <p class="meta"><a href="/">← コート一覧</a></p>
+    <nav class="crumbs" aria-label="パンくず"><a href="/">トップ</a><span aria-hidden="true">›</span><a href={`/areas/${d.prefecture}/`}>{PREFECTURES[d.prefecture].ja}のコート</a></nav>
     <h1 style="margin:12px 0 20px;color:var(--navy)">{d.name}{isNew(court) && <span class="new-label">NEW</span>}</h1>
     {d.ownerVerified && <p class="owner-verified">✓ 施設の運営者が掲載している情報です</p>}
 

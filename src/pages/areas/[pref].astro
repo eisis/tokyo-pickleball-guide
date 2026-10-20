@@ -1,0 +1,117 @@
+---
+// エリア（都道府県）別のコート一覧ページ（例: /areas/tokyo/）
+// 「ピックルボール 東京」のような地名での検索と、AIの回答に引用されることを狙ったページ。
+// 本文の数字・コート名はすべて掲載データから自動で作る（推測の文章は書かない）
+import Base from '../../layouts/Base.astro';
+import CourtCard from '../../components/CourtCard.astro';
+import CourtMap from '../../components/CourtMap.astro';
+import { getCourts, PREFECTURES, courtUrl, hasRental, type Court } from '../../lib/courts';
+import { SITE, ldJson } from '../../lib/site';
+
+type Pref = keyof typeof PREFECTURES;
+
+export async function getStaticPaths() {
+  const courts = await getCourts();
+  return (Object.keys(PREFECTURES) as Pref[])
+    .filter((p) => courts.some((c) => c.data.prefecture === p))
+    .map((p) => ({ params: { pref: p }, props: { pref: p } }));
+}
+
+const { pref } = Astro.props as { pref: Pref };
+const P = PREFECTURES[pref];
+const all = await getCourts();
+const courts = all.filter((c) => c.data.prefecture === pref);
+const others = (Object.keys(PREFECTURES) as Pref[]).filter((p) => p !== pref && all.some((c) => c.data.prefecture === p));
+
+const names = (list: Court[]) => list.map((c) => c.data.name);
+const indoor = courts.filter((c) => c.data.environment.includes('indoor'));
+const outdoor = courts.filter((c) => c.data.environment.includes('outdoor'));
+const rental = courts.filter(hasRental);
+const walkin = courts.filter((c) => c.data.reservation?.includes('walkin'));
+const spots = [...new Set(courts.map((c) => c.data.area.ja))];
+const latest = new Date(Math.max(...courts.map((c) => c.data.updatedAt.getTime())));
+const ymd = (d: Date) => d.toISOString().slice(0, 10);
+
+// 掲載データから答えられる質問だけを出す（該当コートがない質問は出さない）
+const faqs = [
+  indoor.length > 0 && { q: `${P.ja}で屋内のピックルボールコートはありますか？`, a: `掲載中のコートのうち、屋内で打てるのは${names(indoor).join('、')}の${indoor.length}か所です。` },
+  outdoor.length > 0 && { q: `${P.ja}で屋外のピックルボールコートはありますか？`, a: `掲載中のコートのうち、屋外で打てるのは${names(outdoor).join('、')}の${outdoor.length}か所です。` },
+  rental.length > 0 && { q: `パドルなどの道具を持っていなくても大丈夫ですか？`, a: `${names(rental).join('、')}では道具のレンタルがあると公式情報で確認できています。料金や内容は各コートのページをご覧ください。` },
+  walkin.length > 0 && { q: `予約なしで行けるコートはありますか？`, a: `${names(walkin).join('、')}は当日受付に対応していると確認できています。混雑状況は公式サイトでご確認ください。` },
+].filter(Boolean) as { q: string; a: string }[];
+
+const pageUrl = `${SITE.url}/areas/${pref}/`;
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'CollectionPage',
+      name: `${P.ja}のピックルボールコート一覧`,
+      url: pageUrl,
+      dateModified: ymd(latest),
+      isPartOf: { '@id': `${SITE.url}/#website` },
+      mainEntity: {
+        '@type': 'ItemList',
+        numberOfItems: courts.length,
+        itemListElement: courts.map((c, i) => ({ '@type': 'ListItem', position: i + 1, name: c.data.name, url: SITE.url + courtUrl(c) })),
+      },
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'トップ', item: SITE.url + '/' },
+        { '@type': 'ListItem', position: 2, name: `${P.ja}のコート`, item: pageUrl },
+      ],
+    },
+  ],
+};
+---
+
+<Base
+  title={`${P.ja}のピックルボールコート一覧（${courts.length}か所）`}
+  description={`${P.full}でピックルボールができるコート${courts.length}か所（${spots.join('・')}）を、屋内・屋外、道具のレンタル、予約方法で比べられる一覧です。公式情報で確認した内容だけを載せています。`}
+>
+  <script slot="head" type="application/ld+json" set:html={ldJson(jsonLd)} />
+  <main class="container">
+    <nav class="crumbs" aria-label="パンくず"><a href="/">トップ</a><span aria-hidden="true">›</span><span>{P.ja}のコート</span></nav>
+    <h1 style="margin:0 0 12px;color:var(--navy)">{P.ja}のピックルボールコート一覧</h1>
+    <p class="description">
+      {P.full}でピックルボールができる場所を{courts.length}か所掲載しています（{spots.join('・')}）。
+      屋内コートが{indoor.length}か所、屋外コートが{outdoor.length}か所です。
+      料金・営業時間・予約方法は各施設の公式情報で確認したものだけを載せています。
+    </p>
+    <p class="meta">情報の最終確認日：{ymd(latest)}</p>
+
+    <div class="cards" style="margin-top:20px">
+      {courts.map((court) => <CourtCard court={court} />)}
+    </div>
+
+    {courts.some((c) => c.data.location) && <div style="margin-top:28px"><CourtMap courts={courts} /></div>}
+
+    {faqs.length > 0 && (
+      <section class="area-faq" style="margin-top:36px">
+        <h2 style="font-size:1.2rem;color:var(--navy);margin-bottom:12px">{P.ja}でピックルボールをするときのよくある質問</h2>
+        {faqs.map((f) => (
+          <details>
+            <summary>{f.q}</summary>
+            <p>{f.a}</p>
+          </details>
+        ))}
+      </section>
+    )}
+
+    <section style="margin-top:36px">
+      <h2 style="font-size:1.1rem;color:var(--navy);margin-bottom:10px">ほかのエリアから探す</h2>
+      <p class="area-links">{others.map((p) => <a href={`/areas/${p}/`}>{PREFECTURES[p].ja}のコート</a>)}</p>
+      <p class="meta"><a href="/this-week/">今週参加できる練習会・体験会を見る</a>　<a href="/events/">大会・イベント一覧を見る</a></p>
+    </section>
+  </main>
+</Base>
+
+<style>
+  .area-faq details { border-top: 1px solid var(--line, #e5e7eb); padding: 12px 0; }
+  .area-faq details:last-child { border-bottom: 1px solid var(--line, #e5e7eb); }
+  .area-faq summary { cursor: pointer; font-weight: 700; color: var(--navy); }
+  .area-faq p { margin: 8px 0 0; line-height: 1.8; }
+  .area-links { display: flex; flex-wrap: wrap; gap: 10px 18px; }
+</style>
