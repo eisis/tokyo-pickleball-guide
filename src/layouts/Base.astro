@@ -3,6 +3,7 @@
 import '../styles/global.css';
 import { SITE, ldJson } from '../lib/site';
 import SnsLinks from '../components/SnsLinks.astro';
+import Analytics from '@vercel/analytics/astro';
 
 interface Props {
   title: string;
@@ -71,6 +72,7 @@ const siteLd = {
       gtag('config', 'G-DJ5EQR4TPG');
     </script>
     <slot name="head" />
+    <Analytics />
   </head>
   <body>
     <header class="site-header">
