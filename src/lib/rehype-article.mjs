@@ -5,7 +5,7 @@
 //      > ここに大事なことを書く
 //    種類：POINT（ポイント）/ TIP（ワンポイント）/ CAUTION（注意）/ NOTE（メモ）
 //    数字を大きく見せる：[!STAT] の次の行に数字、その次の行に説明（例：> [!STAT]\n> 約2,400万人\n> アメリカでプレーした人）
-// 2. 写真だけの段落は、写真の説明（![ここ](...)）を下に小さく表示する
+// 2. 写真だけの段落は、写真の枠（figure）で包む。説明文（alt）は画面には出さない（読み上げ・検索用）
 // 3. 表は横にスクロールできる枠で包む（スマホではみ出さないように）
 // 4. 安全対策：javascript: などの危険なリンク・画像の指定は無効にする（フォームから載ったイベント本文などに備える）
 
@@ -59,14 +59,13 @@ function transform(node) {
       }
     }
 
-    // 2. 写真だけの段落 → 説明つきの写真
+    // 2. 写真だけの段落 → 写真の枠（altは画面に出さない）
     if (child.tagName === 'p') {
       const parts = child.children.filter((c) => !isBlank(c));
       if (parts.length === 1 && parts[0].type === 'element' && parts[0].tagName === 'img') {
         const img = parts[0];
         img.properties.loading = 'lazy';
-        const alt = img.properties.alt;
-        return el('figure', { className: ['photo'] }, alt ? [img, el('figcaption', {}, [{ type: 'text', value: alt }])] : [img]);
+        return el('figure', { className: ['photo'] }, [img]);
       }
     }
 
