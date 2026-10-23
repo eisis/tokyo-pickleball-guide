@@ -10,8 +10,9 @@ interface Props {
   description: string;
   image?: string; // SNSで共有したときの画像（/images/... または https://...）
   noindex?: boolean; // 検索結果に出さない（準備中のページなど）
+  robots?: string; // 個別指定（例: 'noindex, follow' = 検索には出さないがリンクはたどってもらう）
 }
-const { title, description, image, noindex } = Astro.props;
+const { title, description, image, noindex, robots } = Astro.props;
 // SNS で共有したときの画像。ページごとの画像がなければサイト共通のカード画像（public/og-default.png）を使う
 const ogImage = new URL(image || '/og-default.png', Astro.site).href;
 const siteName = SITE.name;
@@ -51,7 +52,7 @@ const siteLd = {
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
     <script type="application/ld+json" set:html={ldJson(siteLd)} />
     <meta name="description" content={description} />
-    {noindex && <meta name="robots" content="noindex, nofollow" />}
+    {robots ? <meta name="robots" content={robots} /> : noindex && <meta name="robots" content="noindex, nofollow" />}
     <link rel="canonical" href={canonical} />
     <link rel="sitemap" href="/sitemap.xml" />
     <meta property="og:title" content={fullTitle} />

@@ -64,7 +64,7 @@ const jsonLd = {
 };
 ---
 
-<Base title={`${d.title}｜ピックルボールの${type.ja}`} description={desc} image={d.image ?? venue.court?.data.image}>
+<Base title={`${d.title}｜ピックルボールの${type.ja}`} description={desc} image={d.image ?? venue.court?.data.image} robots={d.organizer.self ? undefined : 'noindex, follow'}>
   <script slot="head" type="application/ld+json" set:html={ldJson(jsonLd)} />
   <main class="container narrow">
     <nav class="crumbs" aria-label="パンくず"><a href="/">トップ</a><span aria-hidden="true">›</span><a href="/events/">イベント</a></nav>
