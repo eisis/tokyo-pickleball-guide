@@ -112,19 +112,15 @@ footer(d, 2); im.save(f'{OUT}/02.png')
 
 # ---------- 3 靴 ----------
 im, d, top = head('靴', ['靴は、ふだんの', '運動靴でOK'], ['サンダルや革靴は避けましょう。'])
-label(d, 540, top + 82, '運動靴', ok=True, size=44)
-shadow(im, 540, top + 392, 420)
-put(im, I.sneaker(), 480, 540, bottom=top + 392)
+# 3つとも上から見た図・同じ大きさ・つま先が上で並べる
+sb_ = top + (1230 - top) / 2 + 150
+for cx, item in ((230, I.sneaker_top()), (540, I.sandal()), (850, I.loafer())):
+    shadow(im, cx, sb_ - 4, 170, 22)
+    put(im, item, 180, cx, bottom=sb_)
 d = ImageDraw.Draw(im)
-div = top + 440
-d.line([(120, div), (960, div)], fill=(232, 226, 214), width=4)
-nb = 1145
-for cx in (300, 780): shadow(im, cx, nb - 2, 260, 24)
-put(im, I.sandal(), 320, 300, bottom=nb)
-put(im, I.loafer(), 320, 780, bottom=nb)
-d = ImageDraw.Draw(im)
-label(d, 300, 1200, 'サンダル', ok=False, size=36)
-label(d, 780, 1200, '革靴', ok=False, size=36)
+label(d, 230, sb_ + 76, '運動靴', ok=True, size=40)
+label(d, 540, sb_ + 76, 'サンダル', ok=False, size=40)
+label(d, 850, sb_ + 76, '革靴', ok=False, size=40)
 footer(d, 3); im.save(f'{OUT}/03.png')
 
 # ---------- 4 屋内 ----------

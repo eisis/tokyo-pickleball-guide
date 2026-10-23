@@ -40,30 +40,51 @@ def sneaker(upper='#F3F5F7', accent=NAVY, tab=CORAL, sole='#FFFFFF', outsole=NAV
     return g, 400, 220
 
 
-def sandal():
-    """シャワーサンダル（横から見た図、右向き）。運動靴と同じ viewBox 400×220・同じ縮尺"""
-    g = '''
-    <path d="M30 210 H372 Q392 210 394 196 Q396 182 380 178 L46 168 Q24 168 22 186 Q20 210 30 210 Z" fill="#3E4A55"/>
-    <path d="M26 178 Q28 160 48 158 L376 168 Q392 170 390 180 L26 182 Z" fill="#E9E1D3"/>
-    <path d="M140 170 C146 124 192 104 250 104 C304 104 344 126 372 170 Z" fill="#1F7FB8"/>
-    <path d="M160 168 C166 132 202 116 250 116 C294 116 328 134 350 168" fill="none" stroke="#FFFFFF" stroke-width="4" opacity="0.35"/>
-    <path d="M196 120 C228 112 272 112 302 122" fill="none" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round" opacity="0.5"/>
+# ---- 上から見た靴（3つとも同じ足型・同じ大きさ・つま先が上）。viewBox 160×340 ----
+FOOT = ("M80 10 C122 10 146 44 148 96 C150 140 140 170 136 210 C132 250 140 290 120 316 "
+        "C106 332 54 332 40 316 C20 290 28 250 24 210 C20 170 10 140 12 96 C14 44 38 10 80 10 Z")
+
+
+def sneaker_top(upper='#F3F5F7', accent=NAVY, tab=CORAL):
+    """運動靴（上から）"""
+    g = f'''
+    <path d="{FOOT}" fill="#FFFFFF" stroke="{LINE}" stroke-width="4"/>
+    <g transform="translate(80 170) scale(0.9) translate(-80 -170)"><path d="{FOOT}" fill="{upper}" stroke="{LINE}" stroke-width="3"/></g>
+    <path d="M36 70 C40 34 120 34 124 70" fill="none" stroke="{LINE}" stroke-width="3" stroke-dasharray="6 6"/>
+    <rect x="56" y="78" width="48" height="140" rx="20" fill="{accent}"/>
     '''
-    return g, 400, 220
+    for y in (96, 122, 148, 174, 200):
+        g += f'<path d="M50 {y} H110" stroke="#FFFFFF" stroke-width="7" stroke-linecap="round"/>'
+    g += f'''
+    <ellipse cx="80" cy="262" rx="34" ry="42" fill="{accent}"/>
+    <ellipse cx="80" cy="266" rx="24" ry="32" fill="#2A3B4A"/>
+    <rect x="68" y="304" width="24" height="22" rx="6" fill="{tab}"/>
+    '''
+    return g, 160, 340
+
+
+def sandal():
+    """ビーチサンダル（上から）"""
+    g = f'''
+    <path d="{FOOT}" fill="#E9DCC6" stroke="#C9B590" stroke-width="4"/>
+    <g transform="translate(80 170) scale(0.88) translate(-80 -170)"><path d="{FOOT}" fill="#F4EBDC"/></g>
+    <path d="M80 62 C58 84 34 116 26 146 M80 62 C102 84 126 116 134 146" fill="none" stroke="{SEA}" stroke-width="16" stroke-linecap="round"/>
+    <circle cx="80" cy="62" r="10" fill="{SEA}"/>
+    '''
+    return g, 160, 340
 
 
 def loafer():
-    """革靴（横から見た図、右向き）。運動靴と同じ viewBox 400×220・同じ縮尺"""
-    g = '''
-    <path d="M30 196 C22 164 26 136 44 126 C70 120 100 122 128 126 C144 114 196 108 246 118
-             C290 128 330 142 362 158 C386 170 394 182 390 192 C388 196 384 198 378 198 L30 198 Z" fill="#5A3A26"/>
-    <path d="M160 122 C220 112 300 132 362 160" fill="none" stroke="#3E2818" stroke-width="4"/>
-    <path d="M144 134 C196 124 236 128 270 140" fill="none" stroke="#3E2818" stroke-width="12" stroke-linecap="round"/>
-    <path d="M250 124 C300 132 344 150 372 168" fill="none" stroke="#8A5E42" stroke-width="6" stroke-linecap="round" opacity="0.8"/>
-    <path d="M44 128 C70 124 100 126 128 128" fill="none" stroke="#3E2818" stroke-width="5" stroke-linecap="round"/>
-    <path d="M24 196 H384 Q394 196 394 202 Q394 208 384 208 H96 V214 H28 Q22 214 22 206 Z" fill="#2A1A10"/>
+    """革靴（上から）"""
+    g = f'''
+    <path d="{FOOT}" fill="#2A1A10"/>
+    <g transform="translate(80 170) scale(0.93) translate(-80 -170)"><path d="{FOOT}" fill="#5A3A26"/></g>
+    <path d="M36 150 C30 70 130 70 124 150" fill="none" stroke="#3E2818" stroke-width="5"/>
+    <path d="M44 66 C60 40 100 40 116 66" fill="none" stroke="#8A5E42" stroke-width="8" stroke-linecap="round" opacity="0.7"/>
+    <ellipse cx="80" cy="250" rx="40" ry="64" fill="#24160D"/>
+    <rect x="34" y="162" width="92" height="20" rx="8" fill="#3E2818"/>
     '''
-    return g, 400, 220
+    return g, 160, 340
 
 
 def bottle(body=SEA, cap=NAVY):
