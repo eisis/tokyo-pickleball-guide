@@ -150,22 +150,24 @@ label(d, 300, sb - 210, '外の靴', size=36, c=GREY)
 label(d, 780, sb - 210, '室内用の靴', size=36, c=SEA)
 footer(d, 4); im.save(f'{OUT}/04.png')
 
-# ---------- 5 道具 ----------
-im, d, top = head('道具', ['パドルは、', '借りられる'], ['借りられるコートが多く、', '施設によっては靴まで借りられます。'])
-pill(d, 100, top + 40, 'レンタルOK', font('Black', 36), CORAL, WHITE)
-t2 = '手ぶらで行けるところも'; f2 = font('Black', 34)
-pill(d, 980 - d.textlength(t2, font=f2) - 44, top + 42, t2, f2, KIT, WHITE, padx=22, pady=12)
-base = 1160
-p1 = paddle(width=180, angle=-14); p2 = paddle(width=180, angle=14, face=(255, 107, 74), face2=(235, 90, 60), accent=(255, 214, 120))
+# ---------- 5 道具：借りられる物を並べ、それぞれの下に名前と「レンタルOK」 ----------
+im, d, top = head('道具', ['道具は、', '借りられる'], ['パドルを借りられるコートが多く、', '施設によっては靴も借りられます。'])
+label(d, 540, top + 74, '借りられるもの', size=38, c=GREY)
+base = 1042
+p1 = paddle(width=158, angle=-14); p2 = paddle(width=158, angle=14, face=(255, 107, 74), face2=(235, 90, 60), accent=(255, 214, 120))
 def vis_bottom(p):  # 透明な余白をのぞいた、絵の下端
     return p.getchannel('A').getbbox()[3]
-shadow(im, 315, base - 2, 280)
-im.paste(p1, (int(250 - p1.width / 2), base - vis_bottom(p1)), p1)
-im.paste(p2, (int(385 - p2.width / 2), base + 4 - vis_bottom(p2)), p2)
-shadow(im, 805, base - 2, 320)
-put(im, I.sneaker(), 340, 805, bottom=base)
-place_ball(im, 545, base - 300, 32, glow=False)
+shadow(im, 300, base - 2, 260)
+im.paste(p1, (int(240 - p1.width / 2), base - vis_bottom(p1)), p1)
+im.paste(p2, (int(368 - p2.width / 2), base + 4 - vis_bottom(p2)), p2)
+
+place_ball(im, 462, base - 250, 32, glow=False)
+shadow(im, 770, base - 2, 320)
+put(im, I.sneaker(), 330, 770, bottom=base)
 d = ImageDraw.Draw(im)
+for cx, name, tag, col in ((300, 'パドル', 'レンタルOK', CORAL), (770, 'シューズ', '施設によってOK', SEA)):
+    label(d, cx, base + 70, name, size=44)
+    pill(d, cx, base + 100, tag, font('Black', 32), col, WHITE, anchor='c', padx=22, pady=10)
 footer(d, 5); im.save(f'{OUT}/05.png')
 
 # ---------- 6 あると安心 ----------

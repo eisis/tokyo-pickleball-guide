@@ -243,37 +243,63 @@ def _layer2(lift, sx, sy, fill, oy=300):
             f'<path d="{FOOT}" fill="{fill}"/></g></g>')
 
 
+def _hw(y):
+    """足型の半分の幅（上から見た図、y はつま先0〜かかと340）"""
+    pts = [(10, 0), (30, 40), (60, 60), (100, 68), (150, 64), (200, 56), (250, 54), (290, 46), (320, 30), (332, 0)]
+    for (y0, w0), (y1, w1) in zip(pts, pts[1:]):
+        if y0 <= y <= y1: return w0 + (w1 - w0) * (y - y0) / (y1 - y0)
+    return 0
+
+
 def sneaker34():
     g = _ground()
-    g += _stack(0, 8, 1.0, 1.0, '#1A3550', '#0E3452', n=4)              # 底（紺）
-    g += _stack(8, 28, 1.0, 0.99, '#C9D1D8', '#FFFFFF', n=10)            # ミッドソール（白）
-    # アッパー：横幅はあまり細くせず、前から後ろへ短くしていく → つま先は低く、かかとの履き口がいちばん高い
-    H0, H1, n = 28, 120, 40
-    SX = lambda t: 0.96 - 0.16 * t
-    SY = lambda t: 0.97 - 0.6 * (t ** 0.8)
+    g += _stack(0, 7, 1.0, 1.0, '#13304A', '#0E3452', n=4)              # 底（紺のゴム）
+    g += _stack(7, 30, 1.0, 0.995, '#C3CCD4', '#FFFFFF', n=12)           # ミッドソール（白・厚め）
+    # アッパー：つま先は低く、履き口（かかと側）がいちばん高い。横幅はほぼ保ち、前後を短くしていく
+    H0, H1, n = 30, 104, 40
+    SX = lambda t: 0.95 - 0.10 * t
+    SY = lambda t: 0.96 - 0.50 * (t ** 0.85)
     for i in range(n + 1):
         t = i / n
-        g += _layer2(H0 + (H1 - H0) * t, SX(t), SY(t), _mix('#CBD3DB', '#F8FAFB', t))
-    # 甲の坂：ベロ（紺）と靴ひも
+        g += _layer2(H0 + (H1 - H0) * t, SX(t), SY(t), _mix('#C9D2DA', '#F8FAFB', t))
+    # つま先の補強（うすいグレー）
+    for i in range(0, 12):
+        t = i / 40
+        sx, sy, lift = SX(t), SY(t), H0 + (H1 - H0) * t
+        g += (f'<g transform="translate(0 {-lift:.1f}) {PROJ}"><g transform="translate(80 300) scale({sx:.3f} {sy:.3f}) translate(-80 -300)">'
+              f'<clipPath id="tc{i}"><rect x="0" y="0" width="160" height="70"/></clipPath>'
+              f'<path d="{FOOT}" fill="{_mix("#D5DCE3", "#E9EEF2", i / 11)}" clip-path="url(#tc{i})"/></g></g>')
+    # 手前の横の、紺のライン（なめらかに、かかとへ少し上がる）
+    side = []
+    for i in range(16):
+        yy = 120 + 175 * i / 15
+        t = 0.22 + 0.25 * (i / 15) ** 1.5
+        sx, sy, lift = SX(t), SY(t), H0 + (H1 - H0) * t
+        side.append(_proj(80 + _hw(yy) * sx, 300 + (yy - 300) * sy, lift))
+    d = 'M' + ' L'.join(f'{px:.1f} {py:.1f}' for px, py in side)
+    g += f'<path d="{d}" fill="none" stroke="#0E3452" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>'
+    # ベロと靴ひも（甲の坂）
     pts = []
-    for i in range(0, 21):
-        t = 0.18 + 0.8 * i / 20
+    for i in range(21):
+        t = 0.2 + 0.78 * i / 20
         sy = SY(t); lift = H0 + (H1 - H0) * t
-        yf = 300 + (10 - 300) * sy + 18
-        pts.append(_proj(80, yf, lift))
+        pts.append(_proj(80, 300 + (10 - 300) * sy + 20, lift))
     d = 'M' + ' L'.join(f'{px:.1f} {py:.1f}' for px, py in pts)
-    g += f'<path d="{d}" fill="none" stroke="#0E3452" stroke-width="30" stroke-linecap="round" stroke-linejoin="round"/>'
-    for i in range(1, 20, 3):
-        t = 0.18 + 0.8 * i / 20
+    g += f'<path d="{d}" fill="none" stroke="#E4E9EE" stroke-width="34" stroke-linecap="round" stroke-linejoin="round"/>'
+    g += f'<path d="{d}" fill="none" stroke="#0E3452" stroke-width="5" stroke-linecap="round" opacity="0.25"/>'
+    for i in range(2, 21, 3):
+        t = 0.2 + 0.78 * i / 20
         sy = SY(t); sx = SX(t); lift = H0 + (H1 - H0) * t
-        yf = 300 + (10 - 300) * sy + 18
+        yf = 300 + (10 - 300) * sy + 20
         p1 = _proj(80 - 22 * sx, yf, lift); p2 = _proj(80 + 22 * sx, yf, lift)
-        g += f'<path d="M{p1[0]:.1f} {p1[1]:.1f} L{p2[0]:.1f} {p2[1]:.1f}" stroke="#FFFFFF" stroke-width="5" stroke-linecap="round"/>'
-    # 履き口とかかとのつまみ（いちばん上の段）
+        g += f'<path d="M{p1[0]:.1f} {p1[1]:.1f} L{p2[0]:.1f} {p2[1]:.1f}" stroke="#0E3452" stroke-width="6" stroke-linecap="round"/>'
+    # 履き口：やわらかい白いふち＋中は濃い色、かかとのつまみ
     sx1, sy1 = SX(1), SY(1)
     g += (f'<g transform="translate(0 {-H1}) {PROJ}"><g transform="translate(80 300) scale({sx1:.3f} {sy1:.3f}) translate(-80 -300)">'
-          '<ellipse cx="80" cy="236" rx="54" ry="84" fill="#0E3452"/><ellipse cx="80" cy="242" rx="42" ry="72" fill="#22374A"/>'
-          '<rect x="64" y="318" width="32" height="18" rx="7" fill="#FF6B4A"/></g></g>')
+          '<rect x="50" y="10" width="60" height="110" rx="26" fill="#E4E9EE"/><path d="M58 40 H102 M58 70 H102 M58 100 H102" stroke="#0E3452" stroke-width="6" stroke-linecap="round"/><ellipse cx="80" cy="212" rx="58" ry="110" fill="#E3E8ED"/>'
+          '<ellipse cx="80" cy="216" rx="46" ry="96" fill="#2A3D50"/>'
+          '<ellipse cx="80" cy="228" rx="38" ry="78" fill="#1B2B3A"/>'
+          '<rect x="66" y="320" width="28" height="18" rx="7" fill="#FF6B4A"/></g></g>')
     return g, 400, 300
 
 
