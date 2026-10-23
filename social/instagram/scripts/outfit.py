@@ -112,15 +112,15 @@ footer(d, 2); im.save(f'{OUT}/02.png')
 
 # ---------- 3 靴 ----------
 im, d, top = head('靴', ['靴は、ふだんの', '運動靴でOK'], ['サンダルや革靴は避けましょう。'])
-# 3つとも上から見た図・同じ大きさ・つま先が上で並べる
-sb_ = top + (1230 - top) / 2 + 150
-for cx, item in ((230, I.sneaker_top()), (540, I.sandal()), (850, I.loafer())):
-    shadow(im, cx, sb_ - 4, 170, 22)
-    put(im, item, 180, cx, bottom=sb_)
+# 3つとも斜め上から見た立体の図・同じ向き・同じ大きさで並べる
+sb_ = top + (1230 - top) / 2 - 30
+for cx, item in ((225, I.sneaker34()), (540, I.sandal34()), (855, I.loafer34())):
+    put(im, item, 345, cx, cy=sb_)
 d = ImageDraw.Draw(im)
-label(d, 230, sb_ + 76, '運動靴', ok=True, size=40)
-label(d, 540, sb_ + 76, 'サンダル', ok=False, size=40)
-label(d, 850, sb_ + 76, '革靴', ok=False, size=40)
+lb = sb_ + 160
+label(d, 225, lb, '運動靴', ok=True, size=40)
+label(d, 540, lb, 'サンダル', ok=False, size=40)
+label(d, 855, lb, '革靴', ok=False, size=40)
 footer(d, 3); im.save(f'{OUT}/03.png')
 
 # ---------- 4 屋内 ----------

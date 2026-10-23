@@ -193,3 +193,114 @@ if __name__ == '__main__':
         im = render(g, vw, vh, 280)
         sheet.alpha_composite(im, (20 + (i % 5) * 300, 20 + (i // 5) * 440))
     sheet.save(out)
+
+
+# ---- 斜め上から見た靴（立体）。上から見た足型 FOOT を斜めに投影し、少しずつ持ち上げて重ねて厚みを出す ----
+PROJ = 'matrix(0.25 0.62 -0.95 -0.18 341 165)'  # 足型（つま先が上）→ つま先が右・斜め上から見た形
+
+
+def _mix(c1, c2, t):
+    a = [int(c1[i:i + 2], 16) for i in (1, 3, 5)]; b = [int(c2[i:i + 2], 16) for i in (1, 3, 5)]
+    return '#%02x%02x%02x' % tuple(int(a[i] + (b[i] - a[i]) * t) for i in range(3))
+
+
+def _layer(lift, k, fill, ox=80, oy=290, stroke=None, inner=''):
+    st = f' stroke="{stroke}" stroke-width="2.5"' if stroke else ''
+    return (f'<g transform="translate(0 {-lift:.1f}) {PROJ}"><g transform="translate({ox} {oy}) scale({k:.3f}) translate({-ox} {-oy})">'
+            f'<path d="{FOOT}" fill="{fill}"{st}/>{inner}</g></g>')
+
+
+def _stack(h0, h1, k0, k1, c0, c1, n=18, oy=290):
+    g = ''
+    for i in range(n + 1):
+        t = i / n
+        g += _layer(h0 + (h1 - h0) * t, k0 + (k1 - k0) * t, _mix(c0, c1, t), oy=oy)
+    return g
+
+
+def _ground():
+    return ('<defs><radialGradient id="gs"><stop offset="0" stop-color="#0E3452" stop-opacity="0.28"/>'
+            '<stop offset="1" stop-color="#0E3452" stop-opacity="0"/></radialGradient></defs>'
+            '<ellipse cx="196" cy="236" rx="180" ry="30" fill="url(#gs)"/>')
+
+
+def _top(lift, k, inner, oy=290):
+    """いちばん上の段に、足型の座標系で模様を描く"""
+    return (f'<g transform="translate(0 {-lift:.1f}) {PROJ}"><g transform="translate(80 {oy}) scale({k:.3f}) translate(-80 {-oy})">'
+            f'{inner}</g></g>')
+
+
+def _proj(x, y, lift=0):
+    return (0.25 * x - 0.95 * y + 341, 0.62 * x - 0.18 * y + 165 - lift)
+
+
+def _scaled(x, y, k, oy=290):
+    return (80 + (x - 80) * k, oy + (y - oy) * k)
+
+
+def _layer2(lift, sx, sy, fill, oy=300):
+    return (f'<g transform="translate(0 {-lift:.1f}) {PROJ}"><g transform="translate(80 {oy}) scale({sx:.3f} {sy:.3f}) translate(-80 {-oy})">'
+            f'<path d="{FOOT}" fill="{fill}"/></g></g>')
+
+
+def sneaker34():
+    g = _ground()
+    g += _stack(0, 8, 1.0, 1.0, '#1A3550', '#0E3452', n=4)              # 底（紺）
+    g += _stack(8, 28, 1.0, 0.99, '#C9D1D8', '#FFFFFF', n=10)            # ミッドソール（白）
+    # アッパー：横幅はあまり細くせず、前から後ろへ短くしていく → つま先は低く、かかとの履き口がいちばん高い
+    H0, H1, n = 28, 120, 40
+    SX = lambda t: 0.96 - 0.16 * t
+    SY = lambda t: 0.97 - 0.6 * (t ** 0.8)
+    for i in range(n + 1):
+        t = i / n
+        g += _layer2(H0 + (H1 - H0) * t, SX(t), SY(t), _mix('#CBD3DB', '#F8FAFB', t))
+    # 甲の坂：ベロ（紺）と靴ひも
+    pts = []
+    for i in range(0, 21):
+        t = 0.18 + 0.8 * i / 20
+        sy = SY(t); lift = H0 + (H1 - H0) * t
+        yf = 300 + (10 - 300) * sy + 18
+        pts.append(_proj(80, yf, lift))
+    d = 'M' + ' L'.join(f'{px:.1f} {py:.1f}' for px, py in pts)
+    g += f'<path d="{d}" fill="none" stroke="#0E3452" stroke-width="30" stroke-linecap="round" stroke-linejoin="round"/>'
+    for i in range(1, 20, 3):
+        t = 0.18 + 0.8 * i / 20
+        sy = SY(t); sx = SX(t); lift = H0 + (H1 - H0) * t
+        yf = 300 + (10 - 300) * sy + 18
+        p1 = _proj(80 - 22 * sx, yf, lift); p2 = _proj(80 + 22 * sx, yf, lift)
+        g += f'<path d="M{p1[0]:.1f} {p1[1]:.1f} L{p2[0]:.1f} {p2[1]:.1f}" stroke="#FFFFFF" stroke-width="5" stroke-linecap="round"/>'
+    # 履き口とかかとのつまみ（いちばん上の段）
+    sx1, sy1 = SX(1), SY(1)
+    g += (f'<g transform="translate(0 {-H1}) {PROJ}"><g transform="translate(80 300) scale({sx1:.3f} {sy1:.3f}) translate(-80 -300)">'
+          '<ellipse cx="80" cy="236" rx="54" ry="84" fill="#0E3452"/><ellipse cx="80" cy="242" rx="42" ry="72" fill="#22374A"/>'
+          '<rect x="64" y="318" width="32" height="18" rx="7" fill="#FF6B4A"/></g></g>')
+    return g, 400, 300
+
+
+def sandal34():
+    g = _ground()
+    g += _stack(0, 6, 1.0, 1.0, '#7A6248', '#8D7458', n=3)
+    g += _stack(6, 22, 1.0, 1.0, '#C9B48F', '#DCC9A6', n=8)
+    g += _layer(22, 1.0, '#F2E8D6')
+    post = _proj(80, 62, 22); top_ = _proj(80, 62, 40)
+    for side, col, w in ((-1, '#135A85', 20), (1, '#1F7FB8', 18)):
+        ax, ay = (24, 150) if side < 0 else (136, 150)
+        end = _proj(ax, ay, 22)
+        c1 = _proj(80 + side * 20, 84, 62); c2 = _proj(ax + side * 2, ay - 40, 56)
+        g += (f'<path d="M{top_[0]:.1f} {top_[1]:.1f} C{c1[0]:.1f} {c1[1]:.1f} {c2[0]:.1f} {c2[1]:.1f} {end[0]:.1f} {end[1]:.1f}" '
+              f'fill="none" stroke="{col}" stroke-width="{w}" stroke-linecap="round"/>')
+    g += f'<path d="M{post[0]:.1f} {post[1]:.1f} L{top_[0]:.1f} {top_[1]:.1f}" stroke="#1F7FB8" stroke-width="12" stroke-linecap="round"/>'
+    g += f'<circle cx="{top_[0]:.1f}" cy="{top_[1]:.1f}" r="10" fill="#1F7FB8"/>'
+    return g, 400, 300
+
+
+def loafer34():
+    g = _ground()
+    g += _stack(0, 8, 1.0, 1.0, '#1C110A', '#2A1A10', n=4)
+    g += _stack(8, 64, 0.98, 0.7, '#3E2818', '#6B4630', n=24)
+    top = ('<path d="M34 156 C26 70 134 70 126 156" fill="none" stroke="#3E2818" stroke-width="6"/>'
+           '<path d="M46 62 C62 36 98 36 114 62" fill="none" stroke="#9A6C4E" stroke-width="10" stroke-linecap="round" opacity="0.7"/>'
+           '<rect x="32" y="162" width="96" height="22" rx="9" fill="#3E2818"/>'
+           '<ellipse cx="80" cy="252" rx="44" ry="66" fill="#3E2818"/><ellipse cx="80" cy="256" rx="36" ry="58" fill="#1E120A"/>')
+    g += _top(64, 0.7, top)
+    return g, 400, 300
