@@ -40,26 +40,31 @@ def sneaker(upper='#F3F5F7', accent=NAVY, tab=CORAL, sole='#FFFFFF', outsole=NAV
     return g, 400, 220
 
 
-def flipflop():
-    """ビーチサンダル（上から見た図）。viewBox 120×240"""
-    g = f'''
-    <path d="M60 8 C92 8 108 40 104 84 C100 120 92 140 96 176 C100 214 84 234 60 234 C36 234 20 214 24 176
-             C28 140 20 120 16 84 C12 40 28 8 60 8 Z" fill="#E9C9A1" stroke="#B88E62" stroke-width="4"/>
-    <path d="M58 50 C40 70 28 96 24 116 M58 50 C78 70 92 96 98 116" fill="none" stroke="{CORAL}" stroke-width="12" stroke-linecap="round"/>
-    <circle cx="58" cy="50" r="7" fill="{CORAL}"/>
+def sandal():
+    """スポーツサンダル（横から見た図、右向き）。運動靴と同じ viewBox 400×220・同じ縮尺"""
+    g = '''
+    <path d="M28 210 H378 Q394 210 394 198 Q394 186 378 184 L44 176 Q24 176 22 192 Q20 210 28 210 Z" fill="#6E5039"/>
+    <path d="M26 186 Q26 168 46 168 L372 176 Q390 178 390 188 L26 190 Z" fill="#D9B48A"/>
+    <path d="M46 168 C38 124 70 104 116 112" fill="none" stroke="#3B2A20" stroke-width="16" stroke-linecap="round"/>
+    <path d="M128 172 C132 104 236 96 248 174" fill="none" stroke="#3B2A20" stroke-width="26"/>
+    <path d="M262 176 C268 122 336 118 352 180" fill="none" stroke="#3B2A20" stroke-width="26"/>
+    <rect x="104" y="100" width="24" height="22" rx="5" fill="#C9A15A"/>
     '''
-    return g, 120, 240
+    return g, 400, 220
 
 
 def loafer():
-    """革靴（横から見た図）。viewBox 300×140"""
+    """革靴（横から見た図、右向き）。運動靴と同じ viewBox 400×220・同じ縮尺"""
     g = '''
-    <path d="M16 112 C10 84 16 60 34 52 C54 46 76 48 96 50 C132 36 192 42 238 66 C272 80 294 96 290 112 Z" fill="#5A3A26"/>
-    <path d="M96 50 C132 36 192 42 238 66 C200 62 150 58 104 62 Z" fill="#7A5038"/>
-    <path d="M112 72 C140 64 176 66 204 74" fill="none" stroke="#3A2416" stroke-width="6" stroke-linecap="round"/>
-    <path d="M12 110 H292 Q298 110 296 118 Q294 124 286 124 H56 V132 H16 Q10 132 10 124 Z" fill="#2A1A10"/>
+    <path d="M30 196 C22 164 26 136 44 126 C70 120 100 122 128 126 C144 114 196 108 246 118
+             C290 128 330 142 362 158 C386 170 394 182 390 192 C388 196 384 198 378 198 L30 198 Z" fill="#5A3A26"/>
+    <path d="M160 122 C220 112 300 132 362 160" fill="none" stroke="#3E2818" stroke-width="4"/>
+    <path d="M144 134 C196 124 236 128 270 140" fill="none" stroke="#3E2818" stroke-width="12" stroke-linecap="round"/>
+    <path d="M250 124 C300 132 344 150 372 168" fill="none" stroke="#8A5E42" stroke-width="6" stroke-linecap="round" opacity="0.8"/>
+    <path d="M44 128 C70 124 100 126 128 128" fill="none" stroke="#3E2818" stroke-width="5" stroke-linecap="round"/>
+    <path d="M24 196 H384 Q394 196 394 202 Q394 208 384 208 H96 V214 H28 Q22 214 22 206 Z" fill="#2A1A10"/>
     '''
-    return g, 300, 140
+    return g, 400, 220
 
 
 def bottle(body=SEA, cap=NAVY):
@@ -89,17 +94,47 @@ def towel(c='#BFE1F2', band=SEA):
     return g, 260, 170
 
 
-def cap(c=NAVY, brim='#0A2740'):
-    """スポーツキャップ（正面から見た図）。viewBox 300×190"""
+def cap(c=NAVY, brim='#0A2740', mesh='#2B5F86', pipe=CORAL):
+    """スポーツキャップ（横から見た図、右向き。浅めのクラウンとメッシュ）。viewBox 300×170"""
     g = f'''
-    <path d="M44 134 C40 56 92 22 150 22 C208 22 260 56 256 134 Z" fill="{c}"/>
-    <path d="M150 24 C128 50 118 90 118 128 M150 24 C172 50 182 90 182 128" fill="none" stroke="#FFFFFF" stroke-width="3" opacity="0.25"/>
-    <circle cx="150" cy="22" r="9" fill="{c}"/>
-    <circle cx="100" cy="66" r="4" fill="#FFFFFF" opacity="0.4"/><circle cx="200" cy="66" r="4" fill="#FFFFFF" opacity="0.4"/>
-    <path d="M36 118 C90 138 210 138 264 118 C276 132 252 168 150 172 C48 168 24 132 36 118 Z" fill="{brim}"/>
-    <path d="M60 140 C110 156 190 156 240 140" fill="none" stroke="#FFFFFF" stroke-width="3" opacity="0.3" stroke-dasharray="6 6"/>
+    <path d="M22 124 C20 72 70 40 138 40 C196 40 232 72 236 118 L236 124 Z" fill="{c}"/>
+    <path d="M70 86 C100 70 146 66 176 74 L178 114 L68 116 Z" fill="{mesh}"/>
     '''
-    return g, 300, 190
+    for i in range(6):
+        for j in range(3):
+            g += f'<circle cx="{86 + i * 16 + j * 4}" cy="{86 + j * 11}" r="2.6" fill="#FFFFFF" opacity="0.55"/>'
+    g += f'''
+    <path d="M138 40 C150 60 156 90 154 122" fill="none" stroke="#FFFFFF" stroke-width="2.5" opacity="0.25"/>
+    <circle cx="138" cy="41" r="7" fill="{c}"/>
+    <path d="M190 112 C236 104 282 112 296 128 C300 134 294 140 284 138 C252 130 216 128 184 132 Z" fill="{brim}"/>
+    <path d="M190 130 C222 126 256 128 288 138" fill="none" stroke="{pipe}" stroke-width="4" stroke-linecap="round"/>
+    <rect x="22" y="112" width="30" height="12" rx="3" fill="{mesh}"/>
+    '''
+    return g, 300, 170
+
+
+def tee(c=CORAL):
+    """平置きのTシャツ（丸首）。viewBox 300×300"""
+    dk = '#000000'
+    g = f'''
+    <path d="M112 22 C100 26 70 32 50 44 C34 54 18 80 8 104 L50 124 L70 104 V282 Q70 290 78 290 H222 Q230 290 230 282 V104
+             L250 124 L292 104 C282 80 266 54 250 44 C230 32 200 26 188 22 C178 40 122 40 112 22 Z" fill="{c}"/>
+    <path d="M112 22 C122 44 178 44 188 22" fill="none" stroke="{dk}" stroke-width="7" opacity="0.15"/>
+    <path d="M8 104 L50 124" stroke="{dk}" stroke-width="5" opacity="0.12"/><path d="M292 104 L250 124" stroke="{dk}" stroke-width="5" opacity="0.12"/>
+    '''
+    return g, 300, 300
+
+
+def shorts(c=NAVY, stripe='#FFFFFF'):
+    """平置きのハーフパンツ。viewBox 260×200"""
+    g = f'''
+    <path d="M36 30 H224 L250 180 Q252 190 242 190 H150 L130 96 L110 190 H18 Q8 190 10 180 Z" fill="{c}"/>
+    <rect x="34" y="14" width="192" height="26" rx="8" fill="{c}"/>
+    <path d="M34 40 H226" stroke="#000000" stroke-width="3" opacity="0.2"/>
+    <path d="M120 30 C112 46 104 56 96 60 M140 30 C148 46 156 56 164 60" fill="none" stroke="{stripe}" stroke-width="3" stroke-linecap="round"/>
+    <path d="M40 40 L18 182 M220 40 L242 182" stroke="{stripe}" stroke-width="7"/>
+    '''
+    return g, 260, 200
 
 
 def polo(c=NAVY, trim='#FFFFFF'):

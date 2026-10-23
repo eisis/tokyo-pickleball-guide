@@ -11,6 +11,10 @@ src = open(os.path.join(HERE, 'easy2.py'), encoding='utf-8').read().split('# ---
 src = src.replace("sys.path.insert(0, SP)", "").replace("OUT = '/home/claude/ig-easy'; os.makedirs(OUT, exist_ok=True)", "")
 # 人物の靴を白いスニーカーに（ここだけ差し替え）
 src = src.replace("fy + h * 0.01), h * 0.025, NAVY)", "fy + h * 0.01), h * 0.025, SHOE_C)")
+src = src.replace("collar=WHITE, trim=None):", "collar=WHITE, trim=None, tee=False, pants=None, skirt=True):")
+src = src.replace("long_pants = kind == 'senior'", "long_pants = (kind == 'senior') if pants is None else pants")
+src = src.replace("    if kind == 'woman':\n        f.poly([(cx - sw * 0.85, hip_y - h * 0.05)", "    if kind == 'woman' and skirt and not long_pants:\n        f.poly([(cx - sw * 0.85, hip_y - h * 0.05)")
+src = src.replace("    pk = tuple(max(0, v - 25) for v in shirt)\n", "    pk = tuple(max(0, v - 25) for v in shirt)\n    if tee: collar = shirt; pk = shirt\n")
 SHOE_C = (238, 241, 244)
 exec(src)
 import items_svg as I
@@ -78,11 +82,11 @@ T(d, (62, 186), '何、着ていく？', font('Black', 122), NAVY)
 T(d, (62, 332), '何、持っていく？', font('Black', 122), CORAL)
 T(d, (70, 536), 'ピックルボールの服装と持ち物', font('Black', 48), NAVY)
 d = shadow_card(im, (60, 640, 1020, 1232), fill=WHITE)
-# 上の段：着ていく物（ポロ・スコート・キャップ）と飲み物
+# 上の段：着ていく物（Tシャツ・ハーフパンツ・キャップ）と飲み物
 row1 = 780
-put(im, I.polo(I.NAVY), 210, 190, row1)
-put(im, I.skort(), 190, 425, row1 + 8)
-put(im, I.cap(), 200, 660, row1 + 6)
+put(im, I.tee(I.CORAL), 210, 190, row1)
+put(im, I.shorts(), 180, 425, row1 + 6)
+put(im, I.cap(), 230, 660, row1 + 8)
 put(im, I.bottle(), 88, 892, row1)
 # 下の段：靴・タオル・パドルとボール
 row2b = 1180
@@ -100,8 +104,8 @@ im, d, top = head('服', ['服は、', '動きやすければOK'], ['いつも�
 fy = 1160
 d.rounded_rectangle((100, fy - 30, 980, fy + 34), radius=28, fill=(214, 238, 232))
 f = Fig(W, H)
-front_person(f, 400, fy, 420, NAVY, WHITE, 'man', pad_side=1, pad_c=SUN, collar=WHITE)
-front_person(f, 680, fy, 400, WHITE, NAVY, 'woman', pad_side=-1, pad_c=CORAL, collar=NAVY)
+front_person(f, 400, fy, 420, SEA, NAVY, 'man', pad_side=1, pad_c=SUN, tee=True, pants=True)
+front_person(f, 680, fy, 400, CORAL, NAVY, 'woman', pad_side=-1, pad_c=SUN, tee=True, skirt=False)
 o = f.out(); im.paste(o, (0, 0), o); d = ImageDraw.Draw(im)
 pill(d, 540, top + 40, 'いつもの運動着でOK', font('Black', 38), KIT, WHITE, anchor='c')
 footer(d, 2); im.save(f'{OUT}/02.png')
@@ -115,31 +119,39 @@ d = ImageDraw.Draw(im)
 div = top + 440
 d.line([(120, div), (960, div)], fill=(232, 226, 214), width=4)
 nb = 1145
-put(im, I.flipflop(), 74, 330, bottom=nb)
-put(im, I.loafer(), 230, 730, bottom=nb)
+for cx in (300, 780): shadow(im, cx, nb - 2, 260, 24)
+put(im, I.sandal(), 320, 300, bottom=nb)
+put(im, I.loafer(), 320, 780, bottom=nb)
 d = ImageDraw.Draw(im)
-label(d, 330, 1200, 'サンダル', ok=False, size=36)
-label(d, 730, 1200, '革靴', ok=False, size=36)
+label(d, 300, 1200, 'サンダル', ok=False, size=36)
+label(d, 780, 1200, '革靴', ok=False, size=36)
 footer(d, 3); im.save(f'{OUT}/03.png')
 
 # ---------- 4 屋内 ----------
 im, d, top = head('屋内', ['屋内コートは、', '靴の決まりを確認'], ['室内用の運動靴が必要なところも。', '予約のときに確かめておこう。'])
-# 床（カードの下の部分を木の床に）
-fl = 1060
+# 床：左は外（入口まで・灰色）、右はコートの中（木の床）。外の靴は外に、室内用の靴は木の床に置く
+fl = 1060; mx = 540
+GRAYF = (206, 210, 214); GRAYF2 = (190, 195, 200)
 flo = Image.new('RGBA', im.size, (0, 0, 0, 0)); fd = ImageDraw.Draw(flo)
-fd.rounded_rectangle((60, fl, 1020, 1230), radius=36, fill=WOOD + (255,))
-fd.rectangle((60, fl, 1020, fl + 40), fill=WOOD + (255,))
-for yy in range(fl + 34, 1226, 34): fd.line([(62, yy), (1018, yy)], fill=WOOD2 + (255,), width=3)
-fd.rectangle((60, fl + 70, 1020, fl + 80), fill=(255, 255, 255, 255))
+fd.rounded_rectangle((60, fl, 1020, 1230), radius=36, fill=GRAYF + (255,))
+fd.rectangle((60, fl, 1020, fl + 40), fill=GRAYF + (255,))
+for xx in range(150, mx, 110): fd.line([(xx, fl), (xx, 1228)], fill=GRAYF2 + (255,), width=3)
+fd.rounded_rectangle((mx, fl, 1020, 1230), radius=36, fill=WOOD + (255,))
+fd.rectangle((mx, fl, mx + 60, 1230), fill=WOOD + (255,)); fd.rectangle((mx, fl, 1020, fl + 40), fill=WOOD + (255,))
+for yy in range(fl + 34, 1226, 34): fd.line([(mx, yy), (1018, yy)], fill=WOOD2 + (255,), width=3)
+fd.rectangle((mx, fl + 70, 1020, fl + 80), fill=(255, 255, 255, 255))
+fd.rectangle((mx - 5, fl, mx + 5, 1230), fill=NAVY + (255,))
 im.paste(flo, (0, 0), flo); d = ImageDraw.Draw(im)
-pill(d, 540, top + 40, '室内用の靴に、履きかえ', font('Black', 38), NAVY, WHITE, anchor='c')
+T(d, (300, 1200), '入口・外', font('Black', 32), (110, 118, 126), 'ms')
+T(d, (780, 1200), 'コートの中', font('Black', 32), (120, 80, 40), 'ms')
+pill(d, 540, top + 40, 'コートに入る前に、履きかえ', font('Black', 38), NAVY, WHITE, anchor='c')
 sb = fl + 26
-put(im, I.sneaker(upper='#FFE4A8', accent=I.CORAL, tab=I.NAVY), 320, 280, bottom=sb)
-put(im, I.sneaker(upper='#FFFFFF', accent=I.SEA, tab=I.SUN), 320, 800, bottom=sb)
-put(im, I.arrow(I.NAVY), 90, 540, cy=sb - 80)
+put(im, I.sneaker(upper='#FFE4A8', accent=I.CORAL, tab=I.NAVY), 300, 300, bottom=sb)
+put(im, I.sneaker(upper='#FFFFFF', accent=I.SEA, tab=I.SUN), 300, 780, bottom=sb)
+put(im, I.arrow(I.NAVY), 80, 540, cy=sb - 230)
 d = ImageDraw.Draw(im)
-label(d, 280, sb - 210, '外ではいてきた靴', size=34, c=GREY)
-label(d, 800, sb - 210, '室内用の靴', size=34, c=SEA)
+label(d, 300, sb - 210, '外の靴', size=36, c=GREY)
+label(d, 780, sb - 210, '室内用の靴', size=36, c=SEA)
 footer(d, 4); im.save(f'{OUT}/04.png')
 
 # ---------- 5 道具 ----------
@@ -156,15 +168,14 @@ im.paste(p1, (int(250 - p1.width / 2), base - vis_bottom(p1)), p1)
 im.paste(p2, (int(385 - p2.width / 2), base + 4 - vis_bottom(p2)), p2)
 shadow(im, 805, base - 2, 320)
 put(im, I.sneaker(), 340, 805, bottom=base)
-shadow(im, 565, base - 2, 60)
-place_ball(im, 565, base - 32, 32, glow=False)
+place_ball(im, 545, base - 300, 32, glow=False)
 d = ImageDraw.Draw(im)
 footer(d, 5); im.save(f'{OUT}/05.png')
 
 # ---------- 6 あると安心 ----------
 im, d, top = head('＋α', ['あると安心'], ['飲み物とタオル。', '屋外なら、帽子もあると◎。'])
 ib = (top + 1230) / 2 + 120  # 物の下端をそろえる
-for cx, item, w_ in ((220, I.bottle(), 140), (540, I.towel(), 270), (860, I.cap(), 270)):
+for cx, item, w_ in ((220, I.bottle(), 140), (540, I.towel(), 270), (855, I.cap(), 250)):
     shadow(im, cx, ib, w_ * 0.9, 26)
     put(im, item, w_, cx, bottom=ib)
 d = ImageDraw.Draw(im)
