@@ -41,14 +41,13 @@ def sneaker(upper='#F3F5F7', accent=NAVY, tab=CORAL, sole='#FFFFFF', outsole=NAV
 
 
 def sandal():
-    """スポーツサンダル（横から見た図、右向き）。運動靴と同じ viewBox 400×220・同じ縮尺"""
+    """シャワーサンダル（横から見た図、右向き）。運動靴と同じ viewBox 400×220・同じ縮尺"""
     g = '''
-    <path d="M28 210 H378 Q394 210 394 198 Q394 186 378 184 L44 176 Q24 176 22 192 Q20 210 28 210 Z" fill="#6E5039"/>
-    <path d="M26 186 Q26 168 46 168 L372 176 Q390 178 390 188 L26 190 Z" fill="#D9B48A"/>
-    <path d="M46 168 C38 124 70 104 116 112" fill="none" stroke="#3B2A20" stroke-width="16" stroke-linecap="round"/>
-    <path d="M128 172 C132 104 236 96 248 174" fill="none" stroke="#3B2A20" stroke-width="26"/>
-    <path d="M262 176 C268 122 336 118 352 180" fill="none" stroke="#3B2A20" stroke-width="26"/>
-    <rect x="104" y="100" width="24" height="22" rx="5" fill="#C9A15A"/>
+    <path d="M30 210 H372 Q392 210 394 196 Q396 182 380 178 L46 168 Q24 168 22 186 Q20 210 30 210 Z" fill="#3E4A55"/>
+    <path d="M26 178 Q28 160 48 158 L376 168 Q392 170 390 180 L26 182 Z" fill="#E9E1D3"/>
+    <path d="M140 170 C146 124 192 104 250 104 C304 104 344 126 372 170 Z" fill="#1F7FB8"/>
+    <path d="M160 168 C166 132 202 116 250 116 C294 116 328 134 350 168" fill="none" stroke="#FFFFFF" stroke-width="4" opacity="0.35"/>
+    <path d="M196 120 C228 112 272 112 302 122" fill="none" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round" opacity="0.5"/>
     '''
     return g, 400, 220
 
