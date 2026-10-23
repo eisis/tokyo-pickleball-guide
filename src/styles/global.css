@@ -505,7 +505,8 @@ html[lang="en"] .hero h1 { font-family: var(--display); font-weight: 800; letter
 
 .photo { margin: 2em 0; }
 .photo img { width: 100%; border-radius: var(--radius-sm); display: block; margin: 0 !important; }
-.photo figcaption { margin-top: 8px; font-size: .8rem; color: var(--ink-soft); text-align: center; line-height: 1.6; }
+/* 写真の説明文（alt）は画面に出さない。古いビルドのキャッシュで説明文が残っても見えないようにする */
+.photo figcaption { display: none; }
 .table-wrap { overflow-x: auto; margin: 1.6em 0; border: 1px solid var(--line); border-radius: var(--radius-sm); }
 .article-body .prose .table-wrap table { display: table; width: 100%; border-collapse: collapse; font-size: .92rem; margin: 0; }
 .article-body .prose th { background: var(--foam); color: var(--navy); font-weight: 800; white-space: nowrap; }
