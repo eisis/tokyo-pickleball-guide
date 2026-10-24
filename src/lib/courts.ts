@@ -53,10 +53,15 @@ export const rentalText = (court: Court) => {
 export const reservationText = (court: Court) =>
   court.data.reservation ? court.data.reservation.map((r) => RESERVATION[r].ja).join('・') : null;
 
-/** 公開中のコートを、都道府県順→名前順で返す */
+/** 期間限定コートで、営業最終日（closesAt）が過ぎたか。ビルドした日（日本時間）で判定し、毎朝の再ビルドで反映される */
+export const isClosed = (court: Court) =>
+  !!court.data.closesAt &&
+  court.data.closesAt.toISOString().slice(0, 10) < new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
+
+/** 公開中のコートを、都道府県順→名前順で返す（hidden と、期間が終わったコートは除く） */
 export async function getCourts(): Promise<Court[]> {
   const order = Object.keys(PREFECTURES);
-  return (await getCollection('courts', (c) => !c.data.hidden)).sort(
+  return (await getCollection('courts', (c) => !c.data.hidden && !isClosed(c))).sort(
     (a, b) =>
       order.indexOf(a.data.prefecture) - order.indexOf(b.data.prefecture) ||
       a.data.name.localeCompare(b.data.name, 'ja')

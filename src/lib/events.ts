@@ -1,7 +1,7 @@
 // イベント（大会・練習会・体験会など）の共通の決まりごと。表示名・並び順・日付の扱いはここだけで管理する。
 // 種類を増やすときは EVENT_TYPES に1行足し、content.config.ts の type にも追加する。
 import { getCollection, getEntry, type CollectionEntry } from 'astro:content';
-import { PREFECTURES } from './courts';
+import { PREFECTURES, isClosed } from './courts';
 
 export type Event = CollectionEntry<'events'>;
 type Court = CollectionEntry<'courts'>;
@@ -45,8 +45,8 @@ export async function venueOf(e: Event): Promise<Venue> {
   if (e.data.court) {
     const court = await getEntry('courts', e.data.court);
     if (!court) throw new Error(`イベント ${e.id}: court「${e.data.court}」が見つかりません（コートのファイル名を確認してください）`);
-    // 非公開（hidden）のコートはページがないので、会場名だけ使いリンクは付けない
-    return { name: court.data.name, address: court.data.address, prefecture: court.data.prefecture, area: court.data.area.ja, court: court.data.hidden ? undefined : court };
+    // 非公開（hidden）や期間が終わったコートはページがないので、会場名だけ使いリンクは付けない
+    return { name: court.data.name, address: court.data.address, prefecture: court.data.prefecture, area: court.data.area.ja, court: court.data.hidden || isClosed(court) ? undefined : court };
   }
   if (!e.data.venue) throw new Error(`イベント ${e.id}: court か venue のどちらかを書いてください`);
   return { ...e.data.venue, prefecture: e.data.prefecture };

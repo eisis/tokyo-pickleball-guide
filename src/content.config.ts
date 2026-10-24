@@ -39,6 +39,7 @@ const courts = defineCollection({
     location: z.object({ lat: z.number(), lng: z.number() }).optional(), // 地図のピン位置（なければ地図に出ない）
     mapQuery: z.string(), // Googleマップ検索語
     openedAt: z.coerce.date().optional(),
+    closesAt: z.coerce.date().optional(), // 期間限定コートの営業最終日。この日が過ぎると、毎朝の再ビルドでサイトから自動で消える
     updatedAt: z.coerce.date(), // 情報を最後に確認した日
     sources: z.array(z.string().url()).default([]), // 情報源
     hidden: z.boolean().default(false), // trueにするとサイトに出さない

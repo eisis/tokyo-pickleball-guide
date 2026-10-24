@@ -24,6 +24,7 @@ availabilityUrl: https://example.com/availability       # 空き状況ページ�
 location: { lat: 35.6812, lng: 139.7671 }   # 地図のピン位置。Googleマップで場所を右クリック→一番上の数字をコピー（左が lat、右が lng）
 mapQuery: Googleマップで検索する名前
 openedAt: 2026-10-01         # オープン日（半年以内なら NEW が付く）。不明なら消す
+# closesAt: 2026-12-27       # 期間限定のコートだけ書く：営業最終日。この日が過ぎるとサイトから自動で消える
 updatedAt: 2026-10-12        # 情報を確認した日
 sources:
   - https://情報源のURL
