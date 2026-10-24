@@ -9,7 +9,6 @@ address: 東京都江東区塩浜1-2-2
 description:
   ja: 世界最大級のピックルボールクラブ「Picklr」の東京拠点。全天候型インドアにハードコート7面。会員制です。
   en: Tokyo location of Picklr, one of the world's largest pickleball club chains. Seven indoor hard courts. Membership-based.
-linkCard: {"url":"https://www.picklr.jp/locations/tokyo-toyosu","title":"PICKLR TOKYO TOYOSU 会員プラン","image":"https://aua8zaxczqyxvwvl.public.blob.vercel-storage.com/site-settings/1776173756707-8wxtr9w3gm.png"}
 booking: { url: "https://www.picklr.jp/locations/tokyo-toyosu", label: info }
 location: { lat: 35.66128, lng: 139.80001 }
 mapQuery: PICKLR TOKYO TOYOSU

@@ -14,7 +14,6 @@ description:
   ja: ショッピングセンターの中にある屋内4面のコート。駅から近く、ショップとスクールも併設です。
   en: Four indoor courts inside a shopping center near Wakabadai Station, with a shop and school.
 officialUrl: https://andpickle.jp/PickleK/
-linkCard: {"url":"https://andpickle.jp/PickleK/","title":"Pickle K｜フレスポ若葉台のピックルボールコート＆SHOP"}
 booking: { url: "https://reserve.andpickle.jp/reserve", label: book }
 bookingSystem: "自社サイト（reserve.andpickle.jp・システム名は未特定）" # 社内用メモ：予約に使っているシステム（サイトには出さない）
 location: { lat: 35.620407, lng: 139.471176 }
