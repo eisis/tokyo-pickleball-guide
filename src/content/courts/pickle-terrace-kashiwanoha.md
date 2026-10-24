@@ -15,6 +15,7 @@ description:
   ja: 2026年6月に開業した屋外1面の専用コート。USオープンと同じLaykoldのサーフェスで、ナイター照明もあります。
   en: A single outdoor dedicated court opened in June 2026, with a Laykold surface (as used at the US Open) and night lighting.
 officialUrl: https://pickleterracek.wixsite.com/pickleterrace
+linkCard: {"url":"https://pickleterracek.wixsite.com/pickleterrace","title":"Pickle Terrace 柏の葉 | ピックルボールの専用コート | 千葉県流山市駒木台284-11","site":"PICKLE TERRACE 柏の葉"}
 booking: { url: "https://pickleterracek.wixsite.com/pickleterrace/guide", label: book }
 bookingSystem: "自社WEB予約（Google Apps Script）" # 社内用メモ：サイトには出さない
 mapQuery: PICKLE TERRACE 柏の葉 流山市駒木台

@@ -15,6 +15,7 @@ description:
   ja: 本八幡駅前の屋内3面コート。朝6時から深夜1時まで年中無休で、空調も完備です。
   en: Three air-conditioned indoor courts by Motoyawata Station, open 6am to 1am every day.
 officialUrl: https://www.thepicklebang.com/
+linkCard: {"url":"https://www.thepicklebang.com/","title":"市川・本八幡駅徒歩1分の屋内ピックルボールコート|THE PICKLE BANG THEORY","site":"THE PICKLE BANG THEORY","image":"https://www.thepicklebang.com/opengraph-image.png"}
 booking: { url: "https://www.thepicklebang.com/reserve?tab=pickleball", label: book }
 bookingSystem: "LaBOLA" # 社内用メモ：予約に使っているシステム（サイトには出さない）
 location: { lat: 35.721508, lng: 139.926834 }

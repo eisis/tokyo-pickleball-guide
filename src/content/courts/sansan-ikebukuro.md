@@ -13,6 +13,7 @@ price: 1時間 ¥5,500〜¥8,800
 description:
   ja: 元プール施設を改装した天井の高いインドア3面と、屋上のアウトドア4面。天気に合わせて選べます。
   en: Three high-ceiling indoor courts in a converted pool facility plus four rooftop outdoor courts.
+linkCard: {"url":"https://sansan-pickleball.com/","title":"Sansanピックルボールコート池袋","site":"Sansanピックルボールコート池袋","image":"https://sansan-pickleball.com/assets/images/ogp.jpg"}
 booking: { url: "https://sansan-pickleball.com/", label: book }
 bookingSystem: "自社サイト（reserve.sansan-pickleball.com・システム名は未特定）" # 社内用メモ：予約に使っているシステム（サイトには出さない）
 location: { lat: 35.72527, lng: 139.72017 }

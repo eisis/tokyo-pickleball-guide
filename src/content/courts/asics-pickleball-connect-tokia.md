@@ -13,6 +13,7 @@ reservation: [online]
 description:
   ja: アシックスが東京ビルTOKIAの屋根付きガレリアに開く、フルサイズ2面の期間限定コート。2026年12月27日までの営業です。
   en: A pop-up venue by ASICS with two full-size courts in the covered galleria of Tokyo Building TOKIA, open until December 27, 2026.
+linkCard: {"url":"https://rsv.pickle-one.com/pb1-asics-tokia","title":"ASICS PICKLEBALL CONNECT｜東京駅すぐの屋内ピックルボールコート予約","site":"ASICS PICKLEBALL CONNECT","image":"https://azmffhiqwfcdgpznqfca.supabase.co/storage/v1/object/public/facility-assets/facility/og/aecb2fcd-7025-4548-9c36-2a477d2b257c.jpg"}
 booking: { url: "https://rsv.pickle-one.com/pb1-asics-tokia", label: book }
 bookingSystem: "RESERVE ONE"
 mapQuery: 東京ビルTOKIA

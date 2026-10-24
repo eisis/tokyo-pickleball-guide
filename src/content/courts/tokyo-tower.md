@@ -10,6 +10,7 @@ description:
   ja: 東京タワーの真下で、開放感たっぷりにプレーできます。昼は青空、夜はライトアップされた東京タワーを眺めながら楽しめる、特別な一面です。
   en: Play right beneath Tokyo Tower. Enjoy open skies during the day and a beautifully illuminated tower at night.
 image: /images/courts/tokyo-tower.jpg   # 自分で撮った写真
+linkCard: {"url":"https://tokyotower-pickleball.jp/ticket-announce/","title":"TOKYO TOWER PICKLEBALL FRIENDSHIP | 東京タワーピックルボールフレンドシップ"}
 booking: { url: "https://tokyotower-pickleball.jp/ticket-announce/", label: book }
 location: { lat: 35.65845, lng: 139.74554 }
 mapQuery: Tokyo Tower Pickleball Friendship
