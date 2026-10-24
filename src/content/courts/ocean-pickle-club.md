@@ -15,9 +15,6 @@ description:
   ja: 2026年6月にできた屋外ハードコート2面。ネット常設で、24時間ネット予約できます。
   en: Two outdoor hard courts opened in June 2026, with permanent nets and 24-hour online booking.
 officialUrl: https://www.oceangp.com/about/sports/
-imageUrl: https://www.oceangp.com/common/image/about/sports/court-front.jpg
-image: /images/courts/ocean-pickle-club.jpg
-imageSource: https://www.oceangp.com/about/sports/
 booking: { url: "https://ocean-pickle-club.stores.jp/reserve/tsurumi", label: book }
 bookingSystem: "STORES予約" # 社内用メモ：予約に使っているシステム（サイトには出さない）
 location: { lat: 35.500771, lng: 139.65741 }

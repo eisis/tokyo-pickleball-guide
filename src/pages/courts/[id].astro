@@ -4,6 +4,8 @@ import { render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import CourtMap from '../../components/CourtMap.astro';
 import EventCard from '../../components/EventCard.astro';
+import CourtVisual from '../../components/CourtVisual.astro';
+import LinkCard from '../../components/LinkCard.astro';
 import { getUpcomingEvents } from '../../lib/events';
 import { getCourts, PREFECTURES, ENVIRONMENTS, mapUrl, courtUrl, isNew, rentalText, reservationText, type Court } from '../../lib/courts';
 import { SITE, ldJson } from '../../lib/site';
@@ -59,11 +61,7 @@ const desc = `${d.name}（${pref}・${d.area.ja}）のピックルボールコ�
     <h1 style="margin:12px 0 20px;color:var(--navy)">{d.name}{isNew(court) && <span class="new-label">NEW</span>}</h1>
     {d.ownerVerified && <p class="owner-verified">✓ 施設の運営者が掲載している情報です</p>}
 
-    {d.image ? (
-      <img class="detail-hero" src={d.image} alt={d.name} />
-    ) : (
-      <div class="detail-hero image-placeholder" aria-hidden="true">🏓</div>
-    )}
+    <CourtVisual court={court} variant="hero" />
 
     <p class="description" style="margin-top:20px">{d.description.ja}</p>
 
@@ -83,6 +81,8 @@ const desc = `${d.name}（${pref}・${d.area.ja}）のピックルボールコ�
     <a class="button" href={d.booking.url} target="_blank" rel="noopener" data-track="booking" data-track-from="詳細ページ" data-court-id={court.id} data-court-name={d.name}>{bookLabel}</a>
     {d.availabilityUrl && <a class="button secondary" href={d.availabilityUrl} target="_blank" rel="noopener" data-track="availability" data-track-from="詳細ページ" data-court-id={court.id} data-court-name={d.name}>空き状況を見る</a>}
     <a class="map-button" href={mapUrl(court)} target="_blank" rel="noopener" data-track="map" data-track-from="詳細ページ" data-court-id={court.id} data-court-name={d.name}>📍 Google Map</a>
+
+    {d.linkCard && <LinkCard card={d.linkCard} courtId={court.id} courtName={d.name} />}
 
     <div class="prose"><Content /></div>
 

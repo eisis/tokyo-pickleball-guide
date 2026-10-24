@@ -11,7 +11,6 @@ price: 体験 15分 ¥250〜／コーチ付き 1名 ¥3,000
 description:
   ja: 一棟貸しの民泊とピックルボールを組み合わせた滞在型施設。日帰り利用もOKで、合宿やコーチ付きプランもあります。
   en: A countryside stay facility combining a private guesthouse with pickleball courts. Day visits welcome.
-image: /images/courts/tokigawa-pickleball.jpg
 booking: { url: "https://lin.ee/XweaHuI", label: book }
 bookingSystem: "LINE" # 社内用メモ：予約に使っているシステム（サイトには出さない）
 location: { lat: 35.99865, lng: 139.28129 }

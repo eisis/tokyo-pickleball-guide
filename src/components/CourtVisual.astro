@@ -1,0 +1,55 @@
+---
+// コートの見た目（一覧カードの写真枠・詳細ページの上の画像）
+// 1. 自分で撮った写真・運営者の写真（image）
+// 2. 公式サイトのリンクカード画像（linkCard.image）：保存せず相手のURLのまま表示。出どころのドメインを添える
+// 3. どちらもなければ（詳細ページは1がなければ）、コートを上から見たイラスト（屋内=青・屋外=緑）にエリア名を重ねる
+// 外部の画像が読み込めなかったときも、3のイラストに切り替わる
+import type { Court } from '../lib/courts';
+
+interface Props {
+  court: Court;
+  variant?: 'card' | 'hero';
+}
+const { court, variant = 'card' } = Astro.props;
+const d = court.data;
+const card = d.linkCard;
+// 詳細ページでは公式サイトの画像を下のリンクカードに出すので、上の画像には使わない
+const external = variant === 'card' && !d.image && card?.image ? card.image : undefined;
+const host = card ? new URL(card.url).hostname.replace(/^www\./, '') : '';
+const indoor = d.environment[0] === 'indoor';
+const cls = variant === 'hero' ? 'detail-hero' : 'facility-image';
+---
+
+{d.image && <img class={cls} src={d.image} alt={variant === 'hero' ? d.name : ''} loading={variant === 'card' ? 'lazy' : undefined} />}
+
+{external && (
+  <figure class={`${cls} ext-shot`}>
+    <img src={external} alt="" loading={variant === 'card' ? 'lazy' : undefined} referrerpolicy="no-referrer"
+      onerror="var f=this.parentElement;f.hidden=true;f.nextElementSibling.hidden=false" />
+    <figcaption class="ext-host">↗ {host}</figcaption>
+  </figure>
+)}
+
+{!d.image && (
+  <div class={`${cls} court-art ${indoor ? 'is-indoor' : 'is-outdoor'}`} hidden={!!external} aria-hidden="true">
+    <svg viewBox="0 0 320 200" preserveAspectRatio="xMaxYMid meet" role="presentation">
+      <!-- 実際の比率（横20ft×縦44ft、キッチンはネットから7ft）で、右寄せに描く -->
+      <g transform="rotate(-14 232 100)">
+        <rect x="197" y="23" width="70" height="154" rx="2" class="ca-court" />
+        <rect x="197" y="75.5" width="70" height="49" class="ca-kitchen" />
+        <g class="ca-line" fill="none">
+          <rect x="197" y="23" width="70" height="154" rx="2" />
+          <line x1="197" y1="75.5" x2="267" y2="75.5" />
+          <line x1="197" y1="124.5" x2="267" y2="124.5" />
+          <line x1="232" y1="23" x2="232" y2="75.5" />
+          <line x1="232" y1="124.5" x2="232" y2="177" />
+        </g>
+        <line x1="189" y1="100" x2="275" y2="100" class="ca-net" />
+      </g>
+    </svg>
+    <span class="ca-label">
+      <span class="ca-area">{d.area.ja}</span>
+      <span class="ca-env">{indoor ? 'INDOOR' : 'OUTDOOR'}</span>
+    </span>
+  </div>
+)}

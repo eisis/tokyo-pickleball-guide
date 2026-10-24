@@ -1,0 +1,22 @@
+---
+// 公式サイトへのリンクカード（SNSにURLを貼ったときのプレビューと同じ形）
+// 画像は相手のサイトのシェア用画像を、保存せずそのまま表示する。読み込めなければ画像なしで出す
+interface Props {
+  card: { url: string; title: string; site?: string; image?: string };
+  courtId: string;
+  courtName: string;
+}
+const { card, courtId, courtName } = Astro.props;
+const host = new URL(card.url).hostname.replace(/^www\./, '');
+---
+
+<a class="link-card" href={card.url} target="_blank" rel="noopener" data-track="official" data-track-from="リンクカード" data-court-id={courtId} data-court-name={courtName}>
+  {card.image && (
+    <span class="lc-media"><img src={card.image} alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.remove()" /></span>
+  )}
+  <span class="lc-body">
+    <span class="lc-kicker">公式サイト</span>
+    <span class="lc-title">{card.title}</span>
+    <span class="lc-host">↗ {card.site && card.site !== card.title ? `${card.site} · ${host}` : host}</span>
+  </span>
+</a>
