@@ -9,7 +9,7 @@ import { BOOKING_SYSTEM_OPTIONS } from './court-form.js';
 // content.config.ts の並び順
 const KEY_ORDER = [
   'name', 'area', 'prefecture', 'environment', 'category', 'courts', 'address', 'access', 'hours', 'price', 'rental',
-  'reservation', 'description', 'image', 'officialUrl', 'linkCard', 'booking', 'bookingSystem',
+  'reservation', 'description', 'image', 'imageSource', 'officialUrl', 'imageUrl', 'booking', 'bookingSystem',
   'availabilityUrl', 'location', 'mapQuery', 'openedAt', 'updatedAt', 'sources', 'hidden', 'ownerVerified',
 ];
 
@@ -210,7 +210,7 @@ const show = (v) => (v === undefined || v === null || v === '' ? '—' : typeof 
 const KEY_LABELS = {
   name: '施設名', area: 'エリア表示', prefecture: '都道府県', environment: '屋内/屋外', category: '施設の種類', courts: '面数', address: '住所',
   access: 'アクセス', hours: '営業時間', price: '料金', rental: 'レンタル', reservation: '予約方法', description: 'ひとこと紹介', image: 'メイン写真',
-  officialUrl: '公式サイト', booking: '予約ページ', bookingSystem: '予約システム',
+  imageSource: '画像の取得元', imageUrl: '画像URL', officialUrl: '公式サイト', booking: '予約ページ', bookingSystem: '予約システム',
   availabilityUrl: '空き状況ページ', location: '地図の位置', mapQuery: '地図の検索語', openedAt: 'オープン日', sources: '情報源', ownerVerified: '運営者掲載',
 };
 const DEFAULTS = { category: 'dedicated', hidden: false, ownerVerified: false }; // 書いていないときの値（content.config.ts と同じ）

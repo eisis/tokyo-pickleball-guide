@@ -26,15 +26,10 @@ const courts = defineCollection({
     }).optional(),
     reservation: z.array(z.enum(['online', 'line', 'phone', 'walkin'])).min(1).optional(), // 予約方法：online=ネット / line=LINE / phone=電話 / walkin=当日受付
     description: ja_en, // カードに出る短い紹介文
-    image: z.string().optional(), // 自分で撮った写真・運営者から提供された写真だけ（public/images/courts/）。他サイトの画像は置かない
-    officialUrl: z.string().url().optional(), // 施設の公式サイト（リンクカードの取得元）
-    // 公式サイトのリンクカード（タイトル・シェア用画像）。GitHub Actionsが自動で書き込む。画像は保存せず、相手のURLのまま表示する
-    linkCard: z.object({
-      url: z.string().url(),
-      title: z.string(),
-      site: z.string().optional(),
-      image: z.string().url().optional(),
-    }).optional(),
+    image: z.string().optional(), // public/images/courts/ の画像。なければ🏓を表示
+    imageSource: z.string().url().optional(), // 画像の取得元（自動取得したとき書き込まれる）
+    officialUrl: z.string().url().optional(), // 施設の公式サイト（画像の自動取得に使う）
+    imageUrl: z.string().url().optional(), // コートが写っている写真のURL（あればシェア用画像より優先して取得）
     booking: z.object({
       url: z.string().url(),
       label: z.enum(['book', 'info']).default('book'), // book=予約する / info=詳細を見る

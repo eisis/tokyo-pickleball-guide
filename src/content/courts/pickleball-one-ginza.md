@@ -12,6 +12,7 @@ price: 1時間 ¥5,000〜¥10,000
 description:
   ja: 駅近で行きやすい都心のインドア。天候を気にせずしっかり打てる安心感があります。
   en: Convenient indoor courts near the station. Great for playing regardless of weather.
+image: /images/courts/pickleball-one-ginza.png
 booking: { url: "https://reserva.be/pboneginza", label: book }
 bookingSystem: "RESERVA" # 社内用メモ：予約に使っているシステム（サイトには出さない）
 availabilityUrl: https://reserva.be/pboneginza/availability

@@ -10,6 +10,7 @@ hours: "6:00〜22:00"
 description:
   ja: 「THE DOG PARK TOYOSU」内の屋外ハードコート4面。用品レンタルがあり、グループでの貸し切りやイベントにも対応しています。
   en: Four outdoor hard courts inside THE DOG PARK TOYOSU. Equipment rental available.
+image: /images/courts/pickleball-park-toyosu.jpg
 booking: { url: "https://news.mynavi.jp/article/20260911-4949774/", label: info }
 location: { lat: 35.64852, lng: 139.78961 }
 mapQuery: PICKLEBALL PARK TOYOSU

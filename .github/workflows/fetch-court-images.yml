@@ -1,4 +1,4 @@
-name: Fetch link cards
+name: Fetch court images
 
 on:
   push:
@@ -19,12 +19,13 @@ jobs:
         with:
           node-version: 22
           cache: npm
-      - run: node scripts/fetch-link-cards.mjs
-      - name: リンクカードがあれば保存
+      - run: npm ci
+      - run: node scripts/fetch-court-images.mjs
+      - name: 画像があれば保存
         run: |
-          git add -A src/content/courts
+          git add -A public/images/courts src/content/courts
           if git diff --cached --quiet; then echo "追加なし"; exit 0; fi
           git config user.name "github-actions[bot]"
           git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
-          git commit -m "公式サイトのリンクカードを自動追加"
+          git commit -m "コート画像を自動追加"
           git push

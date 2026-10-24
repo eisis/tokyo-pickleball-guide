@@ -14,6 +14,9 @@ description:
   ja: ショッピングセンターの中にある屋内4面のコート。駅から近く、ショップとスクールも併設です。
   en: Four indoor courts inside a shopping center near Wakabadai Station, with a shop and school.
 officialUrl: https://andpickle.jp/PickleK/
+imageUrl: https://prcdn.freetls.fastly.net/release_image/185955/2/185955-2-f7ab4626cfa205c5909804649f9e34e5-1477x1108.jpg
+image: /images/courts/pickle-k-wakabadai.jpg
+imageSource: https://andpickle.jp/PickleK/
 booking: { url: "https://reserve.andpickle.jp/reserve", label: book }
 bookingSystem: "自社サイト（reserve.andpickle.jp・システム名は未特定）" # 社内用メモ：予約に使っているシステム（サイトには出さない）
 location: { lat: 35.620407, lng: 139.471176 }

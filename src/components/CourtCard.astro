@@ -1,7 +1,6 @@
 ---
 // コート1件分のカード。トップの一覧や記事の関連コートで使い回す。
 // data-* はトップの絞り込み・近い順検索・地図との連動に使う
-import CourtVisual from './CourtVisual.astro';
 import { PREFECTURES, ENVIRONMENTS, CATEGORIES, courtUrl, mapUrl, bookingLabel, isNew, hasRental, type Court } from '../lib/courts';
 
 interface Props {
@@ -28,7 +27,11 @@ const searchText = [d.name, d.area.ja, d.area.en, PREFECTURES[d.prefecture].ja, 
   data-opened={d.openedAt ? d.openedAt.getTime() : 0}
 >
   <a class="card-media" href={detail} tabindex="-1" aria-hidden="true">
-    <CourtVisual court={court} />
+    {d.image ? (
+      <img class="facility-image" src={d.image} alt="" loading="lazy" />
+    ) : (
+      <div class="facility-image image-placeholder">🏓</div>
+    )}
     <span class="card-badges">
       {isNew(court) && <span class="badge-new">NEW</span>}
       {d.ownerVerified && <span class="badge-owner" title="施設の運営者が掲載している情報です" data-ja="運営者掲載" data-en="Official">運営者掲載</span>}

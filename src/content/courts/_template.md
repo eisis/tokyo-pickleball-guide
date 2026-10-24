@@ -16,8 +16,8 @@ reservation: [online]        # 予約方法：online=ネット / line=LINE / pho
 description:
   ja: カードに出る短い紹介文（2文くらい）
   en: Short description in English
-officialUrl: https://example.com/   # 施設の公式サイト。書いておくと、公式サイトのリンクカード（linkCard:）が自動で追加される
-# image: /images/courts/ファイル名.jpg   # 自分で撮った写真・運営者から提供された写真があるときだけ書く（他サイトの画像は使わない）
+officialUrl: https://example.com/   # 施設の公式サイト。書いておくと、そこのシェア用画像を自動で取ってくる
+# image: の行は書かなくてOK（自動で追加される）。自分で用意した写真を使うときだけ書く
 booking: { url: "https://example.com/", label: book }   # label: book=予約する / info=詳細を見る
 bookingSystem: "RESERVA"                                # 社内用メモ：予約に使っているシステム（サイトには出さない・分からなければ消す）
 availabilityUrl: https://example.com/availability       # 空き状況ページがなければこの行を消す

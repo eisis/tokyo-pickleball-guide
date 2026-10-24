@@ -531,42 +531,6 @@ html[lang="en"] .hero h1 { font-family: var(--display); font-weight: 800; letter
 /* court detail */
 .detail-hero { width: 100%; max-height: 420px; object-fit: cover; border-radius: var(--radius); }
 .detail-hero.image-placeholder { height: 260px; font-size: 5rem; }
-
-/* コートの見た目：外部（公式サイト）の画像・コートのイラスト・リンクカード */
-.facility-image[hidden], .detail-hero[hidden] { display: none !important; }
-.ext-shot { position: relative; margin: 0; overflow: hidden; background: var(--foam); }
-.ext-shot img { display: block; width: 100%; height: 100%; object-fit: cover; }
-.ext-host {
-  position: absolute; right: 10px; bottom: 10px; max-width: calc(100% - 20px);
-  padding: 3px 9px; border-radius: 999px; background: rgba(7, 52, 58, .72); color: #fff;
-  font-size: .7rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-}
-.court-art { position: relative; overflow: hidden; --ca: var(--outdoor); background: linear-gradient(150deg, #e6f6ee, var(--sand-deep)); }
-.court-art.is-indoor { --ca: var(--indoor); background: linear-gradient(150deg, #e4eef8, #efe3cf); }
-.court-art svg { position: absolute; inset: 0; width: 100%; height: 100%; }
-.ca-court { fill: var(--ca); opacity: .9; }
-.ca-kitchen { fill: #fff; opacity: .16; }
-.ca-line { stroke: #fff; stroke-width: 2.2; }
-.ca-net { stroke-width: 3.5; stroke: var(--deep); opacity: .6; }
-.ca-label {
-  position: absolute; left: 16px; bottom: 14px; max-width: 52%; display: flex; flex-direction: column; gap: 2px;
-  padding: 8px 12px; border-radius: 12px; background: rgba(255, 255, 255, .92); box-shadow: var(--shadow);
-}
-.ca-area { font-weight: 800; font-size: 1.05rem; color: var(--navy); line-height: 1.2; }
-.ca-env { font-family: var(--display); font-weight: 800; font-size: .66rem; letter-spacing: .14em; color: var(--ca); }
-.detail-hero.court-art { height: 220px; }
-.detail-hero.court-art .ca-area { font-size: 1.4rem; }
-.link-card {
-  display: flex; margin: 20px 0; border: 1px solid var(--line); border-radius: var(--radius-sm); overflow: hidden;
-  background: #fff; color: var(--ink); text-decoration: none; transition: box-shadow .2s, transform .2s;
-}
-.link-card:hover { box-shadow: var(--shadow); transform: translateY(-1px); }
-.lc-media { flex: 0 0 38%; max-width: 220px; background: var(--foam); }
-.lc-media img { display: block; width: 100%; height: 100%; min-height: 110px; object-fit: cover; }
-.lc-body { display: flex; flex-direction: column; justify-content: center; gap: 4px; padding: 14px 16px; min-width: 0; }
-.lc-kicker { font-size: .72rem; font-weight: 700; color: var(--teal-dark); }
-.lc-title { font-weight: 700; line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-.lc-host { font-size: .78rem; color: var(--ink-soft); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .facts { margin: 24px 0; display: grid; grid-template-columns: 8em 1fr; gap: 10px 16px; padding: 20px; background: #fff; border: 1px solid var(--line); border-radius: var(--radius-sm); }
 .facts dt { font-weight: 700; color: var(--navy); }
 .prose { margin-top: 24px; line-height: 1.95; }

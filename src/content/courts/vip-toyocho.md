@@ -15,6 +15,9 @@ description:
   ja: 東陽町駅から歩ける屋内3面の専用コート。冷房完備で、スクールも開講しています。
   en: An indoor 3-court pickleball club near Toyocho Station, with air conditioning and lessons.
 officialUrl: https://viptop.jp/toyocho-pickleball/
+imageUrl: https://viptop.jp/toyocho-pickleball/wp-content/themes/toyocho-pickleball/images/img_court.webp
+image: /images/courts/vip-toyocho.jpg
+imageSource: https://viptop.jp/toyocho-pickleball/
 booking: { url: "https://reserva.be/viptop", label: book }
 bookingSystem: "RESERVA" # 社内用メモ：予約に使っているシステム（サイトには出さない）
 location: { lat: 35.673431, lng: 139.819702 }
