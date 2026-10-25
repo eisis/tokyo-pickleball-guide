@@ -3,11 +3,11 @@ name: Sansanピックルボールコート池袋
 area: { ja: 東池袋, en: Higashi-Ikebukuro }
 prefecture: tokyo
 environment: [indoor, outdoor]
-rental: { status: paid, note: パドル 500円 }
+rental: { status: paid, note: パドル・シューズ 各1時間500円、ウェア各500円 }
 reservation: [online]
 courts: 7
 address: 東京都豊島区東池袋4-27-10 サンソウゴ池袋ビル 4〜6階
-access: { ja: 東池袋駅から徒歩3分, en: 3 min walk from Higashi-Ikebukuro Station }
+access: { ja: 東池袋駅6番出口から徒歩3分, en: 3 min walk from Higashi-Ikebukuro Station (Exit 6) }
 hours: "6:00〜23:00"
 price: 1時間 ¥5,500〜¥8,800
 description:
@@ -19,8 +19,10 @@ bookingSystem: "自社サイト（reserve.sansan-pickleball.com・システム�
 location: { lat: 35.72527, lng: 139.72017 }
 mapQuery: Sansan Pickleball Court Ikebukuro
 openedAt: 2026-07-10
-updatedAt: 2026-10-17
+updatedAt: 2026-10-25
 sources:
+  - https://sansan-pickleball.com/facilities/
+  - https://sansan-pickleball.com/access/
   - https://www.fashionsnap.com/article/2026-07-10/sansan-pickle-coat/
   - https://oggi.jp/7898131
 ---
