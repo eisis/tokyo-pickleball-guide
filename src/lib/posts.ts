@@ -42,6 +42,20 @@ export async function coverOf(p: Post): Promise<{ src: string; alt: string } | n
   return null;
 }
 
+/**
+ * カード・SNSのリンク表示に使う横長（16:9）の画像。記事の画像を出す場所はすべてこれを通す。
+ * banner → 写真の cover（coverFit: cover）→ 本文の最初の画像 → 紹介コートの画像 の順。
+ * 文字入りの縦長の cover（coverFit: contain）は横長の枠に入れると切れるので、banner がなければ使わない
+ * （その場合は scripts/check-post-images.mjs がビルド前に止める）。
+ */
+export async function cardImageOf(p: Post): Promise<{ src: string; alt: string } | null> {
+  const alt = p.data.coverAlt ?? p.data.title;
+  if (p.data.banner) return { src: p.data.banner, alt };
+  if (p.data.cover && p.data.coverFit !== 'contain') return { src: p.data.cover, alt };
+  const c = await coverOf({ ...p, data: { ...p.data, cover: undefined } } as Post);
+  return c ?? (p.data.cover ? { src: p.data.cover, alt } : null);
+}
+
 /** 本文の先頭の文（記事に description がない場合などに使う） */
 export const searchText = (p: Post) =>
   [p.data.title, p.data.description, POST_CATEGORIES[p.data.category].ja, ...p.data.tags, (p.body ?? '').replace(/[#*>\[\]()!`\-]/g, ' ').slice(0, 1500)].join(' ');

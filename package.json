@@ -4,8 +4,9 @@
   "type": "module",
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "node scripts/check-post-images.mjs && astro build",
     "preview": "astro preview",
+    "check:images": "node scripts/check-post-images.mjs",
     "find-courts": "node scripts/find-new-courts.mjs"
   },
   "dependencies": {

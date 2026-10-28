@@ -9,7 +9,7 @@ import PostCard from '../../components/PostCard.astro';
 import { SITE, ldJson } from '../../lib/site';
 import { ENVIRONMENTS, rentalText, reservationText } from '../../lib/courts';
 import {
-  getPosts, POST_CATEGORIES, categoryUrl, tagUrl, postUrl, ymd, readingMinutes, coverOf, relatedPosts, type Post,
+  getPosts, POST_CATEGORIES, categoryUrl, tagUrl, postUrl, ymd, readingMinutes, coverOf, cardImageOf, relatedPosts, type Post,
 } from '../../lib/posts';
 
 export async function getStaticPaths() {
@@ -35,7 +35,7 @@ const facts = main
   : d.facts;
 const related = relatedPosts(post, await getPosts());
 const cover = await coverOf(post);
-const shareImage = d.banner ?? cover?.src; // リンク表示は横長のバナーを優先
+const shareImage = (await cardImageOf(post))?.src; // リンク表示は横長（16:9）
 const cat = POST_CATEGORIES[d.category];
 // 本文にも同じ写真があるときは、上に重ねて出さない
 const showCover = cover && !(post.body ?? '').includes(cover.src);

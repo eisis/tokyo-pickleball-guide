@@ -1,7 +1,7 @@
 ---
 // 記事1件分のカード。記事一覧・トップ・関連記事で使い回す。
 // variant: feature=大きく1枚 / default=写真つき / compact=写真を小さく横に
-import { POST_CATEGORIES, postUrl, coverOf, ymd, readingMinutes, searchText, type Post } from '../lib/posts';
+import { POST_CATEGORIES, postUrl, cardImageOf, ymd, readingMinutes, searchText, type Post } from '../lib/posts';
 
 interface Props {
   post: Post;
@@ -9,12 +9,12 @@ interface Props {
 }
 const { post, variant = 'default' } = Astro.props;
 const d = post.data;
-const cover = d.banner ? { src: d.banner, alt: d.coverAlt ?? d.title } : await coverOf(post);
+const cover = await cardImageOf(post); // 横長（16:9）の画像
 const cat = POST_CATEGORIES[d.category];
 ---
 
 <article class={`pcard pcard-${variant}`} data-post-item data-category={d.category} data-search={searchText(post).toLowerCase()}>
-  <a class:list={["pcard-media", { "fit-contain": !d.banner && d.coverFit === "contain" }]} href={postUrl(post)} tabindex="-1" aria-hidden="true">
+  <a class="pcard-media" href={postUrl(post)} tabindex="-1" aria-hidden="true">
     {cover ? <img src={cover.src} alt="" loading="lazy" /> : <span class="pcard-noimg">{cat.en}</span>}
   </a>
   <div class="pcard-body">

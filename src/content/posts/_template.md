@@ -25,7 +25,7 @@ courts: []
 # cover: /images/posts/写真のファイル名.jpg
 # coverAlt: 写真の説明
 # coverFit: contain   # 文字入りの画像のときだけ。切り取らずに全体を表示する
-# banner: /images/posts/記事ID-banner.jpg   # 記事一覧用の横長（16:9・1600×900）。縦長の表紙のときは必ず作る（social/instagram/scripts/banner.py）
+# banner: /images/posts/記事ID-banner.jpg   # 記事一覧・SNS用の横長（16:9・1600×900）。coverFit: contain の記事は必須（ないとビルドが止まる）。social/instagram/scripts/banner.py で作る
 
 # 記事の冒頭に出す「この記事のポイント」。3つがおすすめ（読者はまずここを読む）
 points:
