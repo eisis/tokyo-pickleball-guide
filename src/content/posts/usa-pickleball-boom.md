@@ -8,6 +8,7 @@ courts: []
 cover: /images/posts/usa-pickleball-boom.png
 coverAlt: アメリカで、ピックルボールがとんでもないことになってる
 coverFit: contain
+banner: /images/posts/usa-pickleball-boom-banner.jpg
 points:
   - アメリカでプレーする人は約2,400万人。日本人の5人に1人と同じくらいの数
   - プロリーグがあり、大会の賞金は1年で約50億円。全米のテレビでも中継されている

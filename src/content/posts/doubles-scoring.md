@@ -7,6 +7,7 @@ tags: [初心者, ルール, ダブルス]
 cover: /images/posts/doubles-scoring.png
 coverAlt: 「0-0-2」って、何の数字？ ダブルスの点数と立つ場所が絵でわかる
 coverFit: contain
+banner: /images/posts/doubles-scoring-banner.jpg
 points:
   - 点が入るのは、自分たちがサーブしているときだけ
   - 左右が動くのは、自分たちのサーブで点を取ったときだけ

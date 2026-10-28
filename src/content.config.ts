@@ -59,6 +59,7 @@ const posts = defineCollection({
     cover: z.string().optional(), // 一覧やSNSで使う画像（なければ本文の最初の画像 → 紹介コートの画像の順で自動）
     coverAlt: z.string().optional(),
     coverFit: z.enum(['cover', 'contain']).default('cover'), // contain = 文字入りの画像など、切り取らずに全体を見せる
+    banner: z.string().optional(), // 記事一覧・SNSのリンク表示で使う横長（16:9）の画像。なければ cover を使う
     featured: z.boolean().default(false),
     points: z.array(z.string()).max(4).default([]), // 記事の冒頭に出す「この記事のポイント」（3つがおすすめ）
     facts: z.array(z.object({ label: z.string(), value: z.string() })).default([]), // 冒頭に出す情報の表（コートレビューの料金・アクセスなど） // true にすると記事一覧の一番上に大きく出る

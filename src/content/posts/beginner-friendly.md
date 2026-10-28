@@ -8,6 +8,7 @@ courts: [vip-toyocho, pickle-k-wakabadai, well-pickle-club]
 cover: /images/posts/beginner-friendly.png
 coverAlt: 運動が苦手でも、ピックルボールってできる？できる理由が、4つあります
 coverFit: contain
+banner: /images/posts/beginner-friendly-banner.jpg
 points:
   - コートはバドミントンと同じくらいの広さで、テニスコートの約3分の1
   - サーブは腰より下で打つルール。いきなり速い球は飛んでこない

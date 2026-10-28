@@ -8,6 +8,7 @@ courts: [sansan-ikebukuro]
 cover: /images/posts/what-to-wear.png
 coverAlt: 何、着ていく？何、持っていく？ピックルボールの服装と持ち物
 coverFit: contain
+banner: /images/posts/what-to-wear-banner.jpg
 points:
   - 服は動きやすければOK。いつものTシャツやジャージで大丈夫
   - 靴はふだんの運動靴で。屋内は室内用の靴が必要なところもある

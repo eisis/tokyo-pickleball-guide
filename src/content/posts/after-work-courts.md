@@ -8,6 +8,7 @@ courts: [pickle-bang-theory, pickleball-one-ginza, sansan-ikebukuro, seibu-fast-
 cover: /images/posts/after-work-courts.png
 coverAlt: 仕事帰りに行けるピックルボールコート5選。本八幡25時、新橋23時、池袋23時、品川22時、丸の内22時まで
 coverFit: contain
+banner: /images/posts/after-work-courts-banner.jpg
 points:
   - 5か所とも屋内で駅から近く、22時以降まで開いている
   - いちばん遅いのは本八幡の25時、新橋と池袋は23時まで

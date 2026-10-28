@@ -8,6 +8,7 @@ courts: [asics-pickleball-connect-tokia]
 cover: /images/posts/asics-pickleball-connect.png
 coverAlt: 10/31 OPEN、12/27までの期間限定。ASICS PICKLEBALL CONNECT、丸の内にASICSのピックルボールコート
 coverFit: contain
+banner: /images/posts/asics-pickleball-connect-banner.jpg
 points:
   - 10月31日から12月27日まで、東京ビルTOKIA 1階のガレリアにフルサイズ2面
   - JR東京駅の丸の内南口から徒歩3分、毎日22時まで。仕事帰りにも寄れる

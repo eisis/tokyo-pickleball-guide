@@ -7,6 +7,7 @@ tags: [初心者, 戦術, ディンク]
 cover: /images/posts/dink-strategy.jpg
 coverAlt: ピックルボールは、強く打った方が負ける？ ネット際で「ふわっ」と打ち合う理由
 coverFit: contain
+banner: /images/posts/dink-strategy-banner.jpg
 points:
   - 強く打つより、ネットの手前に低く落とす方が攻められにくい
   - 相手のキッチンに落ちた球は、弾むのを待って下から返すしかない
