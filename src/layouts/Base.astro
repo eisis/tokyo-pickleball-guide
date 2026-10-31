@@ -14,7 +14,7 @@ interface Props {
 }
 const { title, description, image, noindex, robots } = Astro.props;
 // SNS で共有したときの画像。ページごとの画像がなければサイト共通のカード画像（public/og-default.png）を使う
-const ogImage = new URL(image || '/og-default.png', Astro.site).href;
+const ogImage = new URL(image || '/og-default.png?v=2', Astro.site).href;
 const siteName = SITE.name;
 const fullTitle = title === siteName ? title : `${title} | ${siteName}`;
 const canonical = new URL(Astro.url.pathname, Astro.site);
@@ -46,10 +46,9 @@ const siteLd = {
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap" rel="stylesheet">
-    <link rel="icon" href="/favicon.ico" sizes="48x48">
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-    <link rel="icon" href="/icon-192.png" type="image/png" sizes="192x192">
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <link rel="icon" href="/favicon.ico?v=2" sizes="48x48">
+    <link rel="icon" href="/icon-192.png?v=2" type="image/png" sizes="192x192">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=2">
     <script type="application/ld+json" set:html={ldJson(siteLd)} />
     <meta name="description" content={description} />
     {robots ? <meta name="robots" content={robots} /> : noindex && <meta name="robots" content="noindex, nofollow" />}
@@ -77,7 +76,7 @@ const siteLd = {
   </head>
   <body>
     <header class="site-header">
-      <a class="logo" href="/" aria-label={SITE.name}><img src="/favicon.svg" alt="" width="30" height="30" /><span class="logo-word">Pickleball<span class="logo-accent">Tokyo</span></span></a>
+      <a class="logo" href="/" aria-label={SITE.name}><img src="/logo-mark.png" alt="" width="30" height="30" /><span class="logo-word">Pickleball<span class="logo-accent">Tokyo</span></span></a>
       <nav>
         <a href="/#courts" data-ja="コート" data-en="Courts">コート</a>
         <a class="nav-sub" href="/#areas" data-ja="エリア" data-en="Areas">エリア</a>
