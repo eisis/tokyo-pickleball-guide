@@ -13,8 +13,8 @@ NAVY = '#0e3452'; SUN = '#ffd678'; CORAL = '#ff6b4a'; WHITE = '#ffffff'; PURPLE 
 # 表紙のファイル、切り抜く範囲（元画像の座標）、背景色（Noneなら表紙の左上の色）、文字色、札、見出し、ひとこと
 B = {
   'anna-leigh-waters': dict(src='anna-leigh-waters.jpg', crop=(0, 150, 1080, 740), full=True,
-      bg='#071a2c', fg=WHITE, tags=[('ストーリー', SUN, NAVY)],
-      lines=[[('やりたくない', WHITE)], [('子が、', WHITE)], [('世界1位', SUN), ('に', WHITE)]],
+      bg='#071a2c', fg=WHITE, tags=[('シングルス', '#D9FF3D', NAVY), ('ダブルス', '#D9FF3D', NAVY), ('混合ダブルス', '#D9FF3D', NAVY)],
+      lines=[[('いま、全部', WHITE)], [('世界1位', '#D9FF3D')]],
       sub='アンナ・リー・ウォーターズの9年'),
   'dink-strategy': dict(src='dink-strategy.jpg', crop=(0, 660, 1080, 1250), full=True,
       bg='#0a1d2e', fg=WHITE, tags=[('ちょっと戦術', SUN, NAVY)],
