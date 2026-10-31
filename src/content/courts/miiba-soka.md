@@ -15,6 +15,7 @@ description:
   ja: ティップネスが運営する、24時間営業の屋内ピックルボールコート（1面）。無人入館でネット予約・事前決済、パドルとボールは無料で借りられます。
   en: A 24-hour indoor pickleball court (1 court) run by Tipness. Online booking with prepayment; paddles and balls are free to borrow.
 booking: { url: "https://mypage.miiba.tipness.co.jp/reserve/schedule/14/26", label: book }
+image: /images/courts/miiba-soka.jpg
 mapQuery: 草加TIP'S 草加市氷川町2127-13
 openedAt: 2026-11-17
 updatedAt: 2026-10-31
