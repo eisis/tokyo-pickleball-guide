@@ -12,6 +12,10 @@ NAVY = '#0e3452'; SUN = '#ffd678'; CORAL = '#ff6b4a'; WHITE = '#ffffff'; PURPLE 
 # 全部同じ型：見出しは88pxで1行8文字まで・3行まで、右の絵は同じ枠（680×680）に収める
 # 表紙のファイル、切り抜く範囲（元画像の座標）、背景色（Noneなら表紙の左上の色）、文字色、札、見出し、ひとこと
 B = {
+  'major-league-pickleball': dict(src='major-league-pickleball.jpg', crop=(0, 150, 1080, 740), full=True,
+      bg='#0C1830', fg=WHITE, tags=[('SPECIAL FEATURE', '#F06B3C', WHITE)],
+      lines=[[('ピックルボールの', WHITE)], [('メジャーリーグ', '#F06B3C')]],
+      sub='全米20チームのプロリーグ「MLP」'),
   'anna-leigh-waters': dict(src='anna-leigh-waters.jpg', crop=(0, 150, 1080, 740), full=True,
       bg='#071a2c', fg=WHITE, tags=[('シングルス', '#D9FF3D', NAVY), ('ダブルス', '#D9FF3D', NAVY), ('混合ダブルス', '#D9FF3D', NAVY)],
       lines=[[('いま、全部', WHITE)], [('世界1位', '#D9FF3D')]],
