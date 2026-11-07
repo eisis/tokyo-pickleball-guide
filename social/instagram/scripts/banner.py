@@ -12,6 +12,10 @@ NAVY = '#0e3452'; SUN = '#ffd678'; CORAL = '#ff6b4a'; WHITE = '#ffffff'; PURPLE 
 # 全部同じ型：見出しは88pxで1行8文字まで・3行まで、右の絵は同じ枠（680×680）に収める
 # 表紙のファイル、切り抜く範囲（元画像の座標）、背景色（Noneなら表紙の左上の色）、文字色、札、見出し、ひとこと
 B = {
+  'golf-to-pickleball': dict(src='golf-to-pickleball.jpg', crop=(0, 60, 1080, 760), full=True,
+      bg='#0B1626', fg=WHITE, tags=[('アメリカのいま', '#D4F25A', NAVY)],
+      lines=[[('ゴルフの次は、', WHITE)], [('ピックル', '#D4F25A')], [('ボール？', '#D4F25A')]],
+      sub='アメリカの大人の、新しい付き合い方'),
   'major-league-pickleball': dict(src='major-league-pickleball.jpg', crop=(0, 150, 1080, 740), full=True,
       bg='#0C1830', fg=WHITE, tags=[('SPECIAL FEATURE', '#F06B3C', WHITE)],
       lines=[[('ピックルボールの', WHITE)], [('メジャーリーグ', '#F06B3C')]],
