@@ -12,6 +12,10 @@ NAVY = '#0e3452'; SUN = '#ffd678'; CORAL = '#ff6b4a'; WHITE = '#ffffff'; PURPLE 
 # 全部同じ型：見出しは88pxで1行8文字まで・3行まで、右の絵は同じ枠（680×680）に収める
 # 表紙のファイル、切り抜く範囲（元画像の座標）、背景色（Noneなら表紙の左上の色）、文字色、札、見出し、ひとこと
 B = {
+  'mlp-asia-2026': dict(src='mlp-asia-2026.jpg', crop=(0, 712, 1080, 1240), full=True,
+      bg='#09131F', fg=WHITE, tags=[('11/13 池袋で開幕', '#E07A52', WHITE)],
+      lines=[[('MLPが、', WHITE)], [('アジアで', '#E07A52')], [('初開催', '#E07A52')]],
+      sub='MLP Asia 2026、6チームが参戦'),
   'golf-to-pickleball': dict(src='golf-to-pickleball.jpg', crop=(0, 60, 1080, 760), full=True,
       bg='#0B1626', fg=WHITE, tags=[('アメリカのいま', '#D4F25A', NAVY)],
       lines=[[('ゴルフの次は、', WHITE)], [('ピックル', '#D4F25A')], [('ボール？', '#D4F25A')]],
