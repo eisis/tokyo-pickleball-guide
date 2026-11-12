@@ -96,6 +96,7 @@ const events = defineCollection({
     }).default({ required: true }),
     summary: z.string(), // 一覧に出る1〜2文の紹介
     url: z.string().url().optional(), // 主催者の公式ページ（詳細はこちらへ送る）
+    pickup: z.boolean().default(false), // true = 注目イベントとして一覧の上のほうに出す（主催イベントの次）
     organizer: z.object({
       id: z.string().optional(), // 主催者のファイル名（src/content/organizers/）。書くと主催者ページにまとまる
       name: z.string(),

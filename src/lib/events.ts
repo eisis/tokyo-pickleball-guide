@@ -60,6 +60,7 @@ export async function getUpcomingEvents(): Promise<Event[]> {
     .sort(
       (a, b) =>
         Number(b.data.organizer.self) - Number(a.data.organizer.self) ||
+        Number(b.data.pickup) - Number(a.data.pickup) ||
         upcomingDates(a, today)[0].localeCompare(upcomingDates(b, today)[0])
     );
 }
