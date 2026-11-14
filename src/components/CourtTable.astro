@@ -1,0 +1,61 @@
+---
+// コートの比較表（コート・屋内/屋外・料金・時間・アクセス）。エリアページと駅・街ページで共通。
+// 値はコートのファイルのものをそのまま出す（書いていない項目は「—」）。スマホでは1施設ずつの縦並びになる。
+// 行の data-purpose は、エリアページの「目的で選ぶ」ボタンの絞り込みに使う（定義は lib/courts.ts の PURPOSES）
+import { ENVIRONMENTS, courtUrl, hasRental, isPublic, purposesOf, type Court } from '../lib/courts';
+
+interface Props {
+  courts: Court[];
+  /** 名前の下に区・市名を出す（エリアページ向け） */
+  showArea?: boolean;
+}
+const { courts, showArea = false } = Astro.props;
+const sub = (c: Court) => {
+  const ja = [showArea && c.data.area.ja, isPublic(c) && '自治体の施設', c.data.courts && `${c.data.courts}面`, hasRental(c) && 'レンタルあり'].filter(Boolean).join('・');
+  const en = [showArea && c.data.area.en, isPublic(c) && 'Public', c.data.courts && `${c.data.courts} courts`, hasRental(c) && 'Rental'].filter(Boolean).join(' · ');
+  return { ja, en };
+};
+---
+
+<div class="ct-wrap">
+  <table class="ct">
+    <thead><tr><th data-ja="コート" data-en="Court">コート</th><th data-ja="屋内/屋外" data-en="Type">屋内/屋外</th><th data-ja="料金の目安" data-en="Price">料金の目安</th><th data-ja="時間" data-en="Hours">時間</th><th data-ja="アクセス" data-en="Access">アクセス</th></tr></thead>
+    <tbody>
+      {courts.map((c) => {
+        const s = sub(c);
+        return (
+          <tr data-ct-row data-purpose={purposesOf(c).join(' ')}>
+            <th scope="row"><a href={courtUrl(c)}>{c.data.name}</a>{s.ja && <small data-ja={s.ja} data-en={s.en}>{s.ja}</small>}</th>
+            <td data-label="屋内/屋外" data-label-en="Type" data-ja={c.data.environment.map((e) => ENVIRONMENTS[e].ja).join('・')} data-en={c.data.environment.map((e) => ENVIRONMENTS[e].en).join(' / ')}>{c.data.environment.map((e) => ENVIRONMENTS[e].ja).join('・')}</td>
+            <td data-label="料金の目安" data-label-en="Price">{c.data.price ?? '—'}</td>
+            <td data-label="時間" data-label-en="Hours">{c.data.hours ?? '—'}</td>
+            <td data-label="アクセス" data-label-en="Access" data-ja={c.data.access?.ja ?? '—'} data-en={c.data.access?.en ?? '—'}>{c.data.access?.ja ?? '—'}</td>
+          </tr>
+        );
+      })}
+    </tbody>
+  </table>
+</div>
+
+<style>
+  .ct-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius-sm); background: #fff; }
+  .ct { width: 100%; border-collapse: collapse; font-size: .86rem; min-width: 680px; }
+  .ct th, .ct td { padding: 12px 14px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); line-height: 1.6; }
+  .ct thead th { font-size: .76rem; color: var(--ink-soft); font-weight: 700; background: var(--foam); white-space: nowrap; }
+  .ct tbody tr:last-of-type th, .ct tbody tr:last-of-type td { border-bottom: 0; }
+  .ct tbody th { min-width: 11rem; }
+  .ct tbody th a { font-weight: 700; color: var(--navy); }
+  .ct tbody th small { display: block; font-weight: 500; color: var(--ink-soft); font-size: .74rem; }
+  .ct tr[hidden] { display: none; }
+  @media (max-width: 640px) {
+    .ct-wrap { overflow: visible; }
+    .ct { min-width: 0; }
+    .ct thead { display: none; }
+    .ct tr { display: block; padding: 14px 14px 10px; border-bottom: 1px solid var(--line); }
+    .ct th, .ct td { display: block; padding: 0; border: 0; }
+    .ct tbody th { margin-bottom: 8px; min-width: 0; }
+    .ct td { display: grid; grid-template-columns: 5.5rem 1fr; gap: 8px; padding: 3px 0; }
+    .ct td::before { content: attr(data-label); color: var(--ink-soft); font-size: .76rem; font-weight: 700; }
+    :global(html[lang='en']) .ct td::before { content: attr(data-label-en); }
+  }
+</style>

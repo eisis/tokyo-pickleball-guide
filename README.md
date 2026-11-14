@@ -123,3 +123,9 @@ scripts/         ← 自動化スクリプト（新コート探し）
 4. Pickleball Tokyo 主催のイベントは `organizer: { name: Pickleball Tokyo, self: true }`。一覧の先頭に目立って出て、申込はサイトのフォーム（大会エントリー）で受ける
 
 主催者からの掲載依頼は、お問い合わせフォームの「イベントを掲載したい」（/contact/?type=event）に届く。
+
+## エリアページ（/areas/tokyo/ など）
+4都県とも `src/pages/areas/[pref].astro` 1つで作っています。上から「目的で選んで比べる（比較表）→ 今週の開催 → 写真と地図 → 駅・街 → よくある質問」の順です。
+- 目的のボタン（屋内・レンタル・1人で参加・初心者向け・自治体の施設）は `src/lib/courts.ts` の `PURPOSES` で決めています。コートのファイルに書いた事実だけで判定し、該当0件のボタンは出ません。増やすときは `PURPOSES` に1つ足すだけです。
+- 比較表は `src/components/CourtTable.astro`（駅・街ページと共通）です。
+- 今週の開催は `src/lib/schedule.ts`（今週ページと共通）から、そのエリアの7日分を最大8件出します。`/this-week/?pref=chiba` のようにエリアを指定したリンクも使えます。

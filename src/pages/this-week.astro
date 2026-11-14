@@ -5,27 +5,14 @@
 // ・同じ日の中は Pickleball Tokyo 主催 → 開始時刻の順
 import Base from '../layouts/Base.astro';
 import TwItem from '../components/TwItem.astro';
-import { getUpcomingEvents, EVENT_TYPES, venueOf, upcomingDates, startTime } from '../lib/events';
-import { PREFECTURES, getCourts, sessionDates } from '../lib/courts';
+import { EVENT_TYPES } from '../lib/events';
+import { PREFECTURES } from '../lib/courts';
+import { getSchedule } from '../lib/schedule';
 
-const events = await getUpcomingEvents();
-const items = (
-  await Promise.all(
-    events.map(async (e) => {
-      const venue = await venueOf(e);
-      return upcomingDates(e).map((date) => ({ e, venue, date }));
-    })
-  )
-).flat();
 // 種類のチップは、はじめての人がたどる順（体験 → 習う → 打つ → 試合 → イベント）に並べる
 const TYPE_ORDER = ['trial', 'lesson', 'practice', 'tournament', 'festival'] as const;
-// 施設の定期開催の枠（コートの sessions）も、イベントと同じ並びに混ぜる
-const sessionItems = (await getCourts()).flatMap((c) => sessionDates(c).map((x) => ({ c, ...x })));
-// イベントと定期開催をひとつの並びにする（同じ日の中は Pickleball Tokyo 主催 → 開始時刻の順）
-const all = [
-  ...items.map((x) => ({ kind: 'event' as const, ...x, self: x.e.data.organizer.self, time: startTime(x.e) || '99:99' })),
-  ...sessionItems.map((x) => ({ kind: 'session' as const, c: x.c, s: x.s, date: x.date, self: false, time: (x.s.time.match(/\d{1,2}:\d{2}/)?.[0] ?? '99:99').padStart(5, '0') })),
-];
+// イベントと施設の定期開催をひとつにした並び（日付 → 主催 → 開始時刻の順。lib/schedule.ts）
+const all = await getSchedule();
 const WEEK = ['日', '月', '火', '水', '木', '金', '土'];
 const WEEK_EN = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const base = Date.now() + 9 * 3600 * 1000;
@@ -38,10 +25,10 @@ const week = [...Array(7)].map((_, i) => {
     headEn: i === 0 ? 'Today' : i === 1 ? 'Tomorrow' : WEEK_EN[x.getUTCDay()],
     sub: `${x.getUTCMonth() + 1}/${x.getUTCDate()}（${WEEK[x.getUTCDay()]}）`,
     subEn: `${x.getUTCMonth() + 1}/${x.getUTCDate()}`,
-    list: all.filter((it) => it.date === d).sort((a, b) => Number(b.self) - Number(a.self) || a.time.localeCompare(b.time)),
+    list: all.filter((it) => it.date === d),
   };
 });
-const prefs = (Object.keys(PREFECTURES) as (keyof typeof PREFECTURES)[]).filter((p) => items.some((x) => x.venue.prefecture === p) || sessionItems.some((x) => x.c.data.prefecture === p));
+const prefs = (Object.keys(PREFECTURES) as (keyof typeof PREFECTURES)[]).filter((p) => all.some((x) => x.pref === p));
 ---
 
 <Base
@@ -152,8 +139,11 @@ const prefs = (Object.keys(PREFECTURES) as (keyof typeof PREFECTURES)[]).filter(
   // 絞り込み
   const root = document.getElementById('tw-filters')!;
   const TYPES = ['all', 'trial', 'lesson', 'practice', 'tournament', 'festival'];
-  const fromUrl = new URLSearchParams(location.search).get('type') ?? 'all';
-  const state = { pref: 'all', beginner: false, walkin: false, type: TYPES.includes(fromUrl) ? fromUrl : 'all' };
+  const q = new URLSearchParams(location.search);
+  const fromUrl = q.get('type') ?? 'all';
+  const prefUrl = q.get('pref') ?? 'all';
+  const PREFS = [...root.querySelectorAll<HTMLElement>('.chip[data-key="pref"]')].map((b) => b.dataset.value);
+  const state = { pref: PREFS.includes(prefUrl) ? prefUrl : 'all', beginner: false, walkin: false, type: TYPES.includes(fromUrl) ? fromUrl : 'all' };
   // 7日間に開催がある種類だけチップを出し、件数を付ける
   const inWeek = sections.flatMap((sec) => [...sec.querySelectorAll<HTMLElement>('[data-tw]')]);
   root.querySelectorAll<HTMLElement>('[data-type-n]').forEach((n) => {
@@ -175,9 +165,10 @@ const prefs = (Object.keys(PREFECTURES) as (keyof typeof PREFECTURES)[]).filter(
     });
     root.querySelectorAll<HTMLButtonElement>('.chip[data-key]').forEach((b) => b.classList.toggle('active', state.pref === b.dataset.value));
     root.querySelectorAll<HTMLButtonElement>('.chip[data-type]').forEach((b) => b.classList.toggle('active', state.type === b.dataset.type));
-    // 種類はURLにも残す（?type=trial のリンクをSNSで共有できる）
+    // 種類とエリアはURLにも残す（?type=trial&pref=tokyo のリンクをSNSやエリアページから使える）
     const u = new URL(location.href);
     state.type === 'all' ? u.searchParams.delete('type') : u.searchParams.set('type', state.type);
+    state.pref === 'all' ? u.searchParams.delete('pref') : u.searchParams.set('pref', state.pref);
     history.replaceState(null, '', u);
     root.querySelectorAll<HTMLButtonElement>('[data-toggle]').forEach((b) => {
       const on = state[b.dataset.toggle as 'beginner' | 'walkin'];

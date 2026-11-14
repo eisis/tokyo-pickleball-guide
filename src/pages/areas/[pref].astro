@@ -1,12 +1,15 @@
 ---
-// エリア（都道府県）別のコート一覧ページ（例: /areas/tokyo/）
-// 「ピックルボール 東京」のような地名での検索と、AIの回答に引用されることを狙ったページ。
+// エリア（都道府県）別のコート一覧ページ（例: /areas/tokyo/）。4都県とも同じこのテンプレートで作る
+// 「ピックルボール 東京」「ピックルボール 千葉」のような地名検索の受け皿（トップは首都圏全体の入口のまま）。
+// 上から「目的で選んで比べる → 今週の開催 → 写真と地図 → 駅・街 → よくある質問」の順。
 // 本文の数字・コート名はすべて掲載データから自動で作る（推測の文章は書かない）
 import Base from '../../layouts/Base.astro';
 import CourtCard from '../../components/CourtCard.astro';
 import CourtMap from '../../components/CourtMap.astro';
-import { getCourts, PREFECTURES, courtUrl, hasRental, isPublic, type Court } from '../../lib/courts';
-import PublicCourtList from '../../components/PublicCourtList.astro';
+import CourtTable from '../../components/CourtTable.astro';
+import TwItem from '../../components/TwItem.astro';
+import { getCourts, PREFECTURES, PURPOSES, courtUrl, hasRental, isPublic, type Court, type Purpose } from '../../lib/courts';
+import { getSchedule, nextDays } from '../../lib/schedule';
 import { SPOTS, type SpotId } from '../../lib/spots';
 import { SITE, ldJson } from '../../lib/site';
 
@@ -31,6 +34,20 @@ const outdoor = courts.filter((c) => c.data.environment.includes('outdoor'));
 const rental = courts.filter(hasRental);
 const walkin = courts.filter((c) => c.data.reservation?.includes('walkin'));
 const spots = [...new Set(courts.map((c) => c.data.area.ja))];
+const publics = courts.filter(isPublic);
+// 比較表は専用コートなど → 自治体の施設の順
+const tableCourts = [...courts.filter((c) => !isPublic(c)), ...publics];
+const purposes = (Object.keys(PURPOSES) as Purpose[]).map((k) => ({ k, ...PURPOSES[k], n: courts.filter(PURPOSES[k].test).length })).filter((x) => x.n > 0);
+// 今週の開催（ビルドした日から7日分。毎朝の再ビルドで入れ替わる）。多すぎる日は今週ページへ任せる
+const WEEK = ['日', '月', '火', '水', '木', '金', '土'];
+const days = nextDays(7);
+const schedule = (await getSchedule()).filter((x) => x.pref === pref && days.includes(x.date));
+const MAX_WEEK = 8;
+const weekShown = schedule.slice(0, MAX_WEEK);
+const weekDays = [...new Set(weekShown.map((x) => x.date))].map((d) => {
+  const x = new Date(d + 'T00:00:00Z');
+  return { d, wd: x.getUTCDay(), ja: `${x.getUTCMonth() + 1}/${x.getUTCDate()}（${WEEK[x.getUTCDay()]}）`, en: `${x.getUTCMonth() + 1}/${x.getUTCDate()}`, list: weekShown.filter((y) => y.date === d) };
+});
 const latest = new Date(Math.max(...courts.map((c) => c.data.updatedAt.getTime())));
 const ymd = (d: Date) => d.toISOString().slice(0, 10);
 
@@ -40,6 +57,8 @@ const faqs = [
   outdoor.length > 0 && { q: `${P.ja}で屋外のピックルボールコートはありますか？`, a: `掲載中のコートのうち、屋外で打てるのは${names(outdoor).join('、')}の${outdoor.length}か所です。`, qEn: `Are there outdoor pickleball courts in ${P.en}?`, aEn: `${outdoor.length} listed places are outdoor: ${names(outdoor).join(', ')}.` },
   rental.length > 0 && { q: `パドルなどの道具を持っていなくても大丈夫ですか？`, a: `${names(rental).join('、')}では道具のレンタルがあると公式情報で確認できています。料金や内容は各コートのページをご覧ください。`, qEn: `Can I play without my own paddle?`, aEn: `These places rent equipment, according to their official information: ${names(rental).join(', ')}. See each court page for prices.` },
   walkin.length > 0 && { q: `予約なしで行けるコートはありますか？`, a: `${names(walkin).join('、')}は当日受付に対応していると確認できています。混雑状況は公式サイトでご確認ください。`, qEn: `Can I just walk in without booking?`, aEn: `These places accept same-day walk-ins: ${names(walkin).join(', ')}. Check the official sites for crowding.` },
+  courts.some(PURPOSES.beginner.test) && { q: `${P.ja}で初心者が参加しやすい場所はありますか？`, a: `${names(courts.filter(PURPOSES.beginner.test)).join('、')}では、初心者向けの枠や個人で参加できる回があると公式情報で確認できています。日程は各施設のページと「今週どこで打てる？」をご覧ください。`, qEn: `Where can beginners start in ${P.en}?`, aEn: `These places have beginner-friendly sessions, according to their official information: ${names(courts.filter(PURPOSES.beginner.test)).join(', ')}.` },
+  publics.length > 0 && { q: `${P.ja}で区や市の体育館でもピックルボールはできますか？`, a: `掲載中の自治体の施設は${names(publics).join('、')}の${publics.length}か所です。個人で参加できる回や団体での予約など、使い方は施設ごとに違うので各ページをご覧ください。`, qEn: `Can I play at public sports centers in ${P.en}?`, aEn: `We list ${publics.length} public centers: ${names(publics).join(', ')}. How you can use them differs by facility.` },
 ].filter(Boolean) as { q: string; a: string; qEn: string; aEn: string }[];
 
 const pageUrl = `${SITE.url}/areas/${pref}/`;
@@ -48,7 +67,7 @@ const jsonLd = {
   '@graph': [
     {
       '@type': 'CollectionPage',
-      name: `${P.ja}のピックルボールコート一覧`,
+      name: `${P.ja}でピックルボールができる場所`,
       url: pageUrl,
       dateModified: ymd(latest),
       isPartOf: { '@id': `${SITE.url}/#website` },
@@ -70,35 +89,66 @@ const jsonLd = {
 ---
 
 <Base
-  title={`${P.ja}のピックルボールコート一覧（${courts.length}か所）`}
-  description={`${P.full}でピックルボールができるコート${courts.length}か所（${spots.join('・')}）を、屋内・屋外、道具のレンタル、予約方法で比べられる一覧です。公式情報で確認した内容だけを載せています。`}
+  title={`${P.ja}でピックルボールができる場所（${courts.length}か所）｜料金・予約・初心者向け`}
+  description={`${P.full}でピックルボールができる場所${courts.length}か所を、料金・営業時間・アクセスで比べられる一覧です。屋内${indoor.length}か所、道具のレンタルあり${rental.length}か所${publics.length ? `、区や市の施設${publics.length}か所` : ''}。公式情報で確認し、毎週見直しています。`}
   en
 >
   <script slot="head" type="application/ld+json" set:html={ldJson(jsonLd)} />
   <main class="container">
     <nav class="crumbs" aria-label="パンくず"><a href="/" data-ja="トップ" data-en="Home">トップ</a><span aria-hidden="true">›</span><span data-ja={`${P.ja}のコート`} data-en={`Courts in ${P.en}`}>{P.ja}のコート</span></nav>
-    <h1 style="margin:0 0 12px;color:var(--navy)" data-ja={`${P.ja}のピックルボールコート一覧`} data-en={`Pickleball courts in ${P.en}`}>{P.ja}のピックルボールコート一覧</h1>
-    <p class="description" data-ja={`${P.full}でピックルボールができる場所を${courts.length}か所掲載しています（${spots.join('・')}）。屋内コートが${indoor.length}か所、屋外コートが${outdoor.length}か所です。料金・営業時間・予約方法は各施設の公式情報で確認したものだけを載せています。`} data-en={`We list ${courts.length} places to play pickleball in ${P.en}: ${indoor.length} indoor and ${outdoor.length} outdoor. Prices, hours and booking details come only from each facility's official information.`}>
-      {P.full}でピックルボールができる場所を{courts.length}か所掲載しています（{spots.join('・')}）。屋内コートが{indoor.length}か所、屋外コートが{outdoor.length}か所です。料金・営業時間・予約方法は各施設の公式情報で確認したものだけを載せています。
+    <h1 class="area-title" data-ja={`${P.ja}でピックルボールができる場所`} data-en={`Where to play pickleball in ${P.en}`}>{P.ja}でピックルボールができる場所</h1>
+    <p class="description" data-ja={`${P.full}でピックルボールができる場所を${courts.length}か所掲載しています。屋内が${indoor.length}か所、屋外が${outdoor.length}か所${publics.length ? `で、そのうち${publics.length}か所は区や市の体育館・スポーツセンターです` : 'です'}。料金・営業時間・予約方法は各施設の公式情報で確認したものだけを載せ、毎週見直しています。`} data-en={`We list ${courts.length} places to play pickleball in ${P.en}: ${indoor.length} indoor and ${outdoor.length} outdoor${publics.length ? `, including ${publics.length} public sports centers` : ''}. Prices, hours and booking details come only from official information and are reviewed weekly.`}>
+      {P.full}でピックルボールができる場所を{courts.length}か所掲載しています。屋内が{indoor.length}か所、屋外が{outdoor.length}か所{publics.length ? `で、そのうち${publics.length}か所は区や市の体育館・スポーツセンターです` : 'です'}。料金・営業時間・予約方法は各施設の公式情報で確認したものだけを載せ、毎週見直しています。
     </p>
     <p class="meta" data-ja={`情報の最終確認日：${ymd(latest)}`} data-en={`Last checked: ${ymd(latest)}`}>情報の最終確認日：{ymd(latest)}</p>
 
-    <div class="cards" style="margin-top:20px">
-      {courts.filter((c) => !isPublic(c)).map((court) => <CourtCard court={court} />)}
-    </div>
+    <section class="area-sec" data-purpose-root>
+      <h2 data-ja="目的で選んで、比べる" data-en="Compare by what you need">目的で選んで、比べる</h2>
+      {purposes.length > 1 && (
+        <div class="chips area-purposes" role="group" aria-label="目的">
+          <button type="button" class="chip active" data-purpose-btn="all" aria-pressed="true"><span data-ja="すべて" data-en="All">すべて</span> <span class="n">{courts.length}</span></button>
+          {purposes.map((x) => <button type="button" class="chip" data-purpose-btn={x.k} aria-pressed="false"><span data-ja={x.ja} data-en={x.en}>{x.ja}</span> <span class="n">{x.n}</span></button>)}
+        </div>
+      )}
+      <CourtTable courts={tableCourts} showArea />
+      <p class="meta" data-ja="料金・営業時間は変わることがあります。予約前に各施設の公式サイトでご確認ください。" data-en="Prices and hours may change. Check each official site before booking.">料金・営業時間は変わることがあります。予約前に各施設の公式サイトでご確認ください。</p>
+    </section>
 
-    {courts.some((c) => !isPublic(c) && c.data.location) && <div style="margin-top:28px"><CourtMap courts={courts.filter((c) => !isPublic(c))} /></div>}
+    {weekDays.length > 0 && (
+      <section class="area-sec">
+        <h2 data-ja={`今週${P.ja}で参加できる練習会・体験会`} data-en={`Open play & clinics in ${P.en} this week`}>今週{P.ja}で参加できる練習会・体験会</h2>
+        <div class="area-week">
+          {weekDays.map((w) => (
+            <div class={`tw-day wd-${w.wd}`}>
+              <h3 class="area-week-day" data-ja={w.ja} data-en={w.en}>{w.ja}</h3>
+              <div class="tw-list">{w.list.map((x) => <TwItem {...x} />)}</div>
+            </div>
+          ))}
+        </div>
+        <p class="meta"><a href={`/this-week/?pref=${pref}`} data-ja={schedule.length > MAX_WEEK ? `今週の予定をすべて見る（${schedule.length}件）→` : '今週の予定を日ごとに見る →'} data-en="See the full week →">{schedule.length > MAX_WEEK ? `今週の予定をすべて見る（${schedule.length}件）→` : '今週の予定を日ごとに見る →'}</a></p>
+      </section>
+    )}
 
-    {courts.some(isPublic) && (
-      <section style="margin-top:36px">
-        <h2 style="font-size:1.2rem;color:var(--navy);margin-bottom:12px" data-ja={`${P.ja}の体育館・スポーツセンター`} data-en={`Public sports centers in ${P.en}`}>{P.ja}の体育館・スポーツセンター</h2>
-        <PublicCourtList courts={courts.filter(isPublic)} />
+    {courts.some((c) => !isPublic(c)) && (
+      <section class="area-sec">
+        <h2 data-ja="写真と地図で見る" data-en="Photos & map">写真と地図で見る</h2>
+        <div class="cards">
+          {courts.filter((c) => !isPublic(c)).map((court) => <CourtCard court={court} />)}
+        </div>
+        {courts.some((c) => !isPublic(c) && c.data.location) && <div style="margin-top:28px"><CourtMap courts={courts.filter((c) => !isPublic(c))} /></div>}
+      </section>
+    )}
+
+    {(Object.keys(SPOTS) as SpotId[]).some((k) => SPOTS[k].pref === pref) && (
+      <section class="area-sec">
+        <h2 data-ja="駅・街から探す" data-en="Browse by neighborhood">駅・街から探す</h2>
+        <p class="area-links">{(Object.keys(SPOTS) as SpotId[]).filter((k) => SPOTS[k].pref === pref).map((k) => <a href={`/spots/${k}/`} data-ja={`${SPOTS[k].ja}のコート`} data-en={SPOTS[k].en}>{SPOTS[k].ja}のコート</a>)}</p>
       </section>
     )}
 
     {faqs.length > 0 && (
-      <section class="area-faq" style="margin-top:36px">
-        <h2 style="font-size:1.2rem;color:var(--navy);margin-bottom:12px" data-ja={`${P.ja}でピックルボールをするときのよくある質問`} data-en="FAQ">{P.ja}でピックルボールをするときのよくある質問</h2>
+      <section class="area-sec area-faq">
+        <h2 data-ja={`${P.ja}でピックルボールをするときのよくある質問`} data-en="FAQ">{P.ja}でピックルボールをするときのよくある質問</h2>
         {faqs.map((f) => (
           <details>
             <summary data-ja={f.q} data-en={f.qEn}>{f.q}</summary>
@@ -108,22 +158,37 @@ const jsonLd = {
       </section>
     )}
 
-    {(Object.keys(SPOTS) as SpotId[]).some((k) => SPOTS[k].pref === pref) && (
-      <section style="margin-top:36px">
-        <h2 style="font-size:1.1rem;color:var(--navy);margin-bottom:10px" data-ja="駅・街から探す" data-en="Browse by neighborhood">駅・街から探す</h2>
-        <p class="area-links">{(Object.keys(SPOTS) as SpotId[]).filter((k) => SPOTS[k].pref === pref).map((k) => <a href={`/spots/${k}/`} data-ja={`${SPOTS[k].ja}のコート`} data-en={SPOTS[k].en}>{SPOTS[k].ja}のコート</a>)}</p>
-      </section>
-    )}
-
-    <section style="margin-top:36px">
-      <h2 style="font-size:1.1rem;color:var(--navy);margin-bottom:10px" data-ja="ほかのエリアから探す" data-en="Other areas">ほかのエリアから探す</h2>
+    <section class="area-sec">
+      <h2 data-ja="ほかのエリアから探す" data-en="Other areas">ほかのエリアから探す</h2>
       <p class="area-links">{others.map((p) => <a href={`/areas/${p}/`} data-ja={`${PREFECTURES[p].ja}のコート`} data-en={PREFECTURES[p].en}>{PREFECTURES[p].ja}のコート</a>)}</p>
       <p class="meta"><a href="/this-week/" data-ja="今週参加できる練習会・体験会を見る" data-en="Open play &amp; clinics this week">今週参加できる練習会・体験会を見る</a>　<a href="/events/" data-ja="大会・イベント一覧を見る" data-en="All events">大会・イベント一覧を見る</a></p>
     </section>
   </main>
 </Base>
 
+<script>
+  // 目的のボタン：比較表の行を data-purpose で絞り込む（1つだけ選ぶ方式。もう一度押すと「すべて」に戻る）
+  document.querySelectorAll<HTMLElement>('[data-purpose-root]').forEach((root) => {
+    const btns = [...root.querySelectorAll<HTMLButtonElement>('[data-purpose-btn]')];
+    const rows = [...root.querySelectorAll<HTMLElement>('[data-ct-row]')];
+    let cur = 'all';
+    const apply = () => {
+      rows.forEach((r) => (r.hidden = cur !== 'all' && !(r.dataset.purpose ?? '').split(' ').includes(cur)));
+      btns.forEach((b) => { const on = b.dataset.purposeBtn === cur; b.classList.toggle('active', on); b.setAttribute('aria-pressed', String(on)); });
+    };
+    btns.forEach((b) => b.addEventListener('click', () => { cur = b.dataset.purposeBtn === cur ? 'all' : b.dataset.purposeBtn!; apply(); }));
+  });
+</script>
+
 <style>
+  .area-title { margin: 0 0 12px; color: var(--navy); }
+  .area-sec { margin-top: 40px; }
+  .area-sec > h2 { font-size: 1.2rem; color: var(--navy); margin: 0 0 14px; }
+  .chips.area-purposes { margin-bottom: 14px; flex-wrap: wrap; overflow: visible; }
+  .area-week { display: flex; flex-direction: column; gap: 14px; margin-bottom: 8px; }
+  .area-week-day { font-size: .92rem; font-weight: 700; color: var(--ink-soft); margin: 0 0 6px; padding: 0 4px; }
+  .area-week .wd-0 .area-week-day { color: #c2412b; }
+  .area-week .wd-6 .area-week-day { color: var(--indoor); }
   .area-faq details { border-top: 1px solid var(--line, #e5e7eb); padding: 12px 0; }
   .area-faq details:last-child { border-bottom: 1px solid var(--line, #e5e7eb); }
   .area-faq summary { cursor: pointer; font-weight: 700; color: var(--navy); }

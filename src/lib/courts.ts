@@ -107,3 +107,15 @@ export function sessionDates(court: Court, days = 60) {
   });
   return out;
 }
+
+// 目的別の入口（エリアページの「目的で選ぶ」）。判定はすべて掲載データの事実だけで行う。
+// 増やすときはここに1つ足すだけで、エリアページのボタンと比較表の絞り込みに反映される（該当0件のボタンは出ない）
+export const PURPOSES = {
+  rain: { ja: '雨の日も（屋内）', en: 'Indoor', test: (c: Court) => c.data.environment.includes('indoor') },
+  rental: { ja: '手ぶらでOK（レンタルあり）', en: 'Rental', test: (c: Court) => hasRental(c) },
+  solo: { ja: '1人で参加できる', en: 'Solo drop-in', test: (c: Court) => !!c.data.usage?.includes('dropin') || !!c.data.reservation?.includes('walkin') || c.data.sessions.length > 0 },
+  beginner: { ja: '初心者向けの枠あり', en: 'Beginner slots', test: (c: Court) => !!c.data.beginner || c.data.sessions.some((s) => s.beginner) },
+  public: { ja: '区・市の施設', en: 'Public centers', test: (c: Court) => isPublic(c) },
+} as const;
+export type Purpose = keyof typeof PURPOSES;
+export const purposesOf = (c: Court) => (Object.keys(PURPOSES) as Purpose[]).filter((k) => PURPOSES[k].test(c));

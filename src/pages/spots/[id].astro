@@ -4,7 +4,8 @@
 import Base from '../../layouts/Base.astro';
 import CourtCard from '../../components/CourtCard.astro';
 import CourtMap from '../../components/CourtMap.astro';
-import { getCourts, PREFECTURES, ENVIRONMENTS, courtUrl, hasRental } from '../../lib/courts';
+import CourtTable from '../../components/CourtTable.astro';
+import { getCourts, PREFECTURES, courtUrl } from '../../lib/courts';
 import { SPOTS, type SpotId } from '../../lib/spots';
 import { SITE, ldJson } from '../../lib/site';
 
@@ -45,22 +46,7 @@ const jsonLd = {
     <p class="description" data-ja={`${S.lead}掲載しているのは${courts.length}か所で、屋内が${indoor}か所、屋外が${outdoor}か所です。`} data-en={`${S.leadEn} We list ${courts.length} places: ${indoor} indoor and ${outdoor} outdoor.`}>{S.lead}掲載しているのは{courts.length}か所で、屋内が{indoor}か所、屋外が{outdoor}か所です。</p>
     <p class="meta" data-ja={`情報の最終確認日：${latest}`} data-en={`Last checked: ${latest}`}>情報の最終確認日：{latest}</p>
 
-    <div class="spot-table-wrap">
-      <table class="spot-table">
-        <thead><tr><th data-ja="コート" data-en="Court">コート</th><th data-ja="屋内/屋外" data-en="Type">屋内/屋外</th><th data-ja="料金の目安" data-en="Price">料金の目安</th><th data-ja="時間" data-en="Hours">時間</th><th data-ja="アクセス" data-en="Access">アクセス</th></tr></thead>
-        <tbody>
-          {courts.map((c) => (
-            <tr>
-              <th scope="row"><a href={courtUrl(c)}>{c.data.name}</a>{c.data.courts && <small data-ja={`${c.data.courts}面${hasRental(c) ? '・レンタルあり' : ''}`} data-en={`${c.data.courts} courts${hasRental(c) ? ' · Rental' : ''}`}>{c.data.courts}面{hasRental(c) ? '・レンタルあり' : ''}</small>}</th>
-              <td data-label="屋内/屋外" data-label-en="Type" data-ja={c.data.environment.map((e) => ENVIRONMENTS[e].ja).join('・')} data-en={c.data.environment.map((e) => ENVIRONMENTS[e].en).join(' / ')}>{c.data.environment.map((e) => ENVIRONMENTS[e].ja).join('・')}</td>
-              <td data-label="料金の目安" data-label-en="Price">{c.data.price ?? '—'}</td>
-              <td data-label="時間" data-label-en="Hours">{c.data.hours ?? '—'}</td>
-              <td data-label="アクセス" data-label-en="Access" data-ja={c.data.access?.ja ?? '—'} data-en={c.data.access?.en ?? '—'}>{c.data.access?.ja ?? '—'}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+    <div style="margin-top:20px"><CourtTable courts={courts} /></div>
 
     <div class="cards" style="margin-top:28px">{courts.map((c) => <CourtCard court={c} />)}</div>
     {courts.some((c) => c.data.location) && <div style="margin-top:28px"><CourtMap courts={courts} /></div>}
@@ -72,25 +58,3 @@ const jsonLd = {
     <p class="meta" data-ja="料金・営業時間は変わることがあります。最新情報は各施設の公式サイトでご確認ください。" data-en="Prices and hours may change. Please check each official site.">料金・営業時間は変わることがあります。最新情報は各施設の公式サイトでご確認ください。</p>
   </main>
 </Base>
-
-<style>
-  .spot-table-wrap { margin-top: 20px; overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius-sm); background: #fff; }
-  .spot-table { width: 100%; border-collapse: collapse; font-size: .86rem; min-width: 640px; }
-  .spot-table th, .spot-table td { padding: 12px 14px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); line-height: 1.6; }
-  .spot-table thead th { font-size: .76rem; color: var(--ink-soft); font-weight: 700; background: var(--foam); }
-  .spot-table tbody tr:last-child th, .spot-table tbody tr:last-child td { border-bottom: 0; }
-  .spot-table tbody th a { font-weight: 700; color: var(--navy); }
-  .spot-table tbody th small { display: block; font-weight: 500; color: var(--ink-soft); font-size: .74rem; }
-  @media (max-width: 640px) {
-    .spot-table-wrap { overflow: visible; }
-    .spot-table { min-width: 0; }
-    .spot-table thead { display: none; }
-    .spot-table tr { display: block; padding: 14px 14px 10px; border-bottom: 1px solid var(--line); }
-    .spot-table tbody tr:last-child { border-bottom: 0; }
-    .spot-table th, .spot-table td { display: block; padding: 0; border: 0; }
-    .spot-table tbody th { margin-bottom: 8px; }
-    .spot-table td { display: grid; grid-template-columns: 5.5rem 1fr; gap: 8px; padding: 3px 0; }
-    :global(html[lang='en']) .spot-table td::before { content: attr(data-label-en); }
-    .spot-table td::before { content: attr(data-label); color: var(--ink-soft); font-size: .76rem; font-weight: 700; }
-  }
-</style>

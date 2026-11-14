@@ -37,7 +37,7 @@ const upcoming = (await getUpcomingEvents()).slice(0, 4);
     </video>
     <div class="hero-overlay"></div>
     <div class="hero-content">
-      <p class="hero-eyebrow">Tokyo · Kanagawa · Chiba · Saitama</p>
+      <p class="hero-eyebrow" data-ja="東京・神奈川・千葉・埼玉" data-en="Tokyo · Kanagawa · Chiba · Saitama">東京・神奈川・千葉・埼玉</p>
       <h1 data-ja="東京で、<br>ピックルボールを。" data-en="Find your court<br>in Tokyo." set:html="東京で、<br>ピックルボールを。" />
       <p class="hero-lead" data-ja={SITE.lead.ja} data-en={SITE.lead.en} set:html={SITE.lead.ja} />
 
