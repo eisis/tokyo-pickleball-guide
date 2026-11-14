@@ -7,6 +7,7 @@ import CourtCard from '../../components/CourtCard.astro';
 import CourtMap from '../../components/CourtMap.astro';
 import { getCourts, PREFECTURES, courtUrl, hasRental, isPublic, type Court } from '../../lib/courts';
 import PublicCourtList from '../../components/PublicCourtList.astro';
+import { SPOTS, type SpotId } from '../../lib/spots';
 import { SITE, ldJson } from '../../lib/site';
 
 type Pref = keyof typeof PREFECTURES;
@@ -105,6 +106,13 @@ const jsonLd = {
             <p>{f.a}</p>
           </details>
         ))}
+      </section>
+    )}
+
+    {(Object.keys(SPOTS) as SpotId[]).some((k) => SPOTS[k].pref === pref) && (
+      <section style="margin-top:36px">
+        <h2 style="font-size:1.1rem;color:var(--navy);margin-bottom:10px">駅・街から探す</h2>
+        <p class="area-links">{(Object.keys(SPOTS) as SpotId[]).filter((k) => SPOTS[k].pref === pref).map((k) => <a href={`/spots/${k}/`}>{SPOTS[k].ja}のコート</a>)}</p>
       </section>
     )}
 

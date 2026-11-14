@@ -1,0 +1,94 @@
+---
+// 駅・街の単位のコートまとめ（例: /spots/toyosu/）。「豊洲 ピックルボール」のような地名検索の受け皿
+// 料金・時間・アクセスはコートのファイルの値をそのまま出す（推測の文章は書かない）
+import Base from '../../layouts/Base.astro';
+import CourtCard from '../../components/CourtCard.astro';
+import CourtMap from '../../components/CourtMap.astro';
+import { getCourts, PREFECTURES, ENVIRONMENTS, courtUrl, hasRental } from '../../lib/courts';
+import { SPOTS, type SpotId } from '../../lib/spots';
+import { SITE, ldJson } from '../../lib/site';
+
+export function getStaticPaths() {
+  return (Object.keys(SPOTS) as SpotId[]).map((id) => ({ params: { id }, props: { id } }));
+}
+const { id } = Astro.props as { id: SpotId };
+const S = SPOTS[id];
+const all = await getCourts();
+const courts = (S.courts as readonly string[]).map((c) => all.find((x) => x.id === c)).filter((c): c is NonNullable<typeof c> => !!c);
+const P = PREFECTURES[S.pref];
+const indoor = courts.filter((c) => c.data.environment.includes('indoor')).length;
+const outdoor = courts.filter((c) => c.data.environment.includes('outdoor')).length;
+const latest = new Date(Math.max(...courts.map((c) => c.data.updatedAt.getTime()))).toISOString().slice(0, 10);
+const pageUrl = `${SITE.url}/spots/${id}/`;
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    { '@type': 'ItemList', name: `${S.ja}のピックルボールコート`, itemListElement: courts.map((c, i) => ({ '@type': 'ListItem', position: i + 1, name: c.data.name, url: SITE.url + courtUrl(c) })) },
+    { '@type': 'BreadcrumbList', itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'トップ', item: SITE.url + '/' },
+      { '@type': 'ListItem', position: 2, name: `${P.ja}のコート`, item: `${SITE.url}/areas/${S.pref}/` },
+      { '@type': 'ListItem', position: 3, name: `${S.ja}のコート`, item: pageUrl },
+    ] },
+  ],
+};
+---
+
+<Base
+  title={`${S.ja}でピックルボールができる場所（${courts.length}か所）｜料金・アクセス比較`}
+  description={`${S.ja}のピックルボールコート${courts.length}か所（${courts.map((c) => c.data.name).join('・')}）を、屋内・屋外、料金、営業時間、アクセスで比べられます。公式情報で確認した内容だけを載せています。`}
+>
+  <script slot="head" type="application/ld+json" set:html={ldJson(jsonLd)} />
+  <main class="container">
+    <nav class="crumbs" aria-label="パンくず"><a href="/">トップ</a><span aria-hidden="true">›</span><a href={`/areas/${S.pref}/`}>{P.ja}のコート</a><span aria-hidden="true">›</span><span>{S.ja}</span></nav>
+    <h1 style="margin:0 0 12px;color:var(--navy)">{S.ja}でピックルボールができる場所</h1>
+    <p class="description">{S.lead}掲載しているのは{courts.length}か所で、屋内が{indoor}か所、屋外が{outdoor}か所です。</p>
+    <p class="meta">情報の最終確認日：{latest}</p>
+
+    <div class="spot-table-wrap">
+      <table class="spot-table">
+        <thead><tr><th>コート</th><th>屋内/屋外</th><th>料金の目安</th><th>時間</th><th>アクセス</th></tr></thead>
+        <tbody>
+          {courts.map((c) => (
+            <tr>
+              <th scope="row"><a href={courtUrl(c)}>{c.data.name}</a>{c.data.courts && <small>{c.data.courts}面{hasRental(c) ? '・レンタルあり' : ''}</small>}</th>
+              <td data-label="屋内/屋外">{c.data.environment.map((e) => ENVIRONMENTS[e].ja).join('・')}</td>
+              <td data-label="料金の目安">{c.data.price ?? '—'}</td>
+              <td data-label="時間">{c.data.hours ?? '—'}</td>
+              <td data-label="アクセス">{c.data.access?.ja ?? '—'}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="cards" style="margin-top:28px">{courts.map((c) => <CourtCard court={c} />)}</div>
+    {courts.some((c) => c.data.location) && <div style="margin-top:28px"><CourtMap courts={courts} /></div>}
+
+    <section style="margin-top:36px">
+      <h2 style="font-size:1.1rem;color:var(--navy);margin-bottom:10px">ほかの場所から探す</h2>
+      <p class="meta"><a href={`/areas/${S.pref}/`}>{P.ja}のコート一覧へ</a>　<a href="/this-week/">今週参加できる練習会・体験会</a></p>
+    </section>
+    <p class="meta">料金・営業時間は変わることがあります。最新情報は各施設の公式サイトでご確認ください。</p>
+  </main>
+</Base>
+
+<style>
+  .spot-table-wrap { margin-top: 20px; overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius-sm); background: #fff; }
+  .spot-table { width: 100%; border-collapse: collapse; font-size: .86rem; min-width: 640px; }
+  .spot-table th, .spot-table td { padding: 12px 14px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); line-height: 1.6; }
+  .spot-table thead th { font-size: .76rem; color: var(--ink-soft); font-weight: 700; background: var(--foam); }
+  .spot-table tbody tr:last-child th, .spot-table tbody tr:last-child td { border-bottom: 0; }
+  .spot-table tbody th a { font-weight: 700; color: var(--navy); }
+  .spot-table tbody th small { display: block; font-weight: 500; color: var(--ink-soft); font-size: .74rem; }
+  @media (max-width: 640px) {
+    .spot-table-wrap { overflow: visible; }
+    .spot-table { min-width: 0; }
+    .spot-table thead { display: none; }
+    .spot-table tr { display: block; padding: 14px 14px 10px; border-bottom: 1px solid var(--line); }
+    .spot-table tbody tr:last-child { border-bottom: 0; }
+    .spot-table th, .spot-table td { display: block; padding: 0; border: 0; }
+    .spot-table tbody th { margin-bottom: 8px; }
+    .spot-table td { display: grid; grid-template-columns: 5.5rem 1fr; gap: 8px; padding: 3px 0; }
+    .spot-table td::before { content: attr(data-label); color: var(--ink-soft); font-size: .76rem; font-weight: 700; }
+  }
+</style>

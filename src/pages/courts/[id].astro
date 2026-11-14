@@ -5,6 +5,7 @@ import Base from '../../layouts/Base.astro';
 import CourtMap from '../../components/CourtMap.astro';
 import EventCard from '../../components/EventCard.astro';
 import { getUpcomingEvents } from '../../lib/events';
+import { SPOTS, spotOf } from '../../lib/spots';
 import { getCourts, PREFECTURES, ENVIRONMENTS, mapUrl, courtUrl, isNew, rentalText, reservationText, hasRental, USAGE, type Court } from '../../lib/courts';
 import { SITE, ldJson } from '../../lib/site';
 
@@ -16,6 +17,7 @@ export async function getStaticPaths() {
 const { court } = Astro.props as { court: Court };
 const d = court.data;
 const { Content } = await render(court);
+const spot = spotOf(court.id);
 const courtEvents = (await getUpcomingEvents()).filter((e) => e.data.court === court.id);
 const env = d.environment.map((e) => ENVIRONMENTS[e].ja).join('・');
 const pref = PREFECTURES[d.prefecture].full;
@@ -105,6 +107,7 @@ const pageTitle = `${d.area.ja} ピックルボール｜${d.name}の料金・予
 
     {d.location && <div style="margin-top:28px"><CourtMap courts={[court]} /></div>}
 
+    {spot && <p class="meta" style="margin-top:20px"><a href={`/spots/${spot}/`}>{SPOTS[spot].ja}のほかのコートと比べる →</a></p>}
     <p class="meta">情報確認日：{ymd(d.updatedAt)}　料金・営業時間は変わることがあるため、最新情報は公式サイトでご確認ください。</p>
 
     <aside class="owner-note">
