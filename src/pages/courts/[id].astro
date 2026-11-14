@@ -5,7 +5,7 @@ import Base from '../../layouts/Base.astro';
 import CourtMap from '../../components/CourtMap.astro';
 import EventCard from '../../components/EventCard.astro';
 import { getUpcomingEvents } from '../../lib/events';
-import { getCourts, PREFECTURES, ENVIRONMENTS, mapUrl, courtUrl, isNew, rentalText, reservationText, USAGE, type Court } from '../../lib/courts';
+import { getCourts, PREFECTURES, ENVIRONMENTS, mapUrl, courtUrl, isNew, rentalText, reservationText, hasRental, USAGE, type Court } from '../../lib/courts';
 import { SITE, ldJson } from '../../lib/site';
 
 export async function getStaticPaths() {
@@ -49,10 +49,19 @@ const jsonLd = {
     },
   ],
 };
-const desc = `${d.name}（${pref}・${d.area.ja}）のピックルボールコート情報。${d.description.ja}`;
+// 検索結果で選ばれるように、地名を先頭に置き、料金・時間・アクセスなど「行く前に知りたい事実」を説明文に並べる（書いてある項目だけ）
+const facts = [
+  `${env}${d.courts ? `${d.courts}面` : ''}`,
+  d.price && `料金：${d.price}`,
+  d.hours && `時間：${d.hours.replace(/"/g, '')}`,
+  d.access?.ja,
+  hasRental(court) && '道具のレンタルあり',
+].filter(Boolean).join('、');
+const desc = `${d.area.ja}のピックルボールコート「${d.name}」。${facts}。${d.description.ja}`;
+const pageTitle = `${d.area.ja} ピックルボール｜${d.name}の料金・予約・アクセス`;
 ---
 
-<Base title={`${d.name}｜${d.area.ja}のピックルボールコート`} description={desc} image={d.image}>
+<Base title={pageTitle} description={desc} image={d.image}>
   <script slot="head" type="application/ld+json" set:html={ldJson(jsonLd)} />
   <main class="container narrow">
     <nav class="crumbs" aria-label="パンくず"><a href="/">トップ</a><span aria-hidden="true">›</span><a href={`/areas/${d.prefecture}/`}>{PREFECTURES[d.prefecture].ja}のコート</a></nav>
