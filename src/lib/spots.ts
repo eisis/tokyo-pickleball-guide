@@ -3,9 +3,11 @@
 export const SPOTS = {
   toyosu: {
     ja: '豊洲・有明',
+    en: 'Toyosu & Ariake',
     pref: 'tokyo',
     courts: ['picklr-toyosu', 'pickleball-park-toyosu', 'pacific-pickle-club'],
     lead: '豊洲・新豊洲・有明の湾岸エリアには、屋内の会員制クラブから水辺の屋外コートまで、タイプの違うピックルボールコートが集まっています。',
+    leadEn: 'The Toyosu, Shin-Toyosu and Ariake waterfront area has a mix of pickleball courts, from an indoor members club to open-air courts by the water.',
   },
 } as const;
 export type SpotId = keyof typeof SPOTS;

@@ -691,3 +691,5 @@ html[lang="en"] .hero h1 { font-family: var(--display); font-weight: 800; letter
   background: linear-gradient(135deg, var(--navy) 0%, #1f7fb8 100%); box-shadow: var(--shadow); }
 .stat .stat-num { margin: 0; font-family: var(--display); font-weight: 900; font-size: clamp(2.2rem, 8vw, 3.2rem); line-height: 1.15; color: #ffd678; letter-spacing: .01em; }
 .stat .stat-cap { margin: 8px 0 0; font-size: .95rem; font-weight: 700; color: #d8ecf8; line-height: 1.6; }
+.en-only-note { margin: 0; padding: 10px 20px; background: var(--foam); border-bottom: 1px solid var(--line); font-size: .85rem; color: var(--ink-soft); text-align: center; }
+.en-only-note a { color: var(--teal-dark); font-weight: 700; }

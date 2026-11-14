@@ -10,12 +10,15 @@ price: 区民1,000円、一般1,200円
 rental: { status: available, note: パドル }
 beginner: true
 usage: [dropin]
+sessions:
+  - { title: ピックルボール教室, type: lesson, days: [wed], time: "13:00〜14:10", price: "区民1,000円・一般1,200円", beginner: true, from: 2026-11-25, until: 2026-12-09 }
 description:
   ja: 初めての人や運動が苦手な人も歓迎の「ピックルボール教室」があります。ルールと基礎練習から試合まで行い、パドルは貸し出しがあります。
   en: Beginner-friendly pickleball classes covering rules, basics and games. Paddles available to borrow.
 booking: { url: "https://shisetsu.mizuno.jp/m-7501/event/cat/all", label: info }
 mapQuery: 千代田区立スポーツセンター
 updatedAt: 2026-11-14
+reviewBy: 2026-12-09
 sources:
   - https://shisetsu.mizuno.jp/m-7501/event/60466
   - https://shisetsu.mizuno.jp/m-7501/event/60468

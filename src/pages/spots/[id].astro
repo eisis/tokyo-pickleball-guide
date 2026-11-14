@@ -36,25 +36,26 @@ const jsonLd = {
 <Base
   title={`${S.ja}でピックルボールができる場所（${courts.length}か所）｜料金・アクセス比較`}
   description={`${S.ja}のピックルボールコート${courts.length}か所（${courts.map((c) => c.data.name).join('・')}）を、屋内・屋外、料金、営業時間、アクセスで比べられます。公式情報で確認した内容だけを載せています。`}
+  en
 >
   <script slot="head" type="application/ld+json" set:html={ldJson(jsonLd)} />
   <main class="container">
-    <nav class="crumbs" aria-label="パンくず"><a href="/">トップ</a><span aria-hidden="true">›</span><a href={`/areas/${S.pref}/`}>{P.ja}のコート</a><span aria-hidden="true">›</span><span>{S.ja}</span></nav>
-    <h1 style="margin:0 0 12px;color:var(--navy)">{S.ja}でピックルボールができる場所</h1>
-    <p class="description">{S.lead}掲載しているのは{courts.length}か所で、屋内が{indoor}か所、屋外が{outdoor}か所です。</p>
-    <p class="meta">情報の最終確認日：{latest}</p>
+    <nav class="crumbs" aria-label="パンくず"><a href="/" data-ja="トップ" data-en="Home">トップ</a><span aria-hidden="true">›</span><a href={`/areas/${S.pref}/`} data-ja={`${P.ja}のコート`} data-en={`Courts in ${P.en}`}>{P.ja}のコート</a><span aria-hidden="true">›</span><span data-ja={S.ja} data-en={S.en}>{S.ja}</span></nav>
+    <h1 style="margin:0 0 12px;color:var(--navy)" data-ja={`${S.ja}でピックルボールができる場所`} data-en={`Where to play pickleball in ${S.en}`}>{S.ja}でピックルボールができる場所</h1>
+    <p class="description" data-ja={`${S.lead}掲載しているのは${courts.length}か所で、屋内が${indoor}か所、屋外が${outdoor}か所です。`} data-en={`${S.leadEn} We list ${courts.length} places: ${indoor} indoor and ${outdoor} outdoor.`}>{S.lead}掲載しているのは{courts.length}か所で、屋内が{indoor}か所、屋外が{outdoor}か所です。</p>
+    <p class="meta" data-ja={`情報の最終確認日：${latest}`} data-en={`Last checked: ${latest}`}>情報の最終確認日：{latest}</p>
 
     <div class="spot-table-wrap">
       <table class="spot-table">
-        <thead><tr><th>コート</th><th>屋内/屋外</th><th>料金の目安</th><th>時間</th><th>アクセス</th></tr></thead>
+        <thead><tr><th data-ja="コート" data-en="Court">コート</th><th data-ja="屋内/屋外" data-en="Type">屋内/屋外</th><th data-ja="料金の目安" data-en="Price">料金の目安</th><th data-ja="時間" data-en="Hours">時間</th><th data-ja="アクセス" data-en="Access">アクセス</th></tr></thead>
         <tbody>
           {courts.map((c) => (
             <tr>
-              <th scope="row"><a href={courtUrl(c)}>{c.data.name}</a>{c.data.courts && <small>{c.data.courts}面{hasRental(c) ? '・レンタルあり' : ''}</small>}</th>
-              <td data-label="屋内/屋外">{c.data.environment.map((e) => ENVIRONMENTS[e].ja).join('・')}</td>
-              <td data-label="料金の目安">{c.data.price ?? '—'}</td>
-              <td data-label="時間">{c.data.hours ?? '—'}</td>
-              <td data-label="アクセス">{c.data.access?.ja ?? '—'}</td>
+              <th scope="row"><a href={courtUrl(c)}>{c.data.name}</a>{c.data.courts && <small data-ja={`${c.data.courts}面${hasRental(c) ? '・レンタルあり' : ''}`} data-en={`${c.data.courts} courts${hasRental(c) ? ' · Rental' : ''}`}>{c.data.courts}面{hasRental(c) ? '・レンタルあり' : ''}</small>}</th>
+              <td data-label="屋内/屋外" data-label-en="Type" data-ja={c.data.environment.map((e) => ENVIRONMENTS[e].ja).join('・')} data-en={c.data.environment.map((e) => ENVIRONMENTS[e].en).join(' / ')}>{c.data.environment.map((e) => ENVIRONMENTS[e].ja).join('・')}</td>
+              <td data-label="料金の目安" data-label-en="Price">{c.data.price ?? '—'}</td>
+              <td data-label="時間" data-label-en="Hours">{c.data.hours ?? '—'}</td>
+              <td data-label="アクセス" data-label-en="Access" data-ja={c.data.access?.ja ?? '—'} data-en={c.data.access?.en ?? '—'}>{c.data.access?.ja ?? '—'}</td>
             </tr>
           ))}
         </tbody>
@@ -65,10 +66,10 @@ const jsonLd = {
     {courts.some((c) => c.data.location) && <div style="margin-top:28px"><CourtMap courts={courts} /></div>}
 
     <section style="margin-top:36px">
-      <h2 style="font-size:1.1rem;color:var(--navy);margin-bottom:10px">ほかの場所から探す</h2>
-      <p class="meta"><a href={`/areas/${S.pref}/`}>{P.ja}のコート一覧へ</a>　<a href="/this-week/">今週参加できる練習会・体験会</a></p>
+      <h2 style="font-size:1.1rem;color:var(--navy);margin-bottom:10px" data-ja="ほかの場所から探す" data-en="Find more places">ほかの場所から探す</h2>
+      <p class="meta"><a href={`/areas/${S.pref}/`} data-ja={`${P.ja}のコート一覧へ`} data-en={`All courts in ${P.en}`}>{P.ja}のコート一覧へ</a>　<a href="/this-week/" data-ja="今週参加できる練習会・体験会" data-en="Open play &amp; clinics this week">今週参加できる練習会・体験会</a></p>
     </section>
-    <p class="meta">料金・営業時間は変わることがあります。最新情報は各施設の公式サイトでご確認ください。</p>
+    <p class="meta" data-ja="料金・営業時間は変わることがあります。最新情報は各施設の公式サイトでご確認ください。" data-en="Prices and hours may change. Please check each official site.">料金・営業時間は変わることがあります。最新情報は各施設の公式サイトでご確認ください。</p>
   </main>
 </Base>
 
@@ -89,6 +90,7 @@ const jsonLd = {
     .spot-table th, .spot-table td { display: block; padding: 0; border: 0; }
     .spot-table tbody th { margin-bottom: 8px; }
     .spot-table td { display: grid; grid-template-columns: 5.5rem 1fr; gap: 8px; padding: 3px 0; }
+    :global(html[lang='en']) .spot-table td::before { content: attr(data-label-en); }
     .spot-table td::before { content: attr(data-label); color: var(--ink-soft); font-size: .76rem; font-weight: 700; }
   }
 </style>

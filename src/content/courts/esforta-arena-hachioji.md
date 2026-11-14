@@ -16,6 +16,7 @@ description:
 booking: { url: "https://shisetsu.mizuno.jp/m-7509", label: info }
 mapQuery: エスフォルタアリーナ八王子
 updatedAt: 2026-11-14
+reviewBy: 2026-12-01
 sources:
   - https://bizmanager.jp/user/event/14900?office=30
   - https://bizmanager.jp/user/event/15192?office=30

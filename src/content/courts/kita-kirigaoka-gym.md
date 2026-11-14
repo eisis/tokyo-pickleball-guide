@@ -9,12 +9,16 @@ price: 1回1,650円（当日現金払い）
 reservation: [online]
 beginner: true
 usage: [dropin]
+sessions:
+  - { title: ピックルボールレッスン（経験者）, type: lesson, days: [wed], time: "10:00〜12:00", price: "1,650円", until: 2026-12-23 }
+  - { title: ピックルボールレッスン, type: lesson, days: [thu], time: "13:00〜15:00", price: "1,650円", until: 2026-12-24 }
 description:
   ja: 体育館が主催するピックルボールのレッスンが、毎週水曜と木曜に開かれています。初心者クラスと経験者クラスがあり、1人で申し込めます。
   en: Gym-run pickleball lessons on Wednesdays and Thursdays, with beginner and experienced classes. Sign up individually.
 booking: { url: "https://kita-tai.com/news/2813/", label: info }
 mapQuery: 北区桐ケ丘体育館
 updatedAt: 2026-11-14
+reviewBy: 2026-12-24
 sources:
   - https://kita-tai.com/news/2813/
 ---

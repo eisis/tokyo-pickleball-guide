@@ -11,12 +11,15 @@ rental: { status: paid, note: パドル210円 }
 reservation: [online]
 beginner: true
 usage: [dropin]
+sessions:
+  - { title: みんなでピックルボール, type: practice, days: [tue], time: "13:00〜14:30", price: "1,000円", beginner: true }
 description:
   ja: 毎週火曜に、1人で参加できる「みんなでピックルボール」があります。初めての人も歓迎で、パドルは210円で借りられます。
   en: Weekly drop-in pickleball on Tuesdays, beginners welcome. Paddle rental 210 yen.
 booking: { url: "https://www.edogawa-sotai.com/", label: info }
 mapQuery: 江戸川区総合体育館
 updatedAt: 2026-11-14
+reviewBy: 2026-12-15
 sources:
   - https://bizmanager.jp/user/event/15196?office=9
 ---

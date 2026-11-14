@@ -18,6 +18,7 @@ bookingSystem: "LaBOLA" # 社内用メモ：予約に使っているシステム
 location: { lat: 35.44065, lng: 139.55614 }
 mapQuery: KPI Park Yokohama
 updatedAt: 2026-11-14
+reviewBy: 2026-11-24
 sources:
   - https://local-media.heteml.net/?p=33409
   - https://www.kpi.asia/kpipark/

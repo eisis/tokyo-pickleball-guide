@@ -16,6 +16,7 @@ description:
 booking: { url: "https://fuchu.shogaigakushu.jp/", label: info }
 mapQuery: 府中市生涯学習センター
 updatedAt: 2026-11-14
+reviewBy: 2026-12-01
 sources:
   - https://bizmanager.jp/user/event/14366?office=240
   - https://bizmanager.jp/user/event/14725?office=240

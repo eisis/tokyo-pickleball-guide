@@ -20,6 +20,7 @@ location: { lat: 35.828815, lng: 139.80249 }  # 国土地理院の住所検索�
 mapQuery: 草加TIP'S 草加市氷川町2127-13
 openedAt: 2026-11-17
 updatedAt: 2026-10-31
+reviewBy: 2026-11-18
 sources:
   - https://prtimes.jp/main/html/rd/p/000000415.000009907.html
 ---

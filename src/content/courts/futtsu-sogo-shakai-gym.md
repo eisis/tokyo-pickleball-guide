@@ -15,6 +15,7 @@ description:
 booking: { url: "https://shisetsu.mizuno.jp/m-7576", label: info }
 mapQuery: 富津市総合社会体育館
 updatedAt: 2026-11-14
+reviewBy: 2026-12-01
 sources:
   - https://bizmanager.jp/user/event/15218?office=185
   - https://bizmanager.jp/user/event/15364?office=185

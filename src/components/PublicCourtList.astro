@@ -24,7 +24,7 @@ const count = (key: 'beginner' | 'rental' | 'walkin') => courts.filter((c) => fl
 
 <div class="public-finder" data-public-finder>
   <div class="public-controls">
-    <input class="public-search" type="search" placeholder="区・市・施設名で探す（例：江戸川、八王子）" aria-label="区・市・施設名で探す" data-public-search />
+    <input class="public-search" type="search" placeholder="区・市・施設名で探す（例：江戸川、八王子）" data-ph-ja="区・市・施設名で探す（例：江戸川、八王子）" data-ph-en="Search by city or facility name" aria-label="区・市・施設名で探す" data-public-search />
     {prefs.length > 1 && (
       <div class="chips" role="group" aria-label="エリア">
         <button type="button" class="chip active" data-pref="all"><span data-ja="すべて" data-en="All">すべて</span> <span class="n">{courts.length}</span></button>

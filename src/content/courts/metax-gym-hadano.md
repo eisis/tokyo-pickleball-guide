@@ -15,6 +15,7 @@ description:
 booking: { url: "https://shisetsu.mizuno.jp/m-7506-0001", label: info }
 mapQuery: メタックス体育館はだの
 updatedAt: 2026-11-14
+reviewBy: 2026-12-01
 sources:
   - https://bizmanager.jp/user/event/14524?office=205
 ---

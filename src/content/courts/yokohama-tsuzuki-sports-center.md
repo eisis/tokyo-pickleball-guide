@@ -15,6 +15,7 @@ description:
 booking: { url: "https://yokohama-sport.jp/tsuzuki-sc-ysa/", label: info }
 mapQuery: 横浜市都筑スポーツセンター
 updatedAt: 2026-11-14
+reviewBy: 2026-12-05
 sources:
   - https://yokohama-sport.jp/tsuzuki-sc-ysa/wp-content/uploads/sites/12/2026/09/a99d6d5f8fe35b5d46fcbcb495984983.pdf
 ---

@@ -15,6 +15,7 @@ description:
 booking: { url: "https://shisetsu.mizuno.jp/m-7507-0001", label: info }
 mapQuery: 綾瀬市民スポーツセンター
 updatedAt: 2026-11-14
+reviewBy: 2026-12-01
 sources:
   - https://bizmanager.jp/user/event/14466?office=207
 ---

@@ -24,6 +24,7 @@ location: { lat: 35.620407, lng: 139.471176 }
 mapQuery: Pickle K フレスポ若葉台
 openedAt: 2026-09-01
 updatedAt: 2026-11-14
+reviewBy: 2026-12-01
 sources:
   - https://andpickle.jp/PickleK/
   - https://prtimes.jp/main/html/rd/p/000000002.000185955.html

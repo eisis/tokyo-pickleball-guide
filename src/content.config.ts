@@ -43,6 +43,19 @@ const courts = defineCollection({
     openedAt: z.coerce.date().optional(),
     closesAt: z.coerce.date().optional(), // 期間限定コートの営業最終日。この日が過ぎると、毎朝の再ビルドでサイトから自動で消える
     updatedAt: z.coerce.date(), // 情報を最後に確認した日
+    // 定期開催の枠（毎週◯曜の一般公開・個人参加・教室など）。書くと「今週どこで打てる？」に自動で並ぶ。期間つきなら from / until
+    sessions: z.array(z.object({
+      title: z.string(), // 例: ピックルボール一般公開
+      type: z.enum(['tournament', 'practice', 'trial', 'lesson', 'festival']),
+      days: z.array(z.enum(['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'])).min(1),
+      time: z.string(), // 例: "13:00〜14:30"
+      price: z.string().optional(),
+      beginner: z.boolean().default(false), // 初めての人も参加できると公式に書かれているとき
+      walkin: z.boolean().default(false), // 予約不要（当日受付）
+      from: z.coerce.date().optional(),
+      until: z.coerce.date().optional(),
+    })).default([]),
+    reviewBy: z.coerce.date().optional(), // 見直し日：期限つきの情報（値上げ予定・期間限定の日程など）があるときに書く。この日が来ると週次チェックで必ず確認される
     sources: z.array(z.string().url()).default([]), // 情報源
     hidden: z.boolean().default(false), // trueにするとサイトに出さない
     ownerVerified: z.boolean().default(false), // 施設の運営者本人が掲載・更新した情報（「運営者掲載」マークが付く）

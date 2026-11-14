@@ -11,12 +11,16 @@ price: 大人110円（2時間）、中学生以下無料
 rental: { status: available, note: パドル・ボール、数に限りあり }
 reservation: [walkin]
 usage: [dropin]
+sessions:
+  - { title: ピックルボール一般公開, type: practice, days: [mon], time: "15:00〜17:00", price: "大人110円（2時間）", walkin: true }
+  - { title: ピックルボール一般公開, type: practice, days: [wed], time: "9:00〜15:00", price: "大人110円（2時間）", walkin: true }
 description:
   ja: 区の体育館でピックルボールの一般公開日があります。予約不要の現地先着順で、1人でも参加できます。
   en: A ward sports center with regular drop-in pickleball sessions. No booking needed, first come first served.
 booking: { url: "https://www.city.edogawa.tokyo.jp/event/csp25.html", label: info }
 mapQuery: 江戸川区文化スポーツプラザ
 updatedAt: 2026-11-14
+reviewBy: 2026-12-15
 sources:
   - https://www.city.edogawa.tokyo.jp/event/csp25.html
 ---

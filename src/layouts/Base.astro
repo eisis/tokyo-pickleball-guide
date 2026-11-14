@@ -11,8 +11,9 @@ interface Props {
   image?: string; // SNSで共有したときの画像（/images/... または https://...）
   noindex?: boolean; // 検索結果に出さない（準備中のページなど）
   robots?: string; // 個別指定（例: 'noindex, follow' = 検索には出さないがリンクはたどってもらう）
+  en?: boolean; // 英語の表示に対応しているページか。false のページは英語表示のとき「日本語のみ」の案内を出す
 }
-const { title, description, image, noindex, robots } = Astro.props;
+const { title, description, image, noindex, robots, en = false } = Astro.props;
 // SNS で共有したときの画像。ページごとの画像がなければサイト共通のカード画像（public/og-default.png）を使う
 const ogImage = new URL(image || '/og-default.png?v=2', Astro.site).href;
 const siteName = SITE.name;
@@ -91,6 +92,9 @@ const siteLd = {
       </nav>
     </header>
 
+    {!en && (
+      <p class="en-only-note" data-lang-only="en" hidden>This page is available in Japanese only. Your browser's translate feature can help. <a href="/">Back to the court list</a></p>
+    )}
     <slot />
 
     <footer class="footer">
@@ -168,6 +172,15 @@ const siteLd = {
           document.querySelectorAll('[data-ja]').forEach(function (el) {
             el.innerHTML = lang === 'ja' ? el.dataset.ja : el.dataset.en;
           });
+          // 入力欄の案内文、片方の言語だけで見せるブロック
+          document.querySelectorAll('[data-ph-ja]').forEach(function (el) {
+            el.placeholder = lang === 'ja' ? el.dataset.phJa : el.dataset.phEn;
+          });
+          document.querySelectorAll('[data-lang-only]').forEach(function (el) {
+            el.hidden = el.dataset.langOnly !== lang;
+          });
+          window.currentLang = lang;
+          window.dispatchEvent(new CustomEvent('lang:change', { detail: lang }));
           jp.classList.toggle('active', lang === 'ja');
           en.classList.toggle('active', lang === 'en');
           try { localStorage.setItem('lang', lang); } catch (e) {}
@@ -177,6 +190,8 @@ const siteLd = {
         var saved = 'ja';
         try { saved = localStorage.getItem('lang') || 'ja'; } catch (e) {}
         setLanguage(saved);
+        // スクリプトであとから作った要素にも、今の言語を当てるための入口
+        window.applyLang = function () { setLanguage(window.currentLang || 'ja'); };
       })();
     </script>
   </body>

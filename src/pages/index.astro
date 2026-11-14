@@ -17,11 +17,11 @@ const courts = await getCourts();
 // 写真付きのカード・地図・絞り込みは専用コートなど。公共施設は下の段に文字だけの一覧で出す
 const listed = courts.filter((c) => !isPublic(c));
 const publicCourts = courts.filter(isPublic);
-const indoor = courts.filter((c) => c.data.environment.includes('indoor')).length;
-const outdoor = courts.filter((c) => c.data.environment.includes('outdoor')).length;
-const prefCount = new Set(courts.map((c) => c.data.prefecture)).size;
+// 数字はすべて「一覧・地図に出るコート」で数える（下の絞り込みの件数と合わせる）。公共施設は別に数える
+const indoor = listed.filter((c) => c.data.environment.includes('indoor')).length;
+const outdoor = listed.filter((c) => c.data.environment.includes('outdoor')).length;
 const areas = (Object.keys(PREFECTURES) as (keyof typeof PREFECTURES)[]).map((p) => {
-  const list = courts.filter((c) => c.data.prefecture === p);
+  const list = listed.filter((c) => c.data.prefecture === p);
   return { id: p, ...PREFECTURES[p], count: list.length, spots: [...new Set(list.map((c) => c.data.area.ja))] };
 });
 const allPosts = await getPosts();
@@ -30,7 +30,7 @@ const posts = top ? [top, ...allPosts.filter((p) => p !== top).slice(0, 3)] : []
 const upcoming = (await getUpcomingEvents()).slice(0, 4);
 ---
 
-<Base title="東京近郊のピックルボールコートまとめ" description={SITE.description}>
+<Base title="東京近郊のピックルボールコートまとめ" description={SITE.description} en>
   <section class="hero">
     <video class="hero-video" autoplay muted loop playsinline preload="metadata">
       <source src="/pickleball-hero.mp4" type="video/mp4" />
@@ -52,10 +52,10 @@ const upcoming = (await getUpcomingEvents()).slice(0, 4);
       </div>
     </div>
     <dl class="hero-stats">
-      <div><dt data-ja="掲載コート" data-en="Courts">掲載コート</dt><dd>{courts.length}</dd></div>
+      <div><dt data-ja="掲載コート" data-en="Courts">掲載コート</dt><dd>{listed.length}</dd></div>
       <div><dt data-ja="屋内" data-en="Indoor">屋内</dt><dd>{indoor}</dd></div>
       <div><dt data-ja="屋外" data-en="Outdoor">屋外</dt><dd>{outdoor}</dd></div>
-      <div><dt data-ja="都県" data-en="Prefectures">都県</dt><dd>{prefCount}</dd></div>
+      <div><dt data-ja="自治体の施設" data-en="Public centers">自治体の施設</dt><dd><a href="#public" style="color:inherit">{publicCourts.length}</a></dd></div>
     </dl>
   </section>
 

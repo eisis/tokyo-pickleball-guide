@@ -12,12 +12,15 @@ rental: { status: available, note: パドル }
 reservation: [walkin]
 beginner: true
 usage: [dropin]
+sessions:
+  - { title: ピックルボール個人開放, type: practice, days: [mon], time: "13:20〜15:20", price: "一般300円", beginner: true, walkin: true, until: 2026-11-30 }
 description:
   ja: 新宿区立の施設で、毎週月曜にピックルボールの個人開放があります。コーディネーターが常駐していて、1人でも初めてでも参加しやすい枠です。
   en: A Shinjuku city facility with weekly drop-in pickleball on Mondays. A coordinator is on site, so beginners and solo players are welcome.
 booking: { url: "https://yotsuya-sports-square.jp/", label: info }
 mapQuery: 四谷スポーツスクエア
 updatedAt: 2026-11-14
+reviewBy: 2026-11-30
 sources:
   - https://spopita.jp/stamprally/event/r8096/
   - https://yotsuya-sports-square.jp/

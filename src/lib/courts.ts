@@ -90,3 +90,20 @@ export const isNew = (court: Court) =>
 /** 屋内・屋外・両方 の区分（地図のピンの色分けに使う） */
 export const envKind = (court: Court): 'indoor' | 'outdoor' | 'both' =>
   court.data.environment.length > 1 ? 'both' : court.data.environment[0];
+
+const DAY_INDEX = { sun: 0, mon: 1, tue: 2, wed: 3, thu: 4, fri: 5, sat: 6 } as const;
+/** 定期開催の枠を、今日（日本時間）から days 日分の開催日に展開する */
+export function sessionDates(court: Court, days = 60) {
+  const today = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
+  const out: { date: string; s: Court['data']['sessions'][number]; i: number }[] = [];
+  court.data.sessions.forEach((s, i) => {
+    for (let k = 0; k < days; k++) {
+      const date = new Date(Date.parse(today) + k * 86400000);
+      const d = date.toISOString().slice(0, 10);
+      if (s.from && d < s.from.toISOString().slice(0, 10)) continue;
+      if (s.until && d > s.until.toISOString().slice(0, 10)) continue;
+      if (s.days.some((w) => DAY_INDEX[w] === date.getUTCDay())) out.push({ date: d, s, i });
+    }
+  });
+  return out;
+}

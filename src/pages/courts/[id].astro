@@ -7,7 +7,7 @@ import EventCard from '../../components/EventCard.astro';
 import { getUpcomingEvents } from '../../lib/events';
 import { SPOTS, spotOf } from '../../lib/spots';
 import { getCollection } from 'astro:content';
-import { getCourts, isClosed, PREFECTURES, ENVIRONMENTS, mapUrl, courtUrl, isNew, rentalText, reservationText, hasRental, USAGE, type Court } from '../../lib/courts';
+import { getCourts, isClosed, PREFECTURES, ENVIRONMENTS, mapUrl, courtUrl, isNew, rentalText, reservationText, RESERVATION, RENTAL, hasRental, USAGE, type Court } from '../../lib/courts';
 import { SITE, ldJson } from '../../lib/site';
 
 export async function getStaticPaths() {
@@ -66,15 +66,15 @@ const desc = `${d.area.ja}のピックルボールコート「${d.name}」。${f
 const pageTitle = `${d.area.ja} ピックルボール｜${d.name}の料金・予約・アクセス`;
 ---
 
-<Base title={closed ? `【営業終了】${d.name}` : pageTitle} description={closed ? `${d.name}は期間限定の営業を終了しました。${PREFECTURES[d.prefecture].ja}で今プレーできるピックルボールコートはエリアのページで探せます。` : desc} image={d.image} robots={closed ? 'noindex, follow' : undefined}>
+<Base title={closed ? `【営業終了】${d.name}` : pageTitle} description={closed ? `${d.name}は期間限定の営業を終了しました。${PREFECTURES[d.prefecture].ja}で今プレーできるピックルボールコートはエリアのページで探せます。` : desc} image={d.image} robots={closed ? 'noindex, follow' : undefined} en>
   <script slot="head" type="application/ld+json" set:html={ldJson(jsonLd)} />
   <main class="container narrow">
-    <nav class="crumbs" aria-label="パンくず"><a href="/">トップ</a><span aria-hidden="true">›</span><a href={`/areas/${d.prefecture}/`}>{PREFECTURES[d.prefecture].ja}のコート</a></nav>
+    <nav class="crumbs" aria-label="パンくず"><a href="/" data-ja="トップ" data-en="Home">トップ</a><span aria-hidden="true">›</span><a href={`/areas/${d.prefecture}/`} data-ja={`${PREFECTURES[d.prefecture].ja}のコート`} data-en={`Courts in ${PREFECTURES[d.prefecture].en}`}>{PREFECTURES[d.prefecture].ja}のコート</a></nav>
     <h1 style="margin:12px 0 20px;color:var(--navy)">{d.name}{isNew(court) && <span class="new-label">NEW</span>}</h1>
     {closed && (
       <p class="closed-note">このコートは期間限定の営業を{d.closesAt ? `${d.closesAt.getUTCMonth() + 1}月${d.closesAt.getUTCDate()}日で` : ''}終了しました。<a href={spot ? `/spots/${spot}/` : `/areas/${d.prefecture}/`}>{spot ? SPOTS[spot].ja : PREFECTURES[d.prefecture].ja}で今プレーできるコートを探す →</a></p>
     )}
-    {d.ownerVerified && <p class="owner-verified">✓ 施設の運営者が掲載している情報です</p>}
+    {d.ownerVerified && <p class="owner-verified" data-ja="✓ 施設の運営者が掲載している情報です" data-en="✓ Information provided by the facility">✓ 施設の運営者が掲載している情報です</p>}
 
     {d.image ? (
       <img class="detail-hero" src={d.image} alt={d.name} />
@@ -82,51 +82,52 @@ const pageTitle = `${d.area.ja} ピックルボール｜${d.name}の料金・予
       <div class="detail-hero image-placeholder" aria-hidden="true">🏓</div>
     )}
 
-    <p class="description" style="margin-top:20px">{d.description.ja}</p>
+    <p class="description" style="margin-top:20px" data-ja={d.description.ja} data-en={d.description.en}>{d.description.ja}</p>
 
     <dl class="facts">
-      <dt>エリア</dt><dd>{pref} {d.area.ja}</dd>
-      <dt>屋内/屋外</dt><dd>{env}</dd>
-      {d.usage && (<><dt>利用方法</dt><dd>{d.usage.map((u) => USAGE[u].ja).join('・')}</dd></>)}
-      {d.reservation && (<><dt>予約方法</dt><dd>{reservationText(court)}</dd></>)}
-      {d.rental && (<><dt>レンタル</dt><dd>{rentalText(court)}</dd></>)}
-      {d.courts && (<><dt>面数</dt><dd>{d.courts}面</dd></>)}
-      {d.address && (<><dt>住所</dt><dd>{d.address}</dd></>)}
-      {d.access && (<><dt>アクセス</dt><dd>{d.access.ja}</dd></>)}
-      {d.hours && (<><dt>営業時間</dt><dd>{d.hours}</dd></>)}
-      {d.price && (<><dt>料金の目安</dt><dd>{d.price}</dd></>)}
-      {d.openedAt && (<><dt>オープン</dt><dd>{ymd(d.openedAt)}</dd></>)}
+      <dt data-ja="エリア" data-en="Area">エリア</dt><dd data-ja={`${pref} ${d.area.ja}`} data-en={`${d.area.en}, ${PREFECTURES[d.prefecture].en}`}>{pref} {d.area.ja}</dd>
+      <dt data-ja="屋内/屋外" data-en="Type">屋内/屋外</dt><dd data-ja={env} data-en={d.environment.map((e) => ENVIRONMENTS[e].en).join(" / ")}>{env}</dd>
+      {d.usage && (<><dt data-ja="利用方法" data-en="How to use">利用方法</dt><dd data-ja={d.usage.map((u) => USAGE[u].ja).join('・')} data-en={d.usage.map((u) => USAGE[u].en).join(" / ")}>{d.usage.map((u) => USAGE[u].ja).join('・')}</dd></>)}
+      {d.reservation && (<><dt data-ja="予約方法" data-en="Booking">予約方法</dt><dd data-ja={reservationText(court)} data-en={d.reservation.map((r) => RESERVATION[r].en).join(" / ")}>{reservationText(court)}</dd></>)}
+      {d.rental && (<><dt data-ja="レンタル" data-en="Rental">レンタル</dt><dd data-ja={rentalText(court)} data-en={RENTAL[d.rental.status].en}>{rentalText(court)}</dd></>)}
+      {d.courts && (<><dt data-ja="面数" data-en="Courts">面数</dt><dd data-ja={`${d.courts}面`} data-en={String(d.courts)}>{d.courts}面</dd></>)}
+      {d.address && (<><dt data-ja="住所" data-en="Address">住所</dt><dd>{d.address}</dd></>)}
+      {d.access && (<><dt data-ja="アクセス" data-en="Access">アクセス</dt><dd data-ja={d.access.ja} data-en={d.access.en}>{d.access.ja}</dd></>)}
+      {d.hours && (<><dt data-ja="営業時間" data-en="Hours">営業時間</dt><dd>{d.hours}</dd></>)}
+      {d.price && (<><dt data-ja="料金の目安" data-en="Price">料金の目安</dt><dd>{d.price}</dd></>)}
+      {d.openedAt && (<><dt data-ja="オープン" data-en="Opened">オープン</dt><dd>{ymd(d.openedAt)}</dd></>)}
     </dl>
 
-    {!closed && <a class="button" href={d.booking.url} target="_blank" rel="noopener" data-track="booking" data-track-from="詳細ページ" data-court-id={court.id} data-court-name={d.name}>{bookLabel}</a>}
-    {d.availabilityUrl && <a class="button secondary" href={d.availabilityUrl} target="_blank" rel="noopener" data-track="availability" data-track-from="詳細ページ" data-court-id={court.id} data-court-name={d.name}>空き状況を見る</a>}
+    {!closed && <a class="button" href={d.booking.url} target="_blank" rel="noopener" data-track="booking" data-track-from="詳細ページ" data-court-id={court.id} data-court-name={d.name} data-ja={bookLabel} data-en={d.booking.label === "info" ? "Official site →" : "Book on the official site →"}>{bookLabel}</a>}
+    {d.availabilityUrl && <a class="button secondary" href={d.availabilityUrl} target="_blank" rel="noopener" data-track="availability" data-track-from="詳細ページ" data-court-id={court.id} data-court-name={d.name} data-ja="空き状況を見る" data-en="Availability">空き状況を見る</a>}
     <a class="map-button" href={mapUrl(court)} target="_blank" rel="noopener" data-track="map" data-track-from="詳細ページ" data-court-id={court.id} data-court-name={d.name}>📍 Google Map</a>
 
+    <p class="en-only-note-inline" data-lang-only="en" hidden>The details below are in Japanese.</p>
     <div class="prose"><Content /></div>
 
     {courtEvents.length > 0 && (
       <section style="margin-top:28px">
-        <h2 style="font-size:1.1rem;color:var(--navy);margin-bottom:12px">このコートで開催予定のイベント</h2>
+        <h2 style="font-size:1.1rem;color:var(--navy);margin-bottom:12px" data-ja="このコートで開催予定のイベント" data-en="Upcoming events here">このコートで開催予定のイベント</h2>
         <div class="event-list">{courtEvents.map((e) => <EventCard event={e} />)}</div>
       </section>
     )}
 
     {d.location && <div style="margin-top:28px"><CourtMap courts={[court]} /></div>}
 
-    {spot && <p class="meta" style="margin-top:20px"><a href={`/spots/${spot}/`}>{SPOTS[spot].ja}のほかのコートと比べる →</a></p>}
-    <p class="meta">情報確認日：{ymd(d.updatedAt)}　料金・営業時間は変わることがあるため、最新情報は公式サイトでご確認ください。</p>
+    {spot && <p class="meta" style="margin-top:20px"><a href={`/spots/${spot}/`} data-ja={`${SPOTS[spot].ja}のほかのコートと比べる →`} data-en={`Compare courts in ${SPOTS[spot].en} →`}>{SPOTS[spot].ja}のほかのコートと比べる →</a></p>}
+    <p class="meta" data-ja={`情報確認日：${ymd(d.updatedAt)}　料金・営業時間は変わることがあるため、最新情報は公式サイトでご確認ください。`} data-en={`Last checked: ${ymd(d.updatedAt)}. Prices and hours may change; please check the official site.`}>情報確認日：{ymd(d.updatedAt)}　料金・営業時間は変わることがあるため、最新情報は公式サイトでご確認ください。</p>
 
     <aside class="owner-note">
       <div>
-        <p class="owner-note-title">このコートの運営者の方へ</p>
-        <p>料金・営業時間・写真などの掲載内容は、運営者の方がフォームから直接更新できます。空き状況の表示や予約連携のご相談もあわせて受け付けています。</p>
+        <p class="owner-note-title" data-ja="このコートの運営者の方へ" data-en="Do you run this court?">このコートの運営者の方へ</p>
+        <p data-ja="料金・営業時間・写真などの掲載内容は、運営者の方がフォームから直接更新できます。空き状況の表示や予約連携のご相談もあわせて受け付けています。" data-en="Facility operators can update prices, hours and photos directly via our form. We also welcome inquiries about showing availability or linking bookings.">料金・営業時間・写真などの掲載内容は、運営者の方がフォームから直接更新できます。空き状況の表示や予約連携のご相談もあわせて受け付けています。</p>
       </div>
-      <a class="owner-note-btn" href={`/owners/?court=${court.id}`} data-track="owner_update" data-track-from="詳細ページ" data-court-id={court.id} data-court-name={d.name}>掲載内容を更新する</a>
+      <a class="owner-note-btn" href={`/owners/?court=${court.id}`} data-track="owner_update" data-track-from="詳細ページ" data-court-id={court.id} data-court-name={d.name} data-ja="掲載内容を更新する" data-en="Update this listing">掲載内容を更新する</a>
     </aside>
-    <p class="meta"><a href="/contact/?type=fix">掲載情報の誤りを報告する（利用者の方）</a></p>
+    <p class="meta"><a href="/contact/?type=fix" data-ja="掲載情報の誤りを報告する（利用者の方）" data-en="Report an error in this listing">掲載情報の誤りを報告する（利用者の方）</a></p>
     {d.sources.length > 0 && (
       <div class="sources">
-        <p>参考</p>
+        <p data-ja="参考" data-en="Sources">参考</p>
         <ul>{d.sources.map((s) => <li><a href={s} target="_blank" rel="noopener">{new URL(s).hostname}</a></li>)}</ul>
       </div>
     )}
@@ -135,5 +136,6 @@ const pageTitle = `${d.area.ja} ピックルボール｜${d.name}の料金・予
 
 <style>
   .closed-note { margin: 0 0 20px; padding: 14px 16px; border-radius: var(--radius-sm); background: #fff4f1; border: 1px solid #f6c8bd; color: #8a3a28; line-height: 1.7; }
+  .en-only-note-inline { margin: 24px 0 -8px; font-size: .85rem; color: var(--ink-soft); }
   .closed-note a { font-weight: 700; color: inherit; }
 </style>
