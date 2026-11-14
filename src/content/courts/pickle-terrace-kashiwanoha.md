@@ -18,6 +18,7 @@ officialUrl: https://pickleterracek.wixsite.com/pickleterrace
 image: /images/courts/pickle-terrace-kashiwanoha.jpg
 booking: { url: "https://pickleterracek.wixsite.com/pickleterrace/guide", label: book }
 bookingSystem: "自社WEB予約（Google Apps Script）" # 社内用メモ：サイトには出さない
+location: { lat: 35.894321, lng: 139.931732 }  # 国土地理院の住所検索で取得
 mapQuery: PICKLE TERRACE 柏の葉 流山市駒木台
 openedAt: 2026-06-06
 updatedAt: 2026-10-23

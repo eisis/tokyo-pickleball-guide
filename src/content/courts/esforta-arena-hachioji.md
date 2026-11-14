@@ -4,21 +4,24 @@ area: { ja: 八王子市, en: "Hachioji" }
 prefecture: tokyo
 environment: [indoor]
 category: public
-hours: "体験会・個人参加の日程は施設のイベントページで案内"
-rental: { status: available, note: 用具の貸し出しあり }
+hours: "はじめてのピックルボール教室：水 10:00〜11:30／個人参加：金 14:00〜15:30（日程は回ごとに案内）"
+price: 教室1回1,200円、個人参加1回1,000円
+rental: { status: available, note: パドル }
+reservation: [online]
 usage: [dropin]
 description:
-  ja: 施設を運営するミズノが、ピックルボールの体験会や1人で申し込める個人参加の枠を開いています。用具の貸し出しがあり、会員登録なしで参加できます。
-  en: The operator Mizuno runs pickleball trial sessions and individual-entry play here. Equipment rental available, no membership needed.
+  ja: 初めての人向けの教室と、1人で参加できる個人参加の枠があります。どちらもWebで1人ずつ申し込み、パドルは貸し出しがあります。
+  en: Beginner classes and individual-entry play, booked online one person at a time. Paddles available to borrow.
 booking: { url: "https://shisetsu.mizuno.jp/m-7509", label: info }
 mapQuery: エスフォルタアリーナ八王子
 updatedAt: 2026-11-14
 sources:
-  - https://sports-service.mizuno.jp/pickleball
+  - https://bizmanager.jp/user/event/14900?office=30
+  - https://bizmanager.jp/user/event/15192?office=30
 ---
 
-この施設は、ミズノが管理している公共のスポーツ施設で、ミズノのピックルボールのプログラムを実施している施設の一つです。
+八王子市総合体育館のサブアリーナで、ミズノが運営するピックルボールのプログラムが開かれています。
 
-体験会では、スタッフが基本的なルールを説明し、簡単なラリーから教えてくれます。個人参加の枠は1人で申し込めて、当日その場でペアやグループを組みます。どちらも参加したいクラスのイベントに申し込むだけで、会員登録や長期の契約はいりません。
+「はじめてのピックルボール教室」は初めての人向けで、1回1,200円、定員22名です。「個人参加ピックルボール」は当日集まった人でチームを分けて試合をする枠で、1回1,000円、定員24名です。個人参加はルール説明がなく、セルフジャッジができる16歳以上の人が対象なので、初めての人は教室から始めましょう。
 
-開催日・料金・定員は回ごとに違うため、施設のページでその月の予定を確認してから申し込みましょう。
+申し込みはWebから1人ずつで、当日は1階受付横の券売機で券を買ってアリーナのスタッフに渡します。パドルは貸し出しがあり、持ち物は動きやすい服装、室内用シューズ、飲み物、タオルです。

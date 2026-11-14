@@ -4,21 +4,21 @@ area: { ja: 富津市, en: "Futtsu" }
 prefecture: chiba
 environment: [indoor]
 category: public
-hours: "体験会・個人参加の日程は施設のイベントページで案内"
-rental: { status: available, note: 用具の貸し出しあり }
+hours: "個人参加ピックルボール：土 9:30〜11:30／日 18:30〜20:30 など（日程は回ごとに案内）"
+price: 1回1,100円
+reservation: [online]
 usage: [dropin]
 description:
-  ja: 施設を運営するミズノが、ピックルボールの体験会や1人で申し込める個人参加の枠を開いています。用具の貸し出しがあり、会員登録なしで参加できます。
-  en: The operator Mizuno runs pickleball trial sessions and individual-entry play here. Equipment rental available, no membership needed.
+  ja: 1人で参加できる個人参加ピックルボールが開かれています。初めての人にはウォーミングアップの間にルールを説明してくれます。
+  en: Individual-entry pickleball where pairs rotate. Rules are explained to first-timers during the warm-up.
 booking: { url: "https://shisetsu.mizuno.jp/m-7576", label: info }
 mapQuery: 富津市総合社会体育館
 updatedAt: 2026-11-14
 sources:
-  - https://sports-service.mizuno.jp/pickleball
+  - https://bizmanager.jp/user/event/15218?office=185
+  - https://bizmanager.jp/user/event/15364?office=185
 ---
 
-この施設は、ミズノが管理している公共のスポーツ施設で、ミズノのピックルボールのプログラムを実施している施設の一つです。
+富津市総合社会体育館で、個人参加型のピックルボールが開かれています。参加者でランダムにペアを組みかえながら試合をする形式で、1人でも参加できます。
 
-体験会では、スタッフが基本的なルールを説明し、簡単なラリーから教えてくれます。個人参加の枠は1人で申し込めて、当日その場でペアやグループを組みます。どちらも参加したいクラスのイベントに申し込むだけで、会員登録や長期の契約はいりません。
-
-開催日・料金・定員は回ごとに違うため、施設のページでその月の予定を確認してから申し込みましょう。
+最初の40分ほどがウォーミングアップと基礎練習で、初めての人にはこの間にルールの説明があります。残りの80分ほどはペアを変えながら試合をします。参加費は1回1,100円、定員20名で、対象は中学生以上です。

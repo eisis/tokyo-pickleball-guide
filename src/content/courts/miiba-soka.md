@@ -16,6 +16,7 @@ description:
   en: A 24-hour indoor pickleball court (1 court) run by Tipness. Online booking with prepayment; paddles and balls are free to borrow.
 booking: { url: "https://mypage.miiba.tipness.co.jp/reserve/schedule/14/26", label: book }
 image: /images/courts/miiba-soka.jpg
+location: { lat: 35.828815, lng: 139.80249 }  # 国土地理院の住所検索で取得
 mapQuery: 草加TIP'S 草加市氷川町2127-13
 openedAt: 2026-11-17
 updatedAt: 2026-10-31

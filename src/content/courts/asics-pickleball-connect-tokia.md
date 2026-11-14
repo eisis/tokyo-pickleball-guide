@@ -17,6 +17,7 @@ image: /images/courts/asics-pickleball-connect-tokia.jpg
 imageSource: https://rsv.pickle-one.com/pb1-asics-tokia
 booking: { url: "https://rsv.pickle-one.com/pb1-asics-tokia", label: book }
 bookingSystem: "RESERVE ONE"
+location: { lat: 35.679085, lng: 139.764679 }  # 国土地理院の住所検索で取得
 mapQuery: 東京ビルTOKIA
 openedAt: 2026-10-31
 closesAt: 2026-12-27

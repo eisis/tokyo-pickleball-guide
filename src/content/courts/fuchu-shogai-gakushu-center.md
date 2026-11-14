@@ -4,21 +4,24 @@ area: { ja: 府中市, en: "Fuchu" }
 prefecture: tokyo
 environment: [indoor]
 category: public
-hours: "体験会・個人参加の日程は施設のイベントページで案内"
-rental: { status: available, note: 用具の貸し出しあり }
+hours: "体験会・個人参加ピックルボール：日程は回ごとに案内"
+price: 個人参加1回1,100円
+rental: { status: available, note: ラケット }
+reservation: [online]
 usage: [dropin]
 description:
-  ja: 施設を運営するミズノが、ピックルボールの体験会や1人で申し込める個人参加の枠を開いています。用具の貸し出しがあり、会員登録なしで参加できます。
-  en: The operator Mizuno runs pickleball trial sessions and individual-entry play here. Equipment rental available, no membership needed.
+  ja: 体育室でピックルボールの体験会と、1人で参加できる個人参加の枠があります。ラケットの貸し出しがあり、小学生から参加できます。
+  en: Trial sessions and individual-entry play in the gym. Rackets available to borrow; open to elementary school age and up.
 booking: { url: "https://fuchu.shogaigakushu.jp/", label: info }
 mapQuery: 府中市生涯学習センター
 updatedAt: 2026-11-14
 sources:
-  - https://sports-service.mizuno.jp/pickleball
+  - https://bizmanager.jp/user/event/14366?office=240
+  - https://bizmanager.jp/user/event/14725?office=240
 ---
 
-この施設は、ミズノが管理している公共のスポーツ施設で、ミズノのピックルボールのプログラムを実施している施設の一つです。
+府中市生涯学習センターの体育棟1階の体育室で、ピックルボールの体験会と個人参加の枠が開かれています。
 
-体験会では、スタッフが基本的なルールを説明し、簡単なラリーから教えてくれます。個人参加の枠は1人で申し込めて、当日その場でペアやグループを組みます。どちらも参加したいクラスのイベントに申し込むだけで、会員登録や長期の契約はいりません。
+個人参加ピックルボールは、その場でペアを作ってプレーする枠で、1回1,100円、定員は回によって12〜24名の先着順です。参加できるのは、この施設の体験会に参加したことがあり、ルールを理解している人です。全体のルール説明は原則ないので、初めての人はまず体験会に申し込みましょう。
 
-開催日・料金・定員は回ごとに違うため、施設のページでその月の予定を確認してから申し込みましょう。
+対象は小学生以上で、小・中学生は保護者同伴で参加できます。レンタルラケットがあり、持ち物は動きやすい服装、室内用シューズ、飲み物です。

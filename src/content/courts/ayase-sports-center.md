@@ -4,21 +4,20 @@ area: { ja: 綾瀬市, en: "Ayase" }
 prefecture: kanagawa
 environment: [indoor]
 category: public
-hours: "体験会・個人参加の日程は施設のイベントページで案内"
-rental: { status: available, note: 用具の貸し出しあり }
+hours: "ピックルボール体験会：木 13:15〜／15:00〜／19:15〜（日程は回ごとに案内）"
+price: 体験会1回1,000円
+reservation: [online, phone]
 usage: [dropin]
 description:
-  ja: 施設を運営するミズノが、ピックルボールの体験会や1人で申し込める個人参加の枠を開いています。用具の貸し出しがあり、会員登録なしで参加できます。
-  en: The operator Mizuno runs pickleball trial sessions and individual-entry play here. Equipment rental available, no membership needed.
+  ja: 小体育室でピックルボールの体験会が開かれています。昼と夜の回があり、1人1,000円で参加できます。
+  en: Pickleball trial sessions in the small gym, with daytime and evening slots, 1,000 yen per person.
 booking: { url: "https://shisetsu.mizuno.jp/m-7507-0001", label: info }
-mapQuery: IIMURO GLASS 綾瀬市民スポーツセンター
+mapQuery: 綾瀬市民スポーツセンター
 updatedAt: 2026-11-14
 sources:
-  - https://sports-service.mizuno.jp/pickleball
+  - https://bizmanager.jp/user/event/14466?office=207
 ---
 
-この施設は、ミズノが管理している公共のスポーツ施設で、ミズノのピックルボールのプログラムを実施している施設の一つです。
+綾瀬市民スポーツセンターの小体育室で、ピックルボールの体験会が開かれています。木曜に昼2回と夜1回の枠があり、各回90分、定員18名、参加費は1人1,000円です。対象は高校生以上です。
 
-体験会では、スタッフが基本的なルールを説明し、簡単なラリーから教えてくれます。個人参加の枠は1人で申し込めて、当日その場でペアやグループを組みます。どちらも参加したいクラスのイベントに申し込むだけで、会員登録や長期の契約はいりません。
-
-開催日・料金・定員は回ごとに違うため、施設のページでその月の予定を確認してから申し込みましょう。
+申し込みは電話かホームページで、支払いは1階受付で行います。持ち物は動きやすい服装、タオル、飲み物、室内シューズです。

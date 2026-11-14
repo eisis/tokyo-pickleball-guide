@@ -4,21 +4,20 @@ area: { ja: 秦野市, en: "Hadano" }
 prefecture: kanagawa
 environment: [indoor]
 category: public
-hours: "体験会・個人参加の日程は施設のイベントページで案内"
-rental: { status: available, note: 用具の貸し出しあり }
+hours: "ピックルボール体験会：火 13:15〜14:45（日程は回ごとに案内）"
+price: 体験会1回1,000円
+reservation: [online, phone]
 usage: [dropin]
 description:
-  ja: 施設を運営するミズノが、ピックルボールの体験会や1人で申し込める個人参加の枠を開いています。用具の貸し出しがあり、会員登録なしで参加できます。
-  en: The operator Mizuno runs pickleball trial sessions and individual-entry play here. Equipment rental available, no membership needed.
+  ja: メインアリーナでピックルボールの体験会が開かれています。1人1,000円で、ホームページ・窓口・電話で申し込めます。
+  en: Pickleball trial sessions in the main arena, 1,000 yen per person.
 booking: { url: "https://shisetsu.mizuno.jp/m-7506-0001", label: info }
 mapQuery: メタックス体育館はだの
 updatedAt: 2026-11-14
 sources:
-  - https://sports-service.mizuno.jp/pickleball
+  - https://bizmanager.jp/user/event/14524?office=205
 ---
 
-この施設は、ミズノが管理している公共のスポーツ施設で、ミズノのピックルボールのプログラムを実施している施設の一つです。
+秦野市総合体育館のメインアリーナで、ピックルボールの体験会が開かれています。火曜の13:15〜14:45で、定員18名、参加費は1人1,000円です。対象は高校生以上です。
 
-体験会では、スタッフが基本的なルールを説明し、簡単なラリーから教えてくれます。個人参加の枠は1人で申し込めて、当日その場でペアやグループを組みます。どちらも参加したいクラスのイベントに申し込むだけで、会員登録や長期の契約はいりません。
-
-開催日・料金・定員は回ごとに違うため、施設のページでその月の予定を確認してから申し込みましょう。
+申し込みはホームページ、窓口、電話のいずれかで、支払いは1階受付横の券売機で行います。持ち物は動きやすい服装、タオル、飲み物、室内シューズです。
