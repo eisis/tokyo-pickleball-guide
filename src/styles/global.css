@@ -64,6 +64,28 @@ button { font: inherit; }
 .nav-drop:hover .nav-menu, .nav-drop:focus-within .nav-menu { display: grid; }
 .site-header nav .nav-menu a { padding: 8px 10px; border-radius: 6px; font-size: .9rem; }
 .site-header nav .nav-menu a:hover { background: var(--foam); }
+.nav-links { display: flex; gap: inherit; align-items: center; }
+.menu-btn { display: none; }
+/* スマホ・小さめのタブレット：リンクは三本線ボタンの中にまとめ、縦に並べて開く（ヘッダーには ロゴ・言語・ボタン だけ） */
+@media (max-width: 860px) {
+  .menu-btn { display: grid; place-items: center; width: 40px; height: 40px; margin-right: -6px; border: 0; background: transparent; cursor: pointer; }
+  .menu-btn span, .menu-btn span::before, .menu-btn span::after { display: block; width: 20px; height: 2px; border-radius: 2px; background: var(--navy); transition: transform .2s, background .2s; }
+  .menu-btn span { position: relative; }
+  .menu-btn span::before, .menu-btn span::after { content: ''; position: absolute; left: 0; }
+  .menu-btn span::before { top: -6px; }
+  .menu-btn span::after { top: 6px; }
+  .menu-open .menu-btn span { background: transparent; }
+  .menu-open .menu-btn span::before { transform: translateY(6px) rotate(45deg); }
+  .menu-open .menu-btn span::after { transform: translateY(-6px) rotate(-45deg); }
+  .nav-links { display: none; position: absolute; top: 100%; left: 0; right: 0; flex-direction: column; align-items: stretch; gap: 0; padding: 6px 20px 20px; background: #fff; border-bottom: 1px solid var(--line); box-shadow: 0 14px 28px rgba(15, 42, 61, .1); max-height: calc(100vh - var(--header-h)); overflow-y: auto; }
+  .menu-open .nav-links { display: flex; }
+  .site-header nav .nav-links > a { display: block; padding: 14px 2px; font-size: 1rem; border-bottom: 1px solid var(--line); }
+  .site-header nav .nav-drop > a { display: none; }
+  .nav-menu, .nav-drop:hover .nav-menu, .nav-drop:focus-within .nav-menu { display: grid; position: static; margin: 0; padding: 0 0 8px; border: 0; border-bottom: 1px solid var(--line); border-radius: 0; box-shadow: none; grid-template-columns: 1fr 1fr; }
+  .nav-menu::before { display: none; }
+  .site-header nav .nav-menu a { padding: 10px 2px; font-size: .95rem; }
+  .site-header nav .nav-links > a.nav-cta { margin-top: 16px; justify-content: center; padding: 12px; border-bottom: 0; }
+}
 .lang-switch { display: flex; gap: 4px; background: var(--foam); padding: 3px; border-radius: 999px; }
 .lang-switch button { border: none; background: transparent; color: var(--navy); padding: 4px 11px; border-radius: 999px; font-weight: 700; font-size: .82rem; cursor: pointer; }
 .lang-switch button.active { background: var(--teal-dark); color: #fff; }
@@ -72,7 +94,6 @@ button { font: inherit; }
   .logo-word { font-size: 1.1rem; }
   .site-header .logo img { width: 26px; height: 26px; }
   .site-header nav { gap: 12px; }
-  .nav-sub { display: none; }
 }
 /* スマホ：ヘッダーが画面からはみ出さないように詰める */
 html, body { overflow-x: clip; }
@@ -586,7 +607,6 @@ html[lang="en"] .hero h1 { font-family: var(--display); font-weight: 800; letter
   font-size: .88rem; font-weight: 800; box-shadow: 0 2px 0 #a9c21d;
 }
 .site-header nav a.nav-cta:hover { color: var(--ball-ink); filter: brightness(1.04); }
-@media (max-width: 720px) { .site-header nav a.nav-cta { display: none; } }
 
 /* トップページ：コート運営者向けの案内枠 */
 .owner-band {
