@@ -1,18 +1,15 @@
 ---
-// コートの比較表（コート・屋内/屋外・料金・時間・アクセス）。エリアページと駅・街ページで共通。
+// コートの比較表（コート・屋内/屋外・料金・時間・アクセス）。駅・街ページで使う。
 // 値はコートのファイルのものをそのまま出す（書いていない項目は「—」）。スマホでは1施設ずつの縦並びになる。
-// 行の data-purpose は、エリアページの「目的で選ぶ」ボタンの絞り込みに使う（定義は lib/courts.ts の PURPOSES）
-import { ENVIRONMENTS, courtUrl, hasRental, isPublic, purposesOf, type Court } from '../lib/courts';
+import { ENVIRONMENTS, courtUrl, hasRental, isPublic, type Court } from '../lib/courts';
 
 interface Props {
   courts: Court[];
-  /** 名前の下に区・市名を出す（エリアページ向け） */
-  showArea?: boolean;
 }
-const { courts, showArea = false } = Astro.props;
+const { courts } = Astro.props;
 const sub = (c: Court) => {
-  const ja = [showArea && c.data.area.ja, isPublic(c) && '自治体の施設', c.data.courts && `${c.data.courts}面`, hasRental(c) && 'レンタルあり'].filter(Boolean).join('・');
-  const en = [showArea && c.data.area.en, isPublic(c) && 'Public', c.data.courts && `${c.data.courts} courts`, hasRental(c) && 'Rental'].filter(Boolean).join(' · ');
+  const ja = [isPublic(c) && '自治体の施設', c.data.courts && `${c.data.courts}面`, hasRental(c) && 'レンタルあり'].filter(Boolean).join('・');
+  const en = [isPublic(c) && 'Public', c.data.courts && `${c.data.courts} courts`, hasRental(c) && 'Rental'].filter(Boolean).join(' · ');
   return { ja, en };
 };
 ---
@@ -24,7 +21,7 @@ const sub = (c: Court) => {
       {courts.map((c) => {
         const s = sub(c);
         return (
-          <tr data-ct-row data-purpose={purposesOf(c).join(' ')}>
+          <tr>
             <th scope="row"><a href={courtUrl(c)}>{c.data.name}</a>{s.ja && <small data-ja={s.ja} data-en={s.en}>{s.ja}</small>}</th>
             <td data-label="屋内/屋外" data-label-en="Type" data-ja={c.data.environment.map((e) => ENVIRONMENTS[e].ja).join('・')} data-en={c.data.environment.map((e) => ENVIRONMENTS[e].en).join(' / ')}>{c.data.environment.map((e) => ENVIRONMENTS[e].ja).join('・')}</td>
             <td data-label="料金の目安" data-label-en="Price">{c.data.price ?? '—'}</td>
@@ -46,7 +43,6 @@ const sub = (c: Court) => {
   .ct tbody th { min-width: 11rem; }
   .ct tbody th a { font-weight: 700; color: var(--navy); }
   .ct tbody th small { display: block; font-weight: 500; color: var(--ink-soft); font-size: .74rem; }
-  .ct tr[hidden] { display: none; }
   @media (max-width: 640px) {
     .ct-wrap { overflow: visible; }
     .ct { min-width: 0; }
