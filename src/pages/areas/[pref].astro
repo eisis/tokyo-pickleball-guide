@@ -95,11 +95,17 @@ const jsonLd = {
     </p>
     <p class="meta" data-ja={`情報の最終確認日：${ymd(latest)}`} data-en={`Last checked: ${ymd(latest)}`}>情報の最終確認日：{ymd(latest)}</p>
 
-    <div class="cards" style="margin-top:20px">
-      {courts.filter((c) => !isPublic(c)).map((court) => <CourtCard court={court} />)}
+    {/* トップと同じ並び：左にカード、右に地図（スマホでは地図が上） */}
+    <div class="explore area-explore">
+      <div class="explore-list">
+        <div class="cards">
+          {courts.filter((c) => !isPublic(c)).map((court) => <CourtCard court={court} />)}
+        </div>
+      </div>
+      {courts.some((c) => !isPublic(c) && c.data.location) && (
+        <aside class="explore-map" aria-label="コートマップ"><CourtMap courts={courts.filter((c) => !isPublic(c))} /></aside>
+      )}
     </div>
-
-    {courts.some((c) => !isPublic(c) && c.data.location) && <div style="margin-top:28px"><CourtMap courts={courts.filter((c) => !isPublic(c))} /></div>}
 
     {weekShown.length > 0 && (
       <section style="margin-top:36px">
@@ -148,6 +154,8 @@ const jsonLd = {
 </Base>
 
 <style>
+  .area-explore { padding: 20px 0 0; }
+  .area-explore .explore-map { top: calc(var(--header-h) + 16px); }
   .area-day { font-size: .8rem; font-weight: 700; color: var(--ink-soft); margin: 0 0 4px 4px; }
   .area-faq details { border-top: 1px solid var(--line, #e5e7eb); padding: 12px 0; }
   .area-faq details:last-child { border-bottom: 1px solid var(--line, #e5e7eb); }
