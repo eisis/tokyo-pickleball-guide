@@ -16,6 +16,8 @@ const items = (
     })
   )
 ).flat();
+// 種類のチップは、はじめての人がたどる順（体験 → 習う → 打つ → 試合 → イベント）に並べる
+const TYPE_ORDER = ['trial', 'lesson', 'practice', 'tournament', 'festival'] as const;
 const prefs = (Object.keys(PREFECTURES) as (keyof typeof PREFECTURES)[]).filter((p) => items.some((x) => x.venue.prefecture === p));
 ---
 
@@ -34,6 +36,10 @@ const prefs = (Object.keys(PREFECTURES) as (keyof typeof PREFECTURES)[]).filter(
 
   <main class="container events-page">
     <div class="event-filters" id="tw-filters">
+      <div class="chips" role="group" aria-label="種類">
+        <button type="button" class="chip active" data-type="all">すべて <span class="n" data-type-n="all"></span></button>
+        {TYPE_ORDER.map((t) => <button type="button" class="chip" data-type={t}>{EVENT_TYPES[t].ja} <span class="n" data-type-n={t}></span></button>)}
+      </div>
       {prefs.length > 1 && (
         <div class="chips" role="group" aria-label="エリア">
           <button type="button" class="chip active" data-key="pref" data-value="all">全エリア</button>
@@ -58,6 +64,7 @@ const prefs = (Object.keys(PREFECTURES) as (keyof typeof PREFECTURES)[]).filter(
           data-time={startTime(e) || '99:99'}
           data-self={e.data.organizer.self ? '1' : '0'}
           data-pref={venue.prefecture ?? ''}
+          data-type={e.data.type}
           data-beginner={beginnerOk(e) ? '1' : '0'}
           data-walkin={e.data.entry.required ? '0' : '1'}
         >
@@ -131,12 +138,22 @@ const prefs = (Object.keys(PREFECTURES) as (keyof typeof PREFECTURES)[]).filter(
 
   // 絞り込み
   const root = document.getElementById('tw-filters')!;
-  const state = { pref: 'all', beginner: false, walkin: false };
+  const TYPES = ['all', 'trial', 'lesson', 'practice', 'tournament', 'festival'];
+  const fromUrl = new URLSearchParams(location.search).get('type') ?? 'all';
+  const state = { pref: 'all', beginner: false, walkin: false, type: TYPES.includes(fromUrl) ? fromUrl : 'all' };
+  // 7日間に開催がある種類だけチップを出し、件数を付ける
+  const inWeek = sections.flatMap((sec) => [...sec.querySelectorAll<HTMLElement>('[data-tw]')]);
+  root.querySelectorAll<HTMLElement>('[data-type-n]').forEach((n) => {
+    const t = n.dataset.typeN!;
+    const c = inWeek.filter((el) => t === 'all' || el.dataset.type === t).length;
+    n.textContent = String(c);
+    if (t !== 'all' && c === 0) (n.closest('.chip') as HTMLElement).hidden = true;
+  });
   function apply() {
     sections.forEach((sec) => {
       let n = 0;
       sec.querySelectorAll<HTMLElement>('[data-tw]').forEach((el) => {
-        const ok = (state.pref === 'all' || el.dataset.pref === state.pref) && (!state.beginner || el.dataset.beginner === '1') && (!state.walkin || el.dataset.walkin === '1');
+        const ok = (state.type === 'all' || el.dataset.type === state.type) && (state.pref === 'all' || el.dataset.pref === state.pref) && (!state.beginner || el.dataset.beginner === '1') && (!state.walkin || el.dataset.walkin === '1');
         el.hidden = !ok;
         if (ok) n++;
       });
@@ -144,6 +161,11 @@ const prefs = (Object.keys(PREFECTURES) as (keyof typeof PREFECTURES)[]).filter(
       sec.classList.toggle('empty-day', n === 0);
     });
     root.querySelectorAll<HTMLButtonElement>('.chip[data-key]').forEach((b) => b.classList.toggle('active', state.pref === b.dataset.value));
+    root.querySelectorAll<HTMLButtonElement>('.chip[data-type]').forEach((b) => b.classList.toggle('active', state.type === b.dataset.type));
+    // 種類はURLにも残す（?type=trial のリンクをSNSで共有できる）
+    const u = new URL(location.href);
+    state.type === 'all' ? u.searchParams.delete('type') : u.searchParams.set('type', state.type);
+    history.replaceState(null, '', u);
     root.querySelectorAll<HTMLButtonElement>('[data-toggle]').forEach((b) => {
       const on = state[b.dataset.toggle as 'beginner' | 'walkin'];
       b.classList.toggle('active', on);
@@ -154,6 +176,8 @@ const prefs = (Object.keys(PREFECTURES) as (keyof typeof PREFECTURES)[]).filter(
     const el = e.target as HTMLElement;
     const t = el.closest<HTMLButtonElement>('[data-toggle]');
     if (t) state[t.dataset.toggle as 'beginner' | 'walkin'] = !state[t.dataset.toggle as 'beginner' | 'walkin'];
+    const ty = el.closest<HTMLButtonElement>('.chip[data-type]');
+    if (ty) state.type = ty.dataset.type!;
     const b = el.closest<HTMLButtonElement>('.chip[data-key]');
     if (b) state.pref = b.dataset.value!;
     apply();

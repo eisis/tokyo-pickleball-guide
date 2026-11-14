@@ -627,6 +627,7 @@ html[lang="en"] .hero h1 { font-family: var(--display); font-weight: 800; letter
 .etag-self { background: var(--coral); color: #fff; }
 .etag-level { background: #fff; border: 1px solid var(--line); color: var(--ink-soft); }
 .event-filters { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+.event-filters .chips { flex-wrap: wrap; }
 .event-bands { margin-top: 40px; display: grid; gap: 16px; }
 .event-note { padding: 16px 20px; border-radius: var(--radius-sm); background: var(--sand); border: 1px dashed var(--sand-deep); display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; justify-content: space-between; }
 .facts .event-dates { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 6px; }
