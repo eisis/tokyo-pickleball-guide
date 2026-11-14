@@ -41,6 +41,15 @@ export const RESERVATION = {
   walkin: { ja: '当日受付', en: 'Walk-in' },
 } as const;
 
+// 公共施設の使い方（category: public のときに表示）
+export const USAGE = {
+  dropin: { ja: '個人開放', en: 'Drop-in' },
+  group: { ja: '団体で予約', en: 'Group booking' },
+} as const;
+
+/** 公共施設か（トップやエリアページでは写真付きの一覧と分けて、文字だけの一覧で見せる） */
+export const isPublic = (court: Court) => court.data.category === 'public';
+
 /** 道具を借りられるか（無料・有料どちらでも true） */
 export const hasRental = (court: Court) => !!court.data.rental && court.data.rental.status !== 'none';
 

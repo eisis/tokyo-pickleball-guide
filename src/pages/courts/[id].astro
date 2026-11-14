@@ -5,7 +5,7 @@ import Base from '../../layouts/Base.astro';
 import CourtMap from '../../components/CourtMap.astro';
 import EventCard from '../../components/EventCard.astro';
 import { getUpcomingEvents } from '../../lib/events';
-import { getCourts, PREFECTURES, ENVIRONMENTS, mapUrl, courtUrl, isNew, rentalText, reservationText, type Court } from '../../lib/courts';
+import { getCourts, PREFECTURES, ENVIRONMENTS, mapUrl, courtUrl, isNew, rentalText, reservationText, USAGE, type Court } from '../../lib/courts';
 import { SITE, ldJson } from '../../lib/site';
 
 export async function getStaticPaths() {
@@ -61,7 +61,7 @@ const desc = `${d.name}（${pref}・${d.area.ja}）のピックルボールコ�
 
     {d.image ? (
       <img class="detail-hero" src={d.image} alt={d.name} />
-    ) : (
+    ) : d.category !== 'public' && (
       <div class="detail-hero image-placeholder" aria-hidden="true">🏓</div>
     )}
 
@@ -70,6 +70,7 @@ const desc = `${d.name}（${pref}・${d.area.ja}）のピックルボールコ�
     <dl class="facts">
       <dt>エリア</dt><dd>{pref} {d.area.ja}</dd>
       <dt>屋内/屋外</dt><dd>{env}</dd>
+      {d.usage && (<><dt>利用方法</dt><dd>{d.usage.map((u) => USAGE[u].ja).join('・')}</dd></>)}
       {d.reservation && (<><dt>予約方法</dt><dd>{reservationText(court)}</dd></>)}
       {d.rental && (<><dt>レンタル</dt><dd>{rentalText(court)}</dd></>)}
       {d.courts && (<><dt>面数</dt><dd>{d.courts}面</dd></>)}

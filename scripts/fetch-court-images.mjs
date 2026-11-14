@@ -42,6 +42,7 @@ for (const file of readdirSync(DIR).filter((f) => f.endsWith('.md') && !f.starts
   const text = readFileSync(path, 'utf8');
   const fm = text.split(/^---$/m)[1] ?? '';
   if (/^image:/m.test(fm)) continue; // すでに画像あり
+  if (/^category:\s*public\b/m.test(fm)) continue; // 公共施設は写真を使わない（文字だけの一覧で見せる）
 
   const official = fm.match(/^officialUrl:\s*"?([^"\s#]+)/m)?.[1];
   const booking = fm.match(/^booking:\s*\{\s*url:\s*"?([^",\s}]+)/m)?.[1];

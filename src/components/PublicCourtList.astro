@@ -1,0 +1,59 @@
+---
+// 公共施設（区の体育館・スポーツセンターなど）の一覧。写真は使わず、文字だけの行で見せる。
+// 専用コートのカード一覧とは分けて、トップとエリアページの下の段に出す
+import { PREFECTURES, ENVIRONMENTS, USAGE, courtUrl, hasRental, type Court } from '../lib/courts';
+
+interface Props {
+  courts: Court[];
+}
+const { courts } = Astro.props;
+---
+
+<ul class="public-list">
+  {courts.map((court) => {
+    const d = court.data;
+    return (
+      <li>
+        <a class="public-row" href={courtUrl(court)}>
+          <span class="public-area">
+            <span data-ja={d.area.ja} data-en={d.area.en}>{d.area.ja}</span>
+            <small data-ja={PREFECTURES[d.prefecture].ja} data-en={PREFECTURES[d.prefecture].en}>{PREFECTURES[d.prefecture].ja}</small>
+          </span>
+          <span class="public-main">
+            <span class="public-name">{d.name}</span>
+            <span class="public-meta">
+              {d.environment.map((e) => <span data-ja={ENVIRONMENTS[e].ja} data-en={ENVIRONMENTS[e].en}>{ENVIRONMENTS[e].ja}</span>)}
+              {d.usage?.map((u) => <span data-ja={USAGE[u].ja} data-en={USAGE[u].en}>{USAGE[u].ja}</span>)}
+              {d.reservation?.includes('walkin') && <span data-ja="予約不要" data-en="No booking">予約不要</span>}
+              {hasRental(court) && <span data-ja="道具の貸出あり" data-en="Rental">道具の貸出あり</span>}
+            </span>
+          </span>
+          {d.price && <span class="public-price">{d.price}</span>}
+          <span class="public-arrow" aria-hidden="true">→</span>
+        </a>
+      </li>
+    );
+  })}
+</ul>
+
+<style>
+  .public-list { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+  .public-list li { border-bottom: 1px solid var(--line); }
+  .public-row { display: grid; grid-template-columns: 8.5rem 1fr auto auto; align-items: center; gap: 6px 20px; padding: 16px 4px; color: var(--ink); text-decoration: none; }
+  .public-row:hover .public-name { color: var(--teal-dark); }
+  .public-row:hover .public-arrow { transform: translateX(3px); color: var(--teal-dark); }
+  .public-area { display: flex; flex-direction: column; font-size: .82rem; font-weight: 700; color: var(--navy); line-height: 1.4; }
+  .public-area small { font-weight: 500; color: var(--ink-soft); font-size: .74rem; }
+  .public-main { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+  .public-name { font-weight: 700; font-size: 1rem; line-height: 1.5; transition: color .15s; }
+  .public-meta { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: .78rem; color: var(--ink-soft); }
+  .public-price { font-size: .82rem; color: var(--ink-soft); white-space: nowrap; }
+  .public-arrow { font-family: var(--display); color: var(--ink-soft); transition: transform .15s, color .15s; }
+  @media (max-width: 640px) {
+    .public-row { grid-template-columns: 1fr auto; padding: 14px 2px; }
+    .public-area { flex-direction: row; gap: 8px; align-items: baseline; grid-column: 1 / -1; }
+    .public-main { grid-column: 1; }
+    .public-price { grid-column: 1; white-space: normal; }
+    .public-arrow { grid-column: 2; grid-row: 2 / span 2; }
+  }
+</style>
