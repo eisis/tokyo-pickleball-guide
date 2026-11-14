@@ -18,7 +18,7 @@ const courts = (S.courts as readonly string[]).map((c) => all.find((x) => x.id =
 const P = PREFECTURES[S.pref];
 const indoor = courts.filter((c) => c.data.environment.includes('indoor')).length;
 const outdoor = courts.filter((c) => c.data.environment.includes('outdoor')).length;
-const latest = new Date(Math.max(...courts.map((c) => c.data.updatedAt.getTime()))).toISOString().slice(0, 10);
+const latest = courts.length ? new Date(Math.max(...courts.map((c) => c.data.updatedAt.getTime()))).toISOString().slice(0, 10) : '';
 const pageUrl = `${SITE.url}/spots/${id}/`;
 const jsonLd = {
   '@context': 'https://schema.org',

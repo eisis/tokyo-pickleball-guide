@@ -13,6 +13,7 @@ hours: "9:00〜22:00"
 price: 1時間 ¥5,000〜
 rental: { status: free, note: パドル・ボール }   # 道具の貸し出し：free=無料 / paid=有料 / available=あり（料金不明） / none=なし。確認できなければこの行を消す
 reservation: [online]        # 予約方法：online=ネット / line=LINE / phone=電話 / walkin=当日受付（複数可）。確認できなければこの行を消す
+beginner: true                # 公共施設だけ：体験会・初心者クラス・初めての人へのルール説明があると公式に書かれているときだけ書く（一覧の「初心者OK」）
 usage: [dropin]               # 公共施設だけ：dropin=個人開放 / group=団体で予約（複数可）。公共施設は写真を使わないので image: も書かない
 description:
   ja: カードに出る短い紹介文（2文くらい）

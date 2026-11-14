@@ -7,7 +7,7 @@ import SnsLinks from '../../components/SnsLinks.astro';
 import CourtCard from '../../components/CourtCard.astro';
 import PostCard from '../../components/PostCard.astro';
 import { SITE, ldJson } from '../../lib/site';
-import { ENVIRONMENTS, rentalText, reservationText } from '../../lib/courts';
+import { ENVIRONMENTS, rentalText, reservationText, isClosed } from '../../lib/courts';
 import {
   getPosts, POST_CATEGORIES, categoryUrl, tagUrl, postUrl, ymd, readingMinutes, coverOf, cardImageOf, relatedPosts, type Post,
 } from '../../lib/posts';
@@ -21,7 +21,8 @@ const { post } = Astro.props as { post: Post };
 const d = post.data;
 const { Content, headings } = await render(post);
 const toc = headings.filter((h) => h.depth === 2);
-const courts = (await getEntries(d.courts.map((id) => ({ collection: 'courts' as const, id })))).filter(Boolean);
+// 非表示・営業終了のコートは「この記事で紹介したコート」に出さない
+const courts = (await getEntries(d.courts.map((id) => ({ collection: 'courts' as const, id })))).filter((c) => c && !c.data.hidden && !isClosed(c));
 // コートレビューでは「屋内外・予約・レンタル」を必ず出す。記事に書いていない項目は、紹介コートのデータから自動で足す
 const labels = new Set(d.facts.map((f) => f.label));
 const main = d.category === 'review' ? courts[0] : undefined;

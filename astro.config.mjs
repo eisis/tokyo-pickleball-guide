@@ -11,9 +11,22 @@ const selfEvents = new Set(
     .filter((f) => /\n\s*self:\s*true/.test(readFileSync(`./src/content/events/${f}`, 'utf8')))
     .map((f) => f.replace(/\.md$/, '')),
 );
+// 期間限定で営業が終わったコート（closesAt が過ぎたもの）は、ページは残すが検索には出さない（ページ側も noindex）
+const today = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
+const closedCourts = new Set(
+  readdirSync('./src/content/courts')
+    .filter((f) => f.endsWith('.md') && !f.startsWith('_'))
+    .filter((f) => {
+      const m = readFileSync(`./src/content/courts/${f}`, 'utf8').match(/^closesAt:\s*(\d{4}-\d{2}-\d{2})/m);
+      return m && m[1] < today;
+    })
+    .map((f) => f.replace(/\.md$/, '')),
+);
 const hideFromSitemap = (page) => {
   const path = new URL(page).pathname;
   if (/^\/(my-paddle|tokushoho|contact)\/$/.test(path)) return true; // 準備中・問い合わせページ
+  const c = path.match(/^\/courts\/([^/]+)\/$/);
+  if (c && closedCourts.has(c[1])) return true;
   const m = path.match(/^\/events\/([^/]+)\/$/);
   if (m && m[1] !== 'submit' && !selfEvents.has(m[1])) return true;
   return false;

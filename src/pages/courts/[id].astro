@@ -6,17 +6,20 @@ import CourtMap from '../../components/CourtMap.astro';
 import EventCard from '../../components/EventCard.astro';
 import { getUpcomingEvents } from '../../lib/events';
 import { SPOTS, spotOf } from '../../lib/spots';
-import { getCourts, PREFECTURES, ENVIRONMENTS, mapUrl, courtUrl, isNew, rentalText, reservationText, hasRental, USAGE, type Court } from '../../lib/courts';
+import { getCollection } from 'astro:content';
+import { getCourts, isClosed, PREFECTURES, ENVIRONMENTS, mapUrl, courtUrl, isNew, rentalText, reservationText, hasRental, USAGE, type Court } from '../../lib/courts';
 import { SITE, ldJson } from '../../lib/site';
 
 export async function getStaticPaths() {
-  const courts = await getCourts();
+  // 期間限定で営業が終わったコートもページは残す（検索から来た人に「終了」を伝え、ほかのコートへ案内する）。一覧・地図からは getCourts で外れる
+  const courts = await getCollection('courts', (c) => !c.data.hidden);
   return courts.map((court) => ({ params: { id: court.id }, props: { court } }));
 }
 
 const { court } = Astro.props as { court: Court };
 const d = court.data;
 const { Content } = await render(court);
+const closed = isClosed(court);
 const spot = spotOf(court.id);
 const courtEvents = (await getUpcomingEvents()).filter((e) => e.data.court === court.id);
 const env = d.environment.map((e) => ENVIRONMENTS[e].ja).join('・');
@@ -63,11 +66,14 @@ const desc = `${d.area.ja}のピックルボールコート「${d.name}」。${f
 const pageTitle = `${d.area.ja} ピックルボール｜${d.name}の料金・予約・アクセス`;
 ---
 
-<Base title={pageTitle} description={desc} image={d.image}>
+<Base title={closed ? `【営業終了】${d.name}` : pageTitle} description={closed ? `${d.name}は期間限定の営業を終了しました。${PREFECTURES[d.prefecture].ja}で今プレーできるピックルボールコートはエリアのページで探せます。` : desc} image={d.image} robots={closed ? 'noindex, follow' : undefined}>
   <script slot="head" type="application/ld+json" set:html={ldJson(jsonLd)} />
   <main class="container narrow">
     <nav class="crumbs" aria-label="パンくず"><a href="/">トップ</a><span aria-hidden="true">›</span><a href={`/areas/${d.prefecture}/`}>{PREFECTURES[d.prefecture].ja}のコート</a></nav>
     <h1 style="margin:12px 0 20px;color:var(--navy)">{d.name}{isNew(court) && <span class="new-label">NEW</span>}</h1>
+    {closed && (
+      <p class="closed-note">このコートは期間限定の営業を{d.closesAt ? `${d.closesAt.getUTCMonth() + 1}月${d.closesAt.getUTCDate()}日で` : ''}終了しました。<a href={spot ? `/spots/${spot}/` : `/areas/${d.prefecture}/`}>{spot ? SPOTS[spot].ja : PREFECTURES[d.prefecture].ja}で今プレーできるコートを探す →</a></p>
+    )}
     {d.ownerVerified && <p class="owner-verified">✓ 施設の運営者が掲載している情報です</p>}
 
     {d.image ? (
@@ -92,7 +98,7 @@ const pageTitle = `${d.area.ja} ピックルボール｜${d.name}の料金・予
       {d.openedAt && (<><dt>オープン</dt><dd>{ymd(d.openedAt)}</dd></>)}
     </dl>
 
-    <a class="button" href={d.booking.url} target="_blank" rel="noopener" data-track="booking" data-track-from="詳細ページ" data-court-id={court.id} data-court-name={d.name}>{bookLabel}</a>
+    {!closed && <a class="button" href={d.booking.url} target="_blank" rel="noopener" data-track="booking" data-track-from="詳細ページ" data-court-id={court.id} data-court-name={d.name}>{bookLabel}</a>}
     {d.availabilityUrl && <a class="button secondary" href={d.availabilityUrl} target="_blank" rel="noopener" data-track="availability" data-track-from="詳細ページ" data-court-id={court.id} data-court-name={d.name}>空き状況を見る</a>}
     <a class="map-button" href={mapUrl(court)} target="_blank" rel="noopener" data-track="map" data-track-from="詳細ページ" data-court-id={court.id} data-court-name={d.name}>📍 Google Map</a>
 
@@ -126,3 +132,8 @@ const pageTitle = `${d.area.ja} ピックルボール｜${d.name}の料金・予
     )}
   </main>
 </Base>
+
+<style>
+  .closed-note { margin: 0 0 20px; padding: 14px 16px; border-radius: var(--radius-sm); background: #fff4f1; border: 1px solid #f6c8bd; color: #8a3a28; line-height: 1.7; }
+  .closed-note a { font-weight: 700; color: inherit; }
+</style>
