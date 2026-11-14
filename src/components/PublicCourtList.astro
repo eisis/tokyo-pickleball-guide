@@ -28,7 +28,7 @@ const { courts } = Astro.props;
               {hasRental(court) && <span data-ja="道具の貸出あり" data-en="Rental">道具の貸出あり</span>}
             </span>
           </span>
-          {d.price && <span class="public-price">{d.price}</span>}
+          <span class="public-price">{d.price ?? ""}</span>
           <span class="public-arrow" aria-hidden="true">→</span>
         </a>
       </li>
