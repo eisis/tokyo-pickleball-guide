@@ -9,6 +9,7 @@ hours: "みんなでピックルボール：毎週火 13:00〜14:30"
 price: 1回1,000円（パドルのレンタルは+210円）
 rental: { status: paid, note: パドル210円 }
 reservation: [online]
+beginner: true
 usage: [dropin]
 description:
   ja: 毎週火曜に、1人で参加できる「みんなでピックルボール」があります。初めての人も歓迎で、パドルは210円で借りられます。

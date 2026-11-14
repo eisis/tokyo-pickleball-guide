@@ -10,6 +10,7 @@ hours: "個人開放：毎週月 13:20〜15:20（2026年9月7日〜11月30日）
 price: 一般300円、中学生以下100円
 rental: { status: available, note: パドル }
 reservation: [walkin]
+beginner: true
 usage: [dropin]
 description:
   ja: 新宿区立の施設で、毎週月曜にピックルボールの個人開放があります。コーディネーターが常駐していて、1人でも初めてでも参加しやすい枠です。

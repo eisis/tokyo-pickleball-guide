@@ -7,6 +7,7 @@ category: public
 hours: "ピックルボールレッスン：水 10:00〜12:00（経験者）／木 13:00〜15:00"
 price: 1回1,650円（当日現金払い）
 reservation: [online]
+beginner: true
 usage: [dropin]
 description:
   ja: 体育館が主催するピックルボールのレッスンが、毎週水曜と木曜に開かれています。初心者クラスと経験者クラスがあり、1人で申し込めます。

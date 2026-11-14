@@ -8,6 +8,7 @@ address: 東京都千代田区内神田2-1-8
 hours: "ピックルボール教室：水 13:00〜14:10（日程は施設のイベントページで案内）"
 price: 区民1,000円、一般1,200円
 rental: { status: available, note: パドル }
+beginner: true
 usage: [dropin]
 description:
   ja: 初めての人や運動が苦手な人も歓迎の「ピックルボール教室」があります。ルールと基礎練習から試合まで行い、パドルは貸し出しがあります。

@@ -7,6 +7,7 @@ category: public
 hours: "ピックルボール体験会：木 13:15〜／15:00〜／19:15〜（日程は回ごとに案内）"
 price: 体験会1回1,000円
 reservation: [online, phone]
+beginner: true
 usage: [dropin]
 description:
   ja: 小体育室でピックルボールの体験会が開かれています。昼と夜の回があり、1人1,000円で参加できます。

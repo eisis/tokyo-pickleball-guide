@@ -25,6 +25,7 @@ const courts = defineCollection({
       note: z.string().optional(), // 何を借りられるか（例: パドル・ボール）
     }).optional(),
     reservation: z.array(z.enum(['online', 'line', 'phone', 'walkin'])).min(1).optional(), // 予約方法：online=ネット / line=LINE / phone=電話 / walkin=当日受付
+    beginner: z.boolean().optional(), // 公共施設：初めての人向けの枠（体験会・初心者クラス・ルール説明あり）があると公式に書かれている
     usage: z.array(z.enum(['dropin', 'group'])).min(1).optional(), // 公共施設の使い方：dropin=個人開放（1人でも行ける）/ group=団体で施設を予約
     description: ja_en, // カードに出る短い紹介文
     image: z.string().optional(), // public/images/courts/ の画像。なければ🏓を表示

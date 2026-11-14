@@ -8,6 +8,7 @@ hours: "はじめてのピックルボール教室：水 10:00〜11:30／個人�
 price: 教室1回1,200円、個人参加1回1,000円
 rental: { status: available, note: パドル }
 reservation: [online]
+beginner: true
 usage: [dropin]
 description:
   ja: 初めての人向けの教室と、1人で参加できる個人参加の枠があります。どちらもWebで1人ずつ申し込み、パドルは貸し出しがあります。

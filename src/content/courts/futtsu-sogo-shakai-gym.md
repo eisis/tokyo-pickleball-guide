@@ -7,6 +7,7 @@ category: public
 hours: "個人参加ピックルボール：土 9:30〜11:30／日 18:30〜20:30 など（日程は回ごとに案内）"
 price: 1回1,100円
 reservation: [online]
+beginner: true
 usage: [dropin]
 description:
   ja: 1人で参加できる個人参加ピックルボールが開かれています。初めての人にはウォーミングアップの間にルールを説明してくれます。

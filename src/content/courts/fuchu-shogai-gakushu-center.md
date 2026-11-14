@@ -8,6 +8,7 @@ hours: "体験会・個人参加ピックルボール：日程は回ごとに案
 price: 個人参加1回1,100円
 rental: { status: available, note: ラケット }
 reservation: [online]
+beginner: true
 usage: [dropin]
 description:
   ja: 体育室でピックルボールの体験会と、1人で参加できる個人参加の枠があります。ラケットの貸し出しがあり、小学生から参加できます。

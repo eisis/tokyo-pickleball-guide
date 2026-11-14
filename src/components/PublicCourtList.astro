@@ -1,42 +1,135 @@
 ---
-// 公共施設（区の体育館・スポーツセンターなど）の一覧。写真は使わず、文字だけの行で見せる。
-// 専用コートのカード一覧とは分けて、トップとエリアページの下の段に出す
+// 公共施設（自治体の体育館・スポーツセンターなど）の一覧。写真は使わず、文字だけの行で見せる。
+// 上の絞り込み（エリア・条件・名前検索）は、この一覧の中だけで動く小さな仕組み
 import { PREFECTURES, ENVIRONMENTS, USAGE, courtUrl, hasRental, type Court } from '../lib/courts';
 
 interface Props {
   courts: Court[];
 }
 const { courts } = Astro.props;
+type Pref = keyof typeof PREFECTURES;
+const prefs = (Object.keys(PREFECTURES) as Pref[]).filter((p) => courts.some((c) => c.data.prefecture === p));
+const flags = (c: Court) => ({
+  beginner: !!c.data.beginner,
+  rental: hasRental(c),
+  walkin: !!c.data.reservation?.includes('walkin'),
+});
+const conds = [
+  { key: 'beginner', ja: '初心者OK', en: 'Beginner OK' },
+  { key: 'rental', ja: '道具の貸出あり', en: 'Rental' },
+  { key: 'walkin', ja: '予約不要', en: 'No booking' },
+] as const;
+const count = (key: 'beginner' | 'rental' | 'walkin') => courts.filter((c) => flags(c)[key]).length;
 ---
 
-<ul class="public-list">
-  {courts.map((court) => {
-    const d = court.data;
-    return (
-      <li>
-        <a class="public-row" href={courtUrl(court)}>
-          <span class="public-area">
-            <span data-ja={d.area.ja} data-en={d.area.en}>{d.area.ja}</span>
-            <small data-ja={PREFECTURES[d.prefecture].ja} data-en={PREFECTURES[d.prefecture].en}>{PREFECTURES[d.prefecture].ja}</small>
-          </span>
-          <span class="public-main">
-            <span class="public-name">{d.name}</span>
-            <span class="public-meta">
-              {d.environment.map((e) => <span data-ja={ENVIRONMENTS[e].ja} data-en={ENVIRONMENTS[e].en}>{ENVIRONMENTS[e].ja}</span>)}
-              {d.usage?.map((u) => <span data-ja={USAGE[u].ja} data-en={USAGE[u].en}>{USAGE[u].ja}</span>)}
-              {d.reservation?.includes('walkin') && <span data-ja="予約不要" data-en="No booking">予約不要</span>}
-              {hasRental(court) && <span data-ja="道具の貸出あり" data-en="Rental">道具の貸出あり</span>}
+<div class="public-finder" data-public-finder>
+  <div class="public-controls">
+    <input class="public-search" type="search" placeholder="区・市・施設名で探す（例：江戸川、八王子）" aria-label="区・市・施設名で探す" data-public-search />
+    {prefs.length > 1 && (
+      <div class="chips" role="group" aria-label="エリア">
+        <button type="button" class="chip active" data-pref="all"><span data-ja="すべて" data-en="All">すべて</span> <span class="n">{courts.length}</span></button>
+        {prefs.map((p) => (
+          <button type="button" class="chip" data-pref={p}><span data-ja={PREFECTURES[p].ja} data-en={PREFECTURES[p].en}>{PREFECTURES[p].ja}</span> <span class="n">{courts.filter((c) => c.data.prefecture === p).length}</span></button>
+        ))}
+      </div>
+    )}
+    <div class="chips" role="group" aria-label="条件">
+      {conds.filter((c) => count(c.key) > 0).map((c) => (
+        <button type="button" class="chip" data-cond={c.key} aria-pressed="false"><span data-ja={c.ja} data-en={c.en}>{c.ja}</span> <span class="n">{count(c.key)}</span></button>
+      ))}
+    </div>
+  </div>
+  <p class="public-count" aria-live="polite"><b data-public-count>{courts.length}</b> <span data-ja="件" data-en="places">件</span></p>
+
+  <ul class="public-list">
+    {courts.map((court) => {
+      const d = court.data;
+      const f = flags(court);
+      const search = [d.name, d.area.ja, d.area.en, PREFECTURES[d.prefecture].ja, PREFECTURES[d.prefecture].full, d.address ?? ''].join(' ');
+      return (
+        <li data-public-item data-pref={d.prefecture} data-beginner={f.beginner ? '1' : '0'} data-rental={f.rental ? '1' : '0'} data-walkin={f.walkin ? '1' : '0'} data-search={search}>
+          <a class="public-row" href={courtUrl(court)}>
+            <span class="public-area">
+              <span data-ja={d.area.ja} data-en={d.area.en}>{d.area.ja}</span>
+              <small data-ja={PREFECTURES[d.prefecture].ja} data-en={PREFECTURES[d.prefecture].en}>{PREFECTURES[d.prefecture].ja}</small>
             </span>
-          </span>
-          <span class="public-price">{d.price ?? ""}</span>
-          <span class="public-arrow" aria-hidden="true">→</span>
-        </a>
-      </li>
-    );
-  })}
-</ul>
+            <span class="public-main">
+              <span class="public-name">{d.name}</span>
+              <span class="public-meta">
+                {d.environment.map((e) => <span data-ja={ENVIRONMENTS[e].ja} data-en={ENVIRONMENTS[e].en}>{ENVIRONMENTS[e].ja}</span>)}
+                {f.beginner && <span class="hl" data-ja="初心者OK" data-en="Beginner OK">初心者OK</span>}
+                {d.usage?.map((u) => <span data-ja={USAGE[u].ja} data-en={USAGE[u].en}>{USAGE[u].ja}</span>)}
+                {f.walkin && <span data-ja="予約不要" data-en="No booking">予約不要</span>}
+                {f.rental && <span data-ja="道具の貸出あり" data-en="Rental">道具の貸出あり</span>}
+              </span>
+            </span>
+            <span class="public-price">{d.price ?? ''}</span>
+            <span class="public-arrow" aria-hidden="true">→</span>
+          </a>
+        </li>
+      );
+    })}
+  </ul>
+  <div class="public-empty" data-public-empty hidden>
+    <p data-ja="条件に合う施設が見つかりませんでした。" data-en="No facilities match.">条件に合う施設が見つかりませんでした。</p>
+    <button type="button" class="chip" data-public-reset data-ja="条件をリセット" data-en="Reset">条件をリセット</button>
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-public-finder]').forEach((root) => {
+    const items = [...root.querySelectorAll<HTMLElement>('[data-public-item]')];
+    const input = root.querySelector<HTMLInputElement>('[data-public-search]')!;
+    const prefBtns = [...root.querySelectorAll<HTMLButtonElement>('[data-pref]')];
+    const condBtns = [...root.querySelectorAll<HTMLButtonElement>('[data-cond]')];
+    const countEl = root.querySelector('[data-public-count]')!;
+    const empty = root.querySelector<HTMLElement>('[data-public-empty]')!;
+    let pref = 'all';
+    const conds = new Set<string>();
+    const norm = (s: string) => s.toLowerCase().replace(/[ヶケ]/g, 'ケ').replace(/\s+/g, '');
+    const apply = () => {
+      const q = norm(input.value);
+      let n = 0;
+      for (const el of items) {
+        const ok =
+          (pref === 'all' || el.dataset.pref === pref) &&
+          [...conds].every((c) => el.dataset[c] === '1') &&
+          (!q || norm(el.dataset.search || '').includes(q));
+        el.hidden = !ok;
+        if (ok) n++;
+      }
+      countEl.textContent = String(n);
+      empty.hidden = n > 0;
+    };
+    input.addEventListener('input', apply);
+    prefBtns.forEach((b) => b.addEventListener('click', () => {
+      pref = b.dataset.pref!;
+      prefBtns.forEach((x) => x.classList.toggle('active', x === b));
+      apply();
+    }));
+    condBtns.forEach((b) => b.addEventListener('click', () => {
+      const k = b.dataset.cond!;
+      conds.has(k) ? conds.delete(k) : conds.add(k);
+      b.classList.toggle('active', conds.has(k));
+      b.setAttribute('aria-pressed', String(conds.has(k)));
+      apply();
+    }));
+    root.querySelector('[data-public-reset]')!.addEventListener('click', () => {
+      input.value = ''; pref = 'all'; conds.clear();
+      prefBtns.forEach((x) => x.classList.toggle('active', x.dataset.pref === 'all'));
+      condBtns.forEach((x) => { x.classList.remove('active'); x.setAttribute('aria-pressed', 'false'); });
+      apply();
+    });
+  });
+</script>
 
 <style>
+  .public-controls { display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; }
+  .public-search { width: 100%; max-width: 420px; font: inherit; font-size: .92rem; padding: 10px 14px; border: 1px solid var(--line); border-radius: 999px; background: #fff; color: var(--ink); }
+  .public-search:focus { outline: none; border-color: var(--teal); box-shadow: 0 0 0 3px rgba(20, 184, 166, .15); }
+  .public-controls .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .public-count { font-size: .82rem; color: var(--ink-soft); margin: 0 0 8px; }
+  .public-count b { font-family: var(--display); color: var(--navy); font-size: 1rem; }
   .public-list { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
   .public-list li { border-bottom: 1px solid var(--line); }
   .public-row { display: grid; grid-template-columns: 8.5rem 1fr auto auto; align-items: center; gap: 6px 20px; padding: 16px 4px; color: var(--ink); text-decoration: none; }
@@ -47,13 +140,17 @@ const { courts } = Astro.props;
   .public-main { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
   .public-name { font-weight: 700; font-size: 1rem; line-height: 1.5; transition: color .15s; }
   .public-meta { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: .78rem; color: var(--ink-soft); }
+  .public-meta .hl { color: var(--teal-dark); font-weight: 700; }
   .public-price { font-size: .82rem; color: var(--ink-soft); white-space: nowrap; }
   .public-arrow { font-family: var(--display); color: var(--ink-soft); transition: transform .15s, color .15s; }
+  .public-empty { padding: 24px 4px; color: var(--ink-soft); }
+  .public-empty .chip { margin-top: 10px; }
   @media (max-width: 640px) {
     .public-row { grid-template-columns: 1fr auto; padding: 14px 2px; }
     .public-area { flex-direction: row; gap: 8px; align-items: baseline; grid-column: 1 / -1; }
     .public-main { grid-column: 1; }
     .public-price { grid-column: 1; white-space: normal; }
+    .public-price:empty { display: none; }
     .public-arrow { grid-column: 2; grid-row: 2 / span 2; }
   }
 </style>
