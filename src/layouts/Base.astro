@@ -2,6 +2,9 @@
 // 全ページ共通の枠（ヘッダー・フッター・言語切替）。ページごとに title と description を渡す
 import '../styles/global.css';
 import { SITE, ldJson } from '../lib/site';
+import { PREFECTURES } from '../lib/courts';
+// ヘッダー・フッターのエリアのリンク（都道府県を足せば自動で増える）
+const prefLinks = (Object.keys(PREFECTURES) as (keyof typeof PREFECTURES)[]).map((p) => ({ href: `/areas/${p}/`, ...PREFECTURES[p] }));
 import SnsLinks from '../components/SnsLinks.astro';
 import Analytics from '@vercel/analytics/astro';
 
@@ -80,7 +83,12 @@ const siteLd = {
       <a class="logo" href="/" aria-label={SITE.name}><img src="/logo-mark.png" alt="" width="30" height="30" /><span class="logo-word">Pickleball<span class="logo-accent">Tokyo</span></span></a>
       <nav>
         <a href="/#courts" data-ja="コート" data-en="Courts">コート</a>
-        <a class="nav-sub" href="/#areas" data-ja="エリア" data-en="Areas">エリア</a>
+        <div class="nav-sub nav-drop">
+          <a href="/#areas" aria-haspopup="true" data-ja="エリア ▾" data-en="Areas ▾">エリア ▾</a>
+          <div class="nav-menu">
+            {prefLinks.map((p) => <a href={p.href} data-ja={`${p.ja}のコート`} data-en={p.en}>{p.ja}のコート</a>)}
+          </div>
+        </div>
         <a href="/this-week/" data-ja="今週" data-en="This week">今週</a>
         <a href="/events/" data-ja="イベント" data-en="Events">イベント</a>
         <a class="nav-sub" href="/blog/" data-ja="記事" data-en="Articles">記事</a>
@@ -108,7 +116,7 @@ const siteLd = {
         </div>
         <nav class="footer-nav" aria-label="フッター">
           <a href="/#courts" data-ja="コート一覧" data-en="Courts">コート一覧</a>
-          <a href="/#areas" data-ja="エリア" data-en="Areas">エリア</a>
+          {prefLinks.map((p) => <a href={p.href} data-ja={`${p.ja}のコート`} data-en={`Courts in ${p.en}`}>{p.ja}のコート</a>)}
           <a href="/this-week/" data-ja="今週どこで打てる？" data-en="This week">今週どこで打てる？</a>
           <a href="/events/" data-ja="イベント" data-en="Events">イベント</a>
           <a href="/events/submit/" data-ja="イベントの掲載" data-en="List your event">イベントの掲載</a>

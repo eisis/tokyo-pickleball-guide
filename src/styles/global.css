@@ -57,6 +57,13 @@ button { font: inherit; }
 .site-header nav { display: flex; gap: 18px; align-items: center; }
 .site-header nav a { color: var(--navy); text-decoration: none; font-weight: 700; font-size: .95rem; white-space: nowrap; }
 .site-header nav a:hover { color: var(--teal-dark); }
+/* ヘッダーの「エリア」：マウスを乗せる／キーボードで選ぶと4都県のページが出る（スクリプトなし） */
+.nav-drop { position: relative; }
+.nav-menu { display: none; position: absolute; top: 100%; left: -14px; padding: 8px; margin-top: 8px; background: #fff; border: 1px solid var(--line); border-radius: var(--radius-sm); box-shadow: 0 10px 28px rgba(15, 42, 61, .12); min-width: 9.5rem; z-index: 50; }
+.nav-menu::before { content: ''; position: absolute; left: 0; right: 0; top: -10px; height: 10px; }
+.nav-drop:hover .nav-menu, .nav-drop:focus-within .nav-menu { display: grid; }
+.site-header nav .nav-menu a { padding: 8px 10px; border-radius: 6px; font-size: .9rem; }
+.site-header nav .nav-menu a:hover { background: var(--foam); }
 .lang-switch { display: flex; gap: 4px; background: var(--foam); padding: 3px; border-radius: 999px; }
 .lang-switch button { border: none; background: transparent; color: var(--navy); padding: 4px 11px; border-radius: 999px; font-weight: 700; font-size: .82rem; cursor: pointer; }
 .lang-switch button.active { background: var(--teal-dark); color: #fff; }
