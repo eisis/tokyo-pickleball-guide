@@ -4,8 +4,9 @@
 //   （サイトを更新しなくても、毎日正しい「今週」になる）
 // ・同じ日の中は Pickleball Tokyo 主催 → 開始時刻の順
 import Base from '../layouts/Base.astro';
-import { getUpcomingEvents, EVENT_TYPES, LEVELS, venueOf, upcomingDates, eventUrl, beginnerOk, startTime } from '../lib/events';
-import { PREFECTURES, getCourts, sessionDates, courtUrl } from '../lib/courts';
+import TwItem from '../components/TwItem.astro';
+import { getUpcomingEvents, EVENT_TYPES, venueOf, upcomingDates, startTime } from '../lib/events';
+import { PREFECTURES, getCourts, sessionDates } from '../lib/courts';
 
 const events = await getUpcomingEvents();
 const items = (
@@ -20,6 +21,26 @@ const items = (
 const TYPE_ORDER = ['trial', 'lesson', 'practice', 'tournament', 'festival'] as const;
 // 施設の定期開催の枠（コートの sessions）も、イベントと同じ並びに混ぜる
 const sessionItems = (await getCourts()).flatMap((c) => sessionDates(c).map((x) => ({ c, ...x })));
+// イベントと定期開催をひとつの並びにする（同じ日の中は Pickleball Tokyo 主催 → 開始時刻の順）
+const all = [
+  ...items.map((x) => ({ kind: 'event' as const, ...x, self: x.e.data.organizer.self, time: startTime(x.e) || '99:99' })),
+  ...sessionItems.map((x) => ({ kind: 'session' as const, c: x.c, s: x.s, date: x.date, self: false, time: (x.s.time.match(/\d{1,2}:\d{2}/)?.[0] ?? '99:99').padStart(5, '0') })),
+];
+const WEEK = ['日', '月', '火', '水', '木', '金', '土'];
+const WEEK_EN = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const base = Date.now() + 9 * 3600 * 1000;
+const week = [...Array(7)].map((_, i) => {
+  const x = new Date(base + i * 86400000);
+  const d = x.toISOString().slice(0, 10);
+  return {
+    wd: x.getUTCDay(),
+    head: i === 0 ? '今日' : i === 1 ? '明日' : `${WEEK[x.getUTCDay()]}曜`,
+    headEn: i === 0 ? 'Today' : i === 1 ? 'Tomorrow' : WEEK_EN[x.getUTCDay()],
+    sub: `${x.getUTCMonth() + 1}/${x.getUTCDate()}（${WEEK[x.getUTCDay()]}）`,
+    subEn: `${x.getUTCMonth() + 1}/${x.getUTCDate()}`,
+    list: all.filter((it) => it.date === d).sort((a, b) => Number(b.self) - Number(a.self) || a.time.localeCompare(b.time)),
+  };
+});
 const prefs = (Object.keys(PREFECTURES) as (keyof typeof PREFECTURES)[]).filter((p) => items.some((x) => x.venue.prefecture === p) || sessionItems.some((x) => x.c.data.prefecture === p));
 ---
 
@@ -55,63 +76,19 @@ const prefs = (Object.keys(PREFECTURES) as (keyof typeof PREFECTURES)[]).filter(
       </div>
     </div>
 
-    <div class="tw-days" id="tw-days"></div>
+    <div class="tw-days" id="tw-days">
+      {/* ビルドした日（日本時間）から7日分を最初からHTMLに並べておく（スクリプトを動かさない検索エンジン・AIにも中身が見える）。見た人の今日がずれていれば、下のスクリプトが並べ直す */}
+      {week.map((w) => (
+        <section class={`tw-day wd-${w.wd}${w.list.length ? '' : ' empty-day'}`}>
+          <h2><span class="tw-head" data-ja={w.head} data-en={w.headEn}>{w.head}</span><span class="tw-sub" data-ja={w.sub} data-en={w.subEn}>{w.sub}</span><span class="tw-count">{w.list.length ? `${w.list.length}件` : ''}</span></h2>
+          <div class="tw-list">{w.list.map((x) => <TwItem {...x} />)}</div>
+          <p class="tw-none" data-ja="この日の掲載イベントはまだありません。" data-en="Nothing listed for this day yet.">この日の掲載イベントはまだありません。</p>
+        </section>
+      ))}
+    </div>
 
     <template id="tw-pool">
-      {items.map(({ e, venue, date }) => (
-        <a
-          class:list={['tw-item', { self: e.data.organizer.self }]}
-          href={eventUrl(e)}
-          data-tw
-          data-date={date}
-          data-time={startTime(e) || '99:99'}
-          data-self={e.data.organizer.self ? '1' : '0'}
-          data-pref={venue.prefecture ?? ''}
-          data-type={e.data.type}
-          data-beginner={beginnerOk(e) ? '1' : '0'}
-          data-walkin={e.data.entry.required ? '0' : '1'}
-        >
-          <span class="tw-time">{e.data.time ? e.data.time.split('〜')[0] : ''}</span>
-          <span class="tw-main">
-            <span class="event-tags">
-              <span class={`etag etag-${e.data.type}`} data-ja={EVENT_TYPES[e.data.type].ja} data-en={EVENT_TYPES[e.data.type].en}>{EVENT_TYPES[e.data.type].ja}</span>
-              {e.data.organizer.self && <span class="etag etag-self" data-ja="Pickleball Tokyo 主催" data-en="By Pickleball Tokyo">Pickleball Tokyo 主催</span>}
-              {e.data.level && beginnerOk(e) && <span class="etag etag-level" data-ja={LEVELS[e.data.level].ja} data-en={LEVELS[e.data.level].en}>{LEVELS[e.data.level].ja}</span>}
-              {!e.data.entry.required && <span class="etag etag-level" data-ja="予約不要" data-en="No booking">予約不要</span>}
-            </span>
-            <span class="tw-title">{e.data.title}</span>
-            <span class="tw-where">{venue.prefecture && <span data-ja={PREFECTURES[venue.prefecture].ja} data-en={PREFECTURES[venue.prefecture].en}>{PREFECTURES[venue.prefecture].ja}</span>}{venue.area ? `${venue.area}・` : ''}{venue.name}{e.data.price && <span class="tw-price">{e.data.price}</span>}</span>
-          </span>
-          <span class="tw-go" aria-hidden="true">›</span>
-        </a>
-      ))}
-      {sessionItems.map(({ c, s, date }) => (
-        <a
-          class="tw-item"
-          href={courtUrl(c)}
-          data-tw
-          data-date={date}
-          data-time={(s.time.match(/\d{1,2}:\d{2}/)?.[0] ?? '99:99').padStart(5, '0')}
-          data-self="0"
-          data-pref={c.data.prefecture}
-          data-type={s.type}
-          data-beginner={s.beginner ? '1' : '0'}
-          data-walkin={s.walkin ? '1' : '0'}
-        >
-          <span class="tw-time">{s.time.split('〜')[0]}</span>
-          <span class="tw-main">
-            <span class="event-tags">
-              <span class={`etag etag-${s.type}`} data-ja={EVENT_TYPES[s.type].ja} data-en={EVENT_TYPES[s.type].en}>{EVENT_TYPES[s.type].ja}</span>
-              <span class="etag etag-level" data-ja="定期開催" data-en="Regular">定期開催</span>
-              {s.beginner && <span class="etag etag-level" data-ja="初心者OK" data-en="Beginner OK">初心者OK</span>}
-              {s.walkin && <span class="etag etag-level" data-ja="予約不要" data-en="No booking">予約不要</span>}
-            </span>
-            <span class="tw-title">{s.title}</span>
-            <span class="tw-where"><span data-ja={PREFECTURES[c.data.prefecture].ja} data-en={PREFECTURES[c.data.prefecture].en}>{PREFECTURES[c.data.prefecture].ja}</span>{c.data.area.ja}・{c.data.name}{s.price && <span class="tw-price">{s.price}</span>}</span>
-          </span>
-          <span class="tw-go" aria-hidden="true">›</span>
-        </a>
-      ))}
+      {all.map((x) => <TwItem {...x} />)}
     </template>
 
     <section class="event-bands">
@@ -149,6 +126,7 @@ const prefs = (Object.keys(PREFECTURES) as (keyof typeof PREFECTURES)[]).filter(
 
   // 7日分の枠を作って、イベントを振り分ける
   const wrap = document.getElementById('tw-days')!;
+  wrap.innerHTML = ''; // 最初のHTML（ビルドした日の7日分）は、見た人の今日で作り直す
   const pool = (document.getElementById('tw-pool') as HTMLTemplateElement).content;
   const all = [...pool.querySelectorAll<HTMLElement>('[data-tw]')];
   const sections = days.map((d, i) => {

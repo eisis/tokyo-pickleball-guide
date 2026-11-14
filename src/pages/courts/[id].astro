@@ -41,8 +41,31 @@ const jsonLd = {
       ...(d.image ? { image: new URL(d.image, SITE.url).href } : {}),
       address: { '@type': 'PostalAddress', addressRegion: pref, addressCountry: 'JP', ...(d.address ? { streetAddress: d.address } : {}) },
       ...(d.location ? { geo: { '@type': 'GeoCoordinates', latitude: d.location.lat, longitude: d.location.lng } } : {}),
-      amenityFeature: d.environment.map((e) => ({ '@type': 'LocationFeatureSpecification', name: ENVIRONMENTS[e].ja, value: true })),
+      amenityFeature: [
+        ...d.environment.map((e) => ({ '@type': 'LocationFeatureSpecification', name: ENVIRONMENTS[e].ja, value: true })),
+        ...(hasRental(court) ? [{ '@type': 'LocationFeatureSpecification', name: '道具のレンタル', value: true }] : []),
+        ...(d.courts ? [{ '@type': 'LocationFeatureSpecification', name: 'コート面数', value: d.courts }] : []),
+      ],
       hasMap: mapUrl(court),
+      // 料金・時間・行き方・予約先も、書いてあるものだけ機械が読める形で出す
+      ...(d.price ? { priceRange: d.price } : {}),
+      // 営業時間は自由な書き方なので openingHours（決まった書式）ではなく、アクセスと一緒に項目として出す
+      ...(d.hours || d.access ? { additionalProperty: [
+        ...(d.access ? [{ '@type': 'PropertyValue', name: 'アクセス', value: d.access.ja }] : []),
+        ...(d.hours ? [{ '@type': 'PropertyValue', name: '営業時間', value: d.hours }] : []),
+      ] } : {}),
+      ...(d.category === 'public' ? { publicAccess: true } : {}),
+      ...(d.booking.label === 'book' && !closed ? { potentialAction: { '@type': 'ReserveAction', target: d.booking.url } } : {}),
+    },
+    {
+      '@type': 'WebPage',
+      '@id': pageUrl,
+      url: pageUrl,
+      name: `${d.area.ja} ピックルボール｜${d.name}の料金・予約・アクセス`,
+      about: { '@id': `${pageUrl}#place` },
+      inLanguage: 'ja',
+      dateModified: ymd(d.updatedAt),
+      isPartOf: { '@id': `${SITE.url}/#website` },
     },
     {
       '@type': 'BreadcrumbList',

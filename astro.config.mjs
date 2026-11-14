@@ -32,10 +32,36 @@ const hideFromSitemap = (page) => {
   return false;
 };
 
+// サイトマップの更新日（lastmod）：コート・イベント・記事は、ファイルに書いた確認日・更新日を使う
+const lastmodOf = (dir, key) => {
+  const map = new Map();
+  for (const f of readdirSync(dir).filter((f) => f.endsWith('.md') && !f.startsWith('_'))) {
+    const t = readFileSync(`${dir}/${f}`, 'utf8');
+    const v = key.map((k) => t.match(new RegExp(`^${k}:\\s*(\\d{4}-\\d{2}-\\d{2})`, 'm'))?.[1]).find(Boolean);
+    if (v) map.set(f.replace(/\.md$/, ''), v);
+  }
+  return map;
+};
+const LASTMOD = {
+  courts: lastmodOf('./src/content/courts', ['updatedAt']),
+  events: lastmodOf('./src/content/events', ['updatedAt']),
+  blog: lastmodOf('./src/content/posts', ['updatedAt', 'publishedAt']),
+};
+
 export default defineConfig({
   site: 'https://www.pickleball-tokyo.com',
   // 準備中で非公開のページはサイトマップに載せない（公開するときはここから外す）
-  integrations: [sitemap({ filter: (page) => !hideFromSitemap(page) })],
+  integrations: [
+    sitemap({
+      filter: (page) => !hideFromSitemap(page),
+      serialize(item) {
+        const m = new URL(item.url).pathname.match(/^\/(courts|events|blog)\/([^/]+)\/$/);
+        const d = m && LASTMOD[m[1]].get(decodeURIComponent(m[2]));
+        if (d) item.lastmod = new Date(d + 'T00:00:00+09:00').toISOString();
+        return item;
+      },
+    }),
+  ],
   markdown: {
     rehypePlugins: [rehypeArticle], // 記事のボックス・写真の説明・表（src/lib/rehype-article.mjs）
   },

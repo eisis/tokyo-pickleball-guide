@@ -1,0 +1,66 @@
+---
+// 「今週どこで打てる？」の1行。イベント（events）と、施設の定期開催の枠（コートの sessions）の両方に使う
+import { EVENT_TYPES, LEVELS, eventUrl, beginnerOk, startTime, type Event, type Venue } from '../lib/events';
+import { PREFECTURES, courtUrl, type Court } from '../lib/courts';
+
+type Props =
+  | { kind: 'event'; e: Event; venue: Venue; date: string }
+  | { kind: 'session'; c: Court; s: Court['data']['sessions'][number]; date: string };
+const p = Astro.props;
+---
+
+{p.kind === 'event' ? (() => { const { e, venue, date } = p; return (
+
+        <a
+          class:list={['tw-item', { self: e.data.organizer.self }]}
+          href={eventUrl(e)}
+          data-tw
+          data-date={date}
+          data-time={startTime(e) || '99:99'}
+          data-self={e.data.organizer.self ? '1' : '0'}
+          data-pref={venue.prefecture ?? ''}
+          data-type={e.data.type}
+          data-beginner={beginnerOk(e) ? '1' : '0'}
+          data-walkin={e.data.entry.required ? '0' : '1'}
+        >
+          <span class="tw-time">{e.data.time ? e.data.time.split('〜')[0] : ''}</span>
+          <span class="tw-main">
+            <span class="event-tags">
+              <span class={`etag etag-${e.data.type}`} data-ja={EVENT_TYPES[e.data.type].ja} data-en={EVENT_TYPES[e.data.type].en}>{EVENT_TYPES[e.data.type].ja}</span>
+              {e.data.organizer.self && <span class="etag etag-self" data-ja="Pickleball Tokyo 主催" data-en="By Pickleball Tokyo">Pickleball Tokyo 主催</span>}
+              {e.data.level && beginnerOk(e) && <span class="etag etag-level" data-ja={LEVELS[e.data.level].ja} data-en={LEVELS[e.data.level].en}>{LEVELS[e.data.level].ja}</span>}
+              {!e.data.entry.required && <span class="etag etag-level" data-ja="予約不要" data-en="No booking">予約不要</span>}
+            </span>
+            <span class="tw-title">{e.data.title}</span>
+            <span class="tw-where">{venue.prefecture && <span data-ja={PREFECTURES[venue.prefecture].ja} data-en={PREFECTURES[venue.prefecture].en}>{PREFECTURES[venue.prefecture].ja}</span>}{venue.area ? `${venue.area}・` : ''}{venue.name}{e.data.price && <span class="tw-price">{e.data.price}</span>}</span>
+          </span>
+          <span class="tw-go" aria-hidden="true">›</span>
+        </a>
+); })() : (() => { const { c, s, date } = p; return (
+
+        <a
+          class="tw-item"
+          href={courtUrl(c)}
+          data-tw
+          data-date={date}
+          data-time={(s.time.match(/\d{1,2}:\d{2}/)?.[0] ?? '99:99').padStart(5, '0')}
+          data-self="0"
+          data-pref={c.data.prefecture}
+          data-type={s.type}
+          data-beginner={s.beginner ? '1' : '0'}
+          data-walkin={s.walkin ? '1' : '0'}
+        >
+          <span class="tw-time">{s.time.split('〜')[0]}</span>
+          <span class="tw-main">
+            <span class="event-tags">
+              <span class={`etag etag-${s.type}`} data-ja={EVENT_TYPES[s.type].ja} data-en={EVENT_TYPES[s.type].en}>{EVENT_TYPES[s.type].ja}</span>
+              <span class="etag etag-level" data-ja="定期開催" data-en="Regular">定期開催</span>
+              {s.beginner && <span class="etag etag-level" data-ja="初心者OK" data-en="Beginner OK">初心者OK</span>}
+              {s.walkin && <span class="etag etag-level" data-ja="予約不要" data-en="No booking">予約不要</span>}
+            </span>
+            <span class="tw-title">{s.title}</span>
+            <span class="tw-where"><span data-ja={PREFECTURES[c.data.prefecture].ja} data-en={PREFECTURES[c.data.prefecture].en}>{PREFECTURES[c.data.prefecture].ja}</span>{c.data.area.ja}・{c.data.name}{s.price && <span class="tw-price">{s.price}</span>}</span>
+          </span>
+          <span class="tw-go" aria-hidden="true">›</span>
+        </a>
+); })()}
