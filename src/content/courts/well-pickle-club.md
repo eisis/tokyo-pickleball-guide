@@ -23,7 +23,7 @@ bookingSystem: "aero.lan.jp（サービス名は未特定）" # 社内用メモ�
 location: { lat: 35.790924, lng: 139.852478 }
 mapQuery: WELL PICKLE CLUB 葛飾
 openedAt: 2025-05-05
-updatedAt: 2026-10-17
+updatedAt: 2026-11-21
 sources:
   - https://pickleclub.well-k.jp/
   - https://pickleclub.well-k.jp/rental/

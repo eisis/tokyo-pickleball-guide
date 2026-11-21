@@ -22,7 +22,7 @@ booking: { url: "https://reserva.be/viptop", label: book }
 bookingSystem: "RESERVA" # 社内用メモ：予約に使っているシステム（サイトには出さない）
 location: { lat: 35.673431, lng: 139.819702 }
 mapQuery: VIPインドアピックルボールクラブ東陽町
-updatedAt: 2026-10-17
+updatedAt: 2026-11-21
 sources:
   - https://viptop.jp/toyocho-pickleball/
 ---

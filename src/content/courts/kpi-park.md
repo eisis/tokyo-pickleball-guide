@@ -17,7 +17,7 @@ booking: { url: "https://yoyaku.labola.jp/r/shop/3302/calendar_week/2026/10/12/?
 bookingSystem: "LaBOLA" # 社内用メモ：予約に使っているシステム（サイトには出さない）
 location: { lat: 35.44065, lng: 139.55614 }
 mapQuery: KPI Park Yokohama
-updatedAt: 2026-11-14
+updatedAt: 2026-11-21
 reviewBy: 2026-11-24
 sources:
   - https://local-media.heteml.net/?p=33409

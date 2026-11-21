@@ -6,6 +6,7 @@ environment: [indoor]   # 屋根のあるガレリア内（公式発表「天候
 category: dedicated
 courts: 2
 address: 東京都千代田区丸の内2-7-3 東京ビルTOKIA 1階 ガレリア（西側貫通通路）
+access: { ja: 東京駅丸の内南口から徒歩約3分, en: "About 3 min walk from Tokyo Station (Marunouchi South Exit)" }
 hours: "7:00〜22:00"
 price: 1面1時間 ¥7,000〜（平日18時以降 ¥8,000、土日祝 ¥10,000）
 rental: { status: paid, note: パドル・シューズ 各1時間550円（OneASICS会員・アシックス公式LINE追加でシューズ無料） }
@@ -21,11 +22,12 @@ location: { lat: 35.679085, lng: 139.764679 }  # 国土地理院の住所検索�
 mapQuery: 東京ビルTOKIA
 openedAt: 2026-10-31
 closesAt: 2026-12-27
-updatedAt: 2026-10-24
+updatedAt: 2026-11-21
 sources:
   - https://prtimes.jp/main/html/rd/p/000000339.000020802.html
+  - https://rsv.pickle-one.com/pb1-asics-tokia
 ---
 
 アシックスが丸の内の東京ビルTOKIA 1階ガレリアに開く期間限定のピックルボールコートです。営業は2026年10月31日から12月27日までで、屋根のあるガレリア内にあるため天候を気にせずプレーできます。
 
-予約は RESERVE ONE での事前予約・事前決済（クレジットカードのみ、1時間単位）です。キャンセルは利用日の3日前まで無料で、2日前からは利用料の全額がかかります。パドルとシューズは会場で借りられ、支払いはキャッシュレスのみです。
+予約は RESERVE ONE での事前予約・事前決済（クレジットカードのみ、1時間単位）です。キャンセルは利用日の3日前まで無料で、2日前からは利用料の全額がかかります。パドルとシューズは会場で借りられ、支払いはキャッシュレスのみです。12月分の予約は11月16日から受け付けています。
