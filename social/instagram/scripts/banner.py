@@ -12,6 +12,10 @@ NAVY = '#0e3452'; SUN = '#ffd678'; CORAL = '#ff6b4a'; WHITE = '#ffffff'; PURPLE 
 # 全部同じ型：見出しは88pxで1行8文字まで・3行まで、右の絵は同じ枠（680×680）に収める
 # 表紙のファイル、切り抜く範囲（元画像の座標）、背景色（Noneなら表紙の左上の色）、文字色、札、見出し、ひとこと
 B = {
+  'pro-paddles': dict(src='pro-paddles-art.jpg', crop=(330, 360, 1080, 770), full=True,
+      bg='#0B1419', fg=WHITE, tags=[('GEAR FILE 01', '#C9F23D', '#111111')],
+      lines=[[('世界のトップは、', WHITE)], [('何で', '#C9F23D'), ('打っている？', WHITE)]],
+      sub='男女トップ10、20人のパドル'),
   'ben-johns': dict(src='ben-johns.jpg', crop=(0, 95, 1080, 685), full=True,
       bg='#0F0F0F', fg=WHITE, tags=[('PLAYER FILE 01', '#D8FF3A', '#0F0F0F')],
       lines=[[('99大会で、', WHITE)], [('99回の', '#D8FF3A')], [('表彰台', '#D8FF3A')]],
