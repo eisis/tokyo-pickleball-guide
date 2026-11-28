@@ -81,6 +81,8 @@ const posts = defineCollection({
     author: z.string().default('Pickleball Tokyo 編集部'),
     courts: z.array(z.string()).default([]), // 記事で紹介するコートのファイル名（関連リンクを出す）
     draft: z.boolean().default(false), // trueの間は公開しない
+    // 記事で話題にした道具を通販サイトで探せるリンク（PR）。label=見出し、keyword=検索語、note=ひとこと
+    gear: z.array(z.object({ label: z.string(), keyword: z.string(), note: z.string().optional() })).max(4).default([]),
   }),
 });
 

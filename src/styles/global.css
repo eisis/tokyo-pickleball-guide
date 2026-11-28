@@ -720,3 +720,22 @@ html[lang="en"] .hero h1 { font-family: var(--display); font-weight: 800; letter
 .stat .stat-cap { margin: 8px 0 0; font-size: .95rem; font-weight: 700; color: #d8ecf8; line-height: 1.6; }
 .en-only-note { margin: 0; padding: 10px 20px; background: var(--foam); border-bottom: 1px solid var(--line); font-size: .85rem; color: var(--ink-soft); text-align: center; }
 .en-only-note a { color: var(--teal-dark); font-weight: 700; }
+
+/* ===== 広告・PR（記事の中の色や角丸に合わせ、本文より目立たせない） ===== */
+.pr-note { margin: 0 0 18px; font-size: .8rem; color: var(--ink-soft); }
+.pr-badge { display: inline-block; font-size: .7rem; font-weight: 700; letter-spacing: .04em; color: var(--ink-soft); border: 1px solid var(--line); border-radius: 6px; padding: 1px 7px; background: #fff; }
+.gear { margin: 32px 0 8px; padding: 18px 20px; background: var(--foam); border: 1px solid var(--line); border-radius: var(--radius-sm); }
+.gear-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+.gear-title { margin: 0; font-weight: 700; color: var(--navy); font-size: .98rem; }
+.gear-list { list-style: none; margin: 0; padding: 0; }
+.gear-list li { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 12px 0; border-top: 1px solid var(--line); }
+.gear-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.gear-label { font-weight: 700; color: var(--ink); font-size: .92rem; }
+.gear-note { font-size: .8rem; color: var(--ink-soft); }
+.gear-links { display: flex; gap: 8px; flex-wrap: wrap; }
+.gear-links a { display: inline-block; font-size: .82rem; font-weight: 700; text-decoration: none; color: var(--teal-dark); background: #fff; border: 1px solid var(--line); border-radius: 999px; padding: 6px 14px; white-space: nowrap; }
+.gear-links a:hover { border-color: var(--teal); }
+.gear-foot { margin: 10px 0 0; font-size: .75rem; color: var(--ink-soft); }
+.ad-slot { max-width: 760px; margin: 40px auto 8px; padding: 0 16px; min-height: 280px; }
+.ad-label { margin: 0 0 6px; font-size: .7rem; color: var(--ink-soft); letter-spacing: .04em; }
+.footer-aff { font-size: .75rem; color: var(--ink-soft); }

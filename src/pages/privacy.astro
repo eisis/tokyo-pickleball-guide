@@ -2,10 +2,12 @@
 // プライバシーポリシー（/privacy/）。内容を変えたら「最終改定日」も更新する
 import Base from '../layouts/Base.astro';
 import { SITE } from '../lib/site';
+import { ADS, AFF } from '../lib/monetize';
 
 const contactEmail = 'info@pickleball-tokyo.com';
 const enacted = '2026年10月16日';
-const revised = '2026年10月19日';
+const revised = '2026年11月28日';
+const affNames = [AFF.amazonTag && 'Amazonアソシエイト・プログラム', AFF.rakutenId && '楽天アフィリエイト'].filter(Boolean);
 ---
 
 <Base title="プライバシーポリシー" description={`${SITE.name} における個人情報の取り扱いについて。`}>
@@ -39,12 +41,28 @@ const revised = '2026年10月19日';
         <li>Cloudflare Turnstile（迷惑投稿の防止）</li>
         <li>Vercel（サイトの公開・運用）</li>
         <li>Google アナリティクス（アクセス解析）</li>
+        {ADS.client && <li>Google AdSense（広告の配信）</li>}
+        {affNames.map((n) => <li>{n}（商品の紹介）</li>)}
       </ul>
 
       <h2>5. アクセス解析ツールについて</h2>
       <p>当サイトでは、サイトの利用状況を把握するために Google アナリティクスを利用しています。Google アナリティクスは Cookie を使用して、閲覧したページ・滞在時間・おおよその地域・端末の種類などの情報を収集します。これらの情報に個人を特定する情報は含まれません。収集された情報は Google のプライバシーポリシーに基づいて管理されます。</p>
       <p>データの収集を望まない場合は、ブラウザの設定で Cookie を無効にするか、<a href="https://tools.google.com/dlpage/gaoptout?hl=ja" target="_blank" rel="noopener">Google アナリティクス オプトアウト アドオン</a>をご利用ください。詳しくは <a href="https://policies.google.com/technologies/partner-sites?hl=ja" target="_blank" rel="noopener">Google のサービスを使用するサイトやアプリから収集した情報の Google による使用</a>をご覧ください。</p>
-      <p>今後、広告配信のサービスを導入する場合は、本ポリシーにその内容を追記します。</p>
+      <h2 id="ads">広告について</h2>
+      {!ADS.client && affNames.length === 0 && <p>現在、当サイトに広告は掲載していません。広告配信のサービスを導入する場合は、本ポリシーにその内容を追記します。</p>}
+      {ADS.client && (
+        <>
+          <p>当サイトは、第三者配信の広告サービス Google AdSense を利用しています。Google などの第三者配信事業者は Cookie を使用して、ユーザーが当サイトや他のサイトに過去にアクセスした際の情報に基づいて広告を配信します。Google は広告 Cookie を使用することにより、当サイトや他のサイトへのアクセス情報に基づいて、Google やそのパートナーが適切な広告を表示できるようにしています。</p>
+          <p>パーソナライズ広告は、<a href="https://adssettings.google.com/" target="_blank" rel="noopener">Google の広告設定</a>で無効にできます。また、<a href="https://www.aboutads.info/" target="_blank" rel="noopener">www.aboutads.info</a> にアクセスすれば、第三者配信事業者がパーソナライズ広告に使用する Cookie を無効にできます。詳しくは <a href="https://policies.google.com/technologies/ads?hl=ja" target="_blank" rel="noopener">Google の広告に関するポリシー</a>をご覧ください。</p>
+          <p>広告は、記事ページの下部など本文と区別できる場所に「広告」と表示して掲載しています。</p>
+        </>
+      )}
+      {affNames.length > 0 && (
+        <>
+          <p>当サイトは、{affNames.join('・')}に参加しています。記事の中の「PR」と表示した枠のリンクから商品を購入されると、当サイトに紹介料が支払われることがあります。紹介料の有無によって、コートの掲載内容や記事の評価を変えることはありません。</p>
+          {AFF.amazonTag && <p>Amazonのアソシエイトとして、{SITE.name}は適格販売により収入を得ています。</p>}
+        </>
+      )}
 
       <h2>6. 保管と管理</h2>
       <p>取得した個人情報は、漏えいや紛失を防ぐよう適切に管理し、利用目的に必要な期間保管したのち削除します。</p>

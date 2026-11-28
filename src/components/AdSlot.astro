@@ -1,0 +1,16 @@
+---
+// 表示広告の枠（Google AdSense）。記事の一番下など、決めた場所にだけ置く（自動広告は使わない）。
+// ID が入っていないあいだは何も出さない
+import { ADS } from '../lib/monetize';
+interface Props { slot: string }
+const { slot } = Astro.props;
+const show = Boolean(ADS.client && slot);
+---
+{show && (
+  <aside class="ad-slot" aria-label="広告">
+    <p class="ad-label">広告</p>
+    <ins class="adsbygoogle" style="display:block" data-ad-client={ADS.client} data-ad-slot={slot} data-ad-format="auto" data-full-width-responsive="true"></ins>
+    <script is:inline async src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADS.client}`} crossorigin="anonymous"></script>
+    <script is:inline>(window.adsbygoogle = window.adsbygoogle || []).push({});</script>
+  </aside>
+)}

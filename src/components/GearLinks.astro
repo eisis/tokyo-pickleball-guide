@@ -1,0 +1,32 @@
+---
+// 記事で話題にした道具を、通販サイトで探せるリンク（アフィリエイト）。
+// 特定の商品はすすめず、検索結果へ案内する。PR であることを必ず表示する
+import { amazonSearchUrl, rakutenSearchUrl, affiliateEnabled } from '../lib/monetize';
+interface Props { items: { label: string; keyword: string; note?: string }[] }
+const items = Astro.props.items
+  .map((it) => ({ ...it, amazon: amazonSearchUrl(it.keyword), rakuten: rakutenSearchUrl(it.keyword) }))
+  .filter((it) => it.amazon || it.rakuten);
+---
+{affiliateEnabled && items.length > 0 && (
+  <section class="gear" aria-label="道具を探す">
+    <div class="gear-head">
+      <p class="gear-title">自分の道具をそろえたくなったら</p>
+      <span class="pr-badge">PR</span>
+    </div>
+    <ul class="gear-list">
+      {items.map((it) => (
+        <li>
+          <div class="gear-text">
+            <span class="gear-label">{it.label}</span>
+            {it.note && <span class="gear-note">{it.note}</span>}
+          </div>
+          <div class="gear-links">
+            {it.amazon && <a href={it.amazon} target="_blank" rel="sponsored noopener">Amazonで探す</a>}
+            {it.rakuten && <a href={it.rakuten} target="_blank" rel="sponsored noopener">楽天市場で探す</a>}
+          </div>
+        </li>
+      ))}
+    </ul>
+    <p class="gear-foot">リンク先で購入されると、当サイトに紹介料が入ることがあります。<a href="/privacy/#ads">広告について</a></p>
+  </section>
+)}

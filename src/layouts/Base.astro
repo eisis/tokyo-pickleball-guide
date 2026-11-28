@@ -7,6 +7,7 @@ import { PREFECTURES } from '../lib/courts';
 const prefLinks = (Object.keys(PREFECTURES) as (keyof typeof PREFECTURES)[]).map((p) => ({ href: `/areas/${p}/`, ...PREFECTURES[p] }));
 import SnsLinks from '../components/SnsLinks.astro';
 import Analytics from '@vercel/analytics/astro';
+import { AFF } from '../lib/monetize';
 
 interface Props {
   title: string;
@@ -132,6 +133,7 @@ const siteLd = {
 
       </div>
       <p class="footer-note" data-ja="料金・営業時間は変わることがあります。最新情報は各施設の公式サイトでご確認ください。" data-en="Prices and hours may change. Please check each facility's official site.">料金・営業時間は変わることがあります。最新情報は各施設の公式サイトでご確認ください。</p>
+      {AFF.amazonTag && <p class="footer-note footer-aff">Amazonのアソシエイトとして、{SITE.name}は適格販売により収入を得ています。</p>}
     </footer>
 
     <script is:inline>

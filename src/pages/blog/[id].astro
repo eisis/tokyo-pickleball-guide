@@ -6,6 +6,9 @@ import Base from '../../layouts/Base.astro';
 import SnsLinks from '../../components/SnsLinks.astro';
 import CourtCard from '../../components/CourtCard.astro';
 import PostCard from '../../components/PostCard.astro';
+import GearLinks from '../../components/GearLinks.astro';
+import AdSlot from '../../components/AdSlot.astro';
+import { ADS, affiliateEnabled } from '../../lib/monetize';
 import { SITE, ldJson } from '../../lib/site';
 import { ENVIRONMENTS, rentalText, reservationText, isClosed } from '../../lib/courts';
 import {
@@ -41,6 +44,8 @@ const cat = POST_CATEGORIES[d.category];
 // 本文にも同じ写真があるときは、上に重ねて出さない
 const showCover = cover && !(post.body ?? '').includes(cover.src);
 const url = new URL(postUrl(post), SITE.url).href;
+// 道具のリンク（PR）が出る記事は、冒頭で広告を含むことを示す（ステマ規制への対応）
+const hasPr = affiliateEnabled && d.gear.length > 0;
 const shareText = encodeURIComponent(`${d.title} | ${SITE.name}`);
 
 const jsonLd = {
@@ -90,6 +95,7 @@ const jsonLd = {
         <span>{readingMinutes(post)}分で読めます</span>
         <span>{d.author}</span>
       </p>
+      {hasPr && <p class="pr-note"><span class="pr-badge">PR</span> この記事には広告（アフィリエイトリンク）を含みます</p>}
     </header>
 
     {showCover && (
@@ -127,6 +133,7 @@ const jsonLd = {
 
       <div class="article-body">
         <div class="prose"><Content /></div>
+        <GearLinks items={d.gear} />
 
         <footer class="article-foot">
           {d.tags.length > 0 && (
@@ -159,6 +166,8 @@ const jsonLd = {
         <div class="post-cards">{related.map((p) => <PostCard post={p} />)}</div>
       </section>
     )}
+
+    <AdSlot slot={ADS.articleSlot} />
 
     <p class="article-back"><a href="/blog/">← 記事一覧へ</a></p>
   </article>
