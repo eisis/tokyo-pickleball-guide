@@ -19,8 +19,8 @@ bookingSystem: "自社サイト（reserve.sansan-pickleball.com・システム�
 location: { lat: 35.72527, lng: 139.72017 }
 mapQuery: Sansan Pickleball Court Ikebukuro
 openedAt: 2026-07-10
-updatedAt: 2026-11-14
-reviewBy: 2026-12-01
+updatedAt: 2026-11-28
+reviewBy: 2026-12-05
 sources:
   - https://sansan-pickleball.com/
   - https://sansan-pickleball.com/pricing/

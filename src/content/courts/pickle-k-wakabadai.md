@@ -10,7 +10,7 @@ access: { ja: 京王相模原線 若葉台駅から徒歩3分, en: "3 min walk f
 hours: "9:00〜22:00"
 rental: { status: paid, note: パドル400円・シューズ200円 }
 reservation: [online, walkin]
-price: 1面1時間 ¥4,000〜（ビジター）
+price: 1面1時間 ¥4,000〜（ビジター・事前オンライン決済）
 description:
   ja: ショッピングセンターの中にある屋内4面のコート。駅から近く、ショップとスクールも併設です。
   en: Four indoor courts inside a shopping center near Wakabadai Station, with a shop and school.
@@ -23,15 +23,16 @@ bookingSystem: "自社サイト（reserve.andpickle.jp・システム名は未�
 location: { lat: 35.620407, lng: 139.471176 }
 mapQuery: Pickle K フレスポ若葉台
 openedAt: 2026-09-01
-updatedAt: 2026-11-14
-reviewBy: 2026-12-01
+updatedAt: 2026-11-28
 sources:
   - https://andpickle.jp/PickleK/
   - https://prtimes.jp/main/html/rd/p/000000002.000185955.html
+  - https://andpickle.jp/PickleK/announcements/2026-11-12-price-revision/
+  - https://andpickle.jp/PickleK/announcements/2026-11-09-openplay-schedule/
 ---
 
 2026年9月、フレスポ若葉台の2階にできた屋内コートです。4面あり、若葉台駅から徒歩3分で、買い物のついでにも寄れます。当日受付もしています。
 
 コートレンタルはビジターで1面1時間4,000円からです。1人で参加できるオープンプレーや、レベル別のレッスン（体験レッスンあり）、月2回ほどの大会やイベントもあります。パドルは400円、シューズは200円で借りられるので、手ぶらでも始められます。
 
-なお、12月から店舗で支払う料金が500円上がると案内されています。
+12月1日の利用分からは、店舗で支払う場合だけ料金に500円が加算されます。予約時にオンラインで先に払えば、これまでと同じ料金です。道具のレンタル料は変わりません。また12月からは、水曜夜に2面で開いていた目安レベル4〜5のオープンプレーが木曜夜に移り、水曜夜はレベル指定のない1面での開催になります。

@@ -14,12 +14,13 @@ description:
   en: Pickleball trial sessions in the main arena, 1,000 yen per person.
 booking: { url: "https://shisetsu.mizuno.jp/m-7506-0001", label: info }
 mapQuery: メタックス体育館はだの
-updatedAt: 2026-11-14
-reviewBy: 2026-12-01
+updatedAt: 2026-11-28
+reviewBy: 2027-01-19
 sources:
   - https://bizmanager.jp/user/event/14524?office=205
+  - https://bizmanager.jp/user/event/list_view?office=205
 ---
 
-秦野市総合体育館のメインアリーナで、ピックルボールの体験会が開かれています。火曜の13:15〜14:45で、定員18名、参加費は1人1,000円です。対象は高校生以上です。
+秦野市総合体育館のメインアリーナで、ピックルボールの体験会が開かれています。火曜の13:15〜14:45で、定員18名、参加費は1人1,000円です。対象は高校生以上です。今後は12月15日と2027年1月19日（いずれも火曜）の開催が案内されていて、どちらもキャンセル待ちが出るほどの人気です。
 
 申し込みはホームページ、窓口、電話のいずれかで、支払いは1階受付横の券売機で行います。持ち物は動きやすい服装、タオル、飲み物、室内シューズです。
